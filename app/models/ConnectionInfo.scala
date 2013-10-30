@@ -1,6 +1,6 @@
 package models
 
-import models.ScreenPosition.ScreenPosition
+import consts.ScreenPositions.ScreenPosition
 
 /**
  * This object holds information about the entire connection. Each entity with this object

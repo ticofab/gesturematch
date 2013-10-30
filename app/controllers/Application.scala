@@ -4,19 +4,23 @@ import play.api.mvc._
 import scala.concurrent.Future
 import play.api.libs.iteratee.{Concurrent, Iteratee, Enumerator}
 import akka.actor.{ActorRef, ActorSystem}
-import actors.{Input, Setup, HandlingActorFactory}
+import actors._
 import models.RequestToMatch
+import actors.Setup
+import actors.Input
+import scala.Some
 
 object Application extends Controller {
   val system = ActorSystem("screens-system")
+  val matchingActor = system.actorOf(MatcherActor.props)
 
   def requestWS(requestType: String,
                 latitude: Double,
                 longitude: Double,
                 swipeStart: Int,
                 swipeEnd: Int,
-                equalityParam: String) = WebSocket.async {
-
+                payload: String,
+                equalityParam: String): WebSocket[String] = WebSocket.async {
 
     def isRequestValid = {
       // TODO: check more things about parameters
@@ -46,14 +50,16 @@ object Application extends Controller {
 
         // add it to the matcher queue
         val timestamp = System.currentTimeMillis
-        val requestData = new RequestToMatch(latitude, longitude, timestamp, swipeStart, swipeEnd, equalityParam, handlingActor)
+        val requestData = new RequestToMatch(latitude, longitude, timestamp, swipeStart,
+          swipeEnd, equalityParam, payload, handlingActor)
 
+        matchingActor ! NewRequest(requestData)
 
         (in, out)
       } else {
         // we don't like this request.
         val in: Iteratee[String, Unit] = Iteratee.ignore[String]
-        val out = Enumerator.eof
+        val out: Enumerator[String] = Enumerator.eof
         (in, out)
       }
     }

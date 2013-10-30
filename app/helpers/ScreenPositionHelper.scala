@@ -1,23 +1,15 @@
-package models
+package helpers
 
-import models.SwipeMovement._
+import consts.ScreenPositions._
+import consts.SwipeMovements._
+import consts.Areas._
+import scala.Left
+import scala.Right
 
 /**
- * This object provides an abstraction of device positions with respect to each other.
+ * This object is a helper to understand device positions with respect to each other.
  */
-
-// TODO: maybe this would be better being a List or some "more native" scala structure
-object ScreenPosition extends Enumeration {
-  type ScreenPosition = Value
-
-  // unknown position
-  val PositionUnknown, PositionUndetermined = Value
-
-  // values for 2 devices
-  val PositionLeft, PositionRight, PositionTop, PositionBottom = Value
-
-  // values for 4 devices (not taking into account the device orientation) 
-  val PositionTopLeft, PositionTopRight, PositionBottomLeft, PositionBottomRight = Value
+object ScreenPositionHelper {
 
   /*
    * Understands a position given a movement. Attention: for the four-device case, it only works for positions
@@ -98,6 +90,16 @@ object ScreenPosition extends Enumeration {
           case _ => PositionUnknown
         }
       }
+    }
+  }
+
+  def getCorrespondingEntrance(exitArea: Int) = {
+    exitArea match {
+      case Bottom => Top
+      case Top => Bottom
+      case Left => Right
+      case Right => Left
+      case _ => Invalid
     }
   }
 }

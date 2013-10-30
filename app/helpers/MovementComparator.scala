@@ -1,6 +1,6 @@
 package helpers
 
-import models.SwipeMovement._
+import consts.SwipeMovements._
 
 /**
  * Created with IntelliJ IDEA.
