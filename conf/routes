@@ -3,4 +3,9 @@
 # ~~~~
 
 # Home page
-GET     /request/:requestType                         controllers.Application.requestWS(requestType)
+GET     /request/:requestType                         controllers.Application.requestWS(requestType: String,
+                                                                                        latitude: Double,
+                                                                                        longitude: Double,
+                                                                                        swipeStart: Int,
+                                                                                        swipeEnd: Int,
+                                                                                        equalityParam1: String)

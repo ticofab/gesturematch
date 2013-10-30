@@ -9,11 +9,12 @@ import akka.actor.Props
  * Time: 16:06
  */
 object HandlingActorFactory {
-  def getActorProps(requestType: String): Option[Props] = {
+  val PHOTO = "photo"
+  val CONTACT = "contact"
+  def getActorProps(requestType: String): Props = {
     requestType match {
-      case "photo" => Some(PhotoExchangeActor.props)
-      case "contact" => Some(ContactExchangeActor.props)
-      case _ => None
+      case PHOTO => PhotoExchangeActor.props
+      case CONTACT => ContactExchangeActor.props
     }
   }
 }
