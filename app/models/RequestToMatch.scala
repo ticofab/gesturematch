@@ -14,4 +14,5 @@ class RequestToMatch(val latitude: Double,
                      val swipeStart: Int,
                      val swipeEnd: Int,
                      val equalityParam: String,
+                     val payload: String,
                      val handlingActor: ActorRef)

@@ -1,11 +1,10 @@
 package actors
 
 import akka.actor.Actor
-import models.RequestToMatch
+import models.{ScreenPosition, RequestToMatch}
 import helpers.{MovementComparator, RequestListHelper}
 import consts.TimeoutConsts
 import models.SwipeMovement._
-import com.sun.org.apache.bcel.internal.classfile.Unknown
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,8 +22,8 @@ class MatcherActor extends Actor {
     val closeEnough: Boolean = latDiff < 0.01 && lonDiff < 0.01
 
     // check if movements are compatible
-    val mov1: SwipeMovement = MatcherActor.swipesToMovement(r1.swipeStart, r1.swipeEnd)
-    val mov2: SwipeMovement = MatcherActor.swipesToMovement(r1.swipeStart, r2.swipeEnd)
+    val mov1: SwipeMovement = swipesToMovement(r1.swipeStart, r1.swipeEnd)
+    val mov2: SwipeMovement = swipesToMovement(r1.swipeStart, r2.swipeEnd)
     val compatibleMovements: Boolean = MovementComparator.compareMovement(mov1, mov2) != 0
 
     closeEnough && compatibleMovements
@@ -43,7 +42,66 @@ class MatcherActor extends Actor {
   def deliverMatchedMessages(group: List[RequestToMatch]): Unit = {
     val devicesInConnection: Int = group length
 
+    devicesInConnection match {
+      case 4 => deliverMatchedMessagesTo4Group(group)
+      case 2 => deliverMatchedMessagesTo2Group(group)
+    }
+  }
 
+  def deliverMatchedMessagesTo2Group(group: List[RequestToMatch]): Unit = {
+    // the new request
+    val newRequest = group head
+    val mov1 = swipesToMovement(newRequest.swipeStart, newRequest.swipeEnd)
+    val pos1 = ScreenPosition.getPosition(mov1, 2)
+
+    // the existing request
+    val existingRequest = (group tail) head
+    val mov2 = swipesToMovement(existingRequest.swipeStart, existingRequest.swipeEnd)
+    val pos2 = ScreenPosition.getPosition(mov2, 2)
+
+    newRequest.handlingActor ! Matched2(pos1, newRequest.payload, existingRequest.payload)
+    existingRequest.handlingActor ! Matched2(pos2, existingRequest.payload, newRequest.payload)
+  }
+
+  def deliverMatchedMessagesTo4Group(group: List[RequestToMatch]): Unit = {
+    // here I need to understand what's the orientation. the issue could be with movement that end or start in the middle,
+    // as at that point I wouldn't be able to see where they are placed.
+
+    // 1. filter out the one which starts with an inner position
+    val start_rest_partitioned_requests = group partition (request => request.swipeStart == MatcherActor.kViewAreaInner)
+    val first = start_rest_partitioned_requests._1.head
+    val firstMovement = swipesToMovement(first.swipeStart, first.swipeEnd)
+
+    // 2. find second request
+    val secondEntrance = MatcherActor.getCorrespondingEntrance(first.swipeEnd)
+    val second_rest_partitioned_requests = start_rest_partitioned_requests._2 partition (request => request.swipeStart == secondEntrance)
+    val second = second_rest_partitioned_requests._1.head
+
+    // 3. look at what kind of movement it is and understand where the start is
+    val secondMovement = swipesToMovement(second.swipeStart, second.swipeEnd)
+    val firstPosition = ScreenPosition.getCorrespondingStartPosition(secondMovement)
+    val secondPosition = ScreenPosition.getPosition(secondMovement, 4)
+
+    // 4. find final movement
+    val lastPosition = ScreenPosition.getCorrespondingFinalPosition(firstMovement, firstPosition)
+    val last_third_partitioned_requests = second_rest_partitioned_requests._2 partition (request => request.swipeEnd == MatcherActor.kViewAreaInner)
+    val last = last_third_partitioned_requests._1.head
+
+    // 5. find third movement
+    val third = last_third_partitioned_requests._2.head
+    val thirdMovement = swipesToMovement(third.swipeStart, third.swipeEnd)
+    val thirdPosition = ScreenPosition.getPosition(thirdMovement, 4)
+
+    // TODO: setup a logger
+    println(s"1st mov & pos:   ${firstMovement.toString}    ${firstPosition.toString}")
+    println(s"2nd mov & pos:   ${secondMovement.toString}   ${secondPosition.toString}")
+    println(s"3rd mov & pos:   ${thirdMovement.toString}    ${thirdPosition.toString}")
+    println(s"4th pos:         ${lastPosition.toString}\n")
+
+    first.handlingActor ! new Matched4(firstPosition, first.payload, List(second.payload, third.payload, last.payload))
+    second.handlingActor ! new Matched4(secondPosition, second.payload, List(first.payload, third.payload, last.payload))
+    third.handlingActor ! new Matched4(thirdPosition, third.payload, List(first.payload, second.payload, last.payload))
+    last.handlingActor ! new Matched4(lastPosition, last.payload, List(first.payload, second.payload, third.payload))
 
   }
 
@@ -64,14 +122,14 @@ class MatcherActor extends Actor {
       matchedRequests match {
         case None => {
           // If nothing has changed, this is useless for now.
-          RequestListHelper updateCurrentRequests existingRequests
+          RequestListHelper updateCurrentRequests request :: existingRequests
         }
         case Some(group) => {
           // update the requests storage with the churned list
           RequestListHelper updateCurrentRequests (existingRequests diff group)
 
           // Send a matching notification to the actors managing the corresponding devices
-          deliverMatchedMessages(group)
+          deliverMatchedMessages(request :: group)
         }
       }
     }
@@ -86,28 +144,14 @@ object MatcherActor {
   val kViewAreaInner: Int = 4
   val kViewAreaInvalid: Int = 5
 
-  def swipesToMovement(swipeStart: Int, swipeEnd: Int): SwipeMovement = {
-    val swipeValue: Int = swipeStart * 10 + swipeEnd
-    swipeValue match {
-      case 2 => TopLeft
-      case 3 => TopRight
-      case 4 => TopInner
-      case 12 => BottomLeft
-      case 13 => BottomRight
-      case 14 => BottomInner
-      case 20 => LeftTop
-      case 21 => LeftBottom
-      case 24 => LeftInner
-      case 30 => RightTop
-      case 31 => RightBottom
-      case 34 => RightInner
-      case 40 => InnerTop
-      case 41 => InnerBottom
-      case 42 => InnerLeft
-      case 43 => InnerRight
-      case _ => Unknown
+  def getCorrespondingEntrance(exitArea: Int) =
+    exitArea match {
+      case `kViewAreaBottom` => kViewAreaTop
+      case `kViewAreaTop` => kViewAreaBottom
+      case `kViewAreaLeft` => kViewAreaRight
+      case `kViewAreaRight` => kViewAreaLeft
+      case _ => kViewAreaInvalid
     }
-  }
 }
 
 
