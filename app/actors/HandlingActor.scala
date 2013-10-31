@@ -5,7 +5,7 @@ import play.api.libs.iteratee.Enumerator
 import consts.ScreenPositions.ScreenPosition
 
 trait HandlingActor extends Actor {
-  val out: Option[Enumerator[String]] = None
+  var out: Option[Enumerator[String]] = None
 }
 
 case class Setup(out: Enumerator[String])
