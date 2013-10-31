@@ -18,7 +18,7 @@ object Application extends Controller {
   val matchingActor = system.actorOf(MatcherActor.props)
 
   def logRequest(endpoint: String, request: RequestHeader) = {
-    Logger.info(s"aliveTest API call. Request:\n  ${request.remoteAddress} ${request.version} ${request.method} ${request.uri}")
+    Logger.info(s"$endpoint API call. Request:\n  ${request.remoteAddress} ${request.version} ${request.method} ${request.uri}")
   }
 
   def aliveTest = Action {
@@ -57,9 +57,11 @@ object Application extends Controller {
         // setup handling actor
         val handlingActor: ActorRef = system.actorOf(props)
         var channel: Option[Concurrent.Channel[String]] = None
-        val out: Enumerator[String] = Concurrent.unicast(c => channel = Some(c))
+        val out: Enumerator[String] = Concurrent.unicast(c => {
+          channel = Some(c)
+          handlingActor ! Setup(channel)
+        })
 
-        handlingActor ! Setup(channel)
         val in = Iteratee.foreach[String] {
           // pass everything the client sends to its managing actor
           input => handlingActor ! Input(input)

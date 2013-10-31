@@ -20,7 +20,7 @@ class MatcherActor extends Actor {
 
     // check if movements are compatible
     val mov1: SwipeMovement = swipesToMovement(r1.swipeStart, r1.swipeEnd)
-    val mov2: SwipeMovement = swipesToMovement(r1.swipeStart, r2.swipeEnd)
+    val mov2: SwipeMovement = swipesToMovement(r2.swipeStart, r2.swipeEnd)
     val compatibleMovements: Boolean = MovementComparator.compareMovement(mov1, mov2) != 0
 
     // check if equality parameters are the same
@@ -98,7 +98,7 @@ class MatcherActor extends Actor {
 
   def receive: Actor.Receive = {
     case NewRequest(request) => {
-      Logger.info(s"MatcherActor, new request ${request.toString}")
+      Logger.info(s"MatcherActor, new ${request.toString}")
 
       // This operation should be fine, as the MatcherActor is designed to be a single one,
       // therefore there won't be two concurrent accesses to the RequestListHelper?
@@ -126,8 +126,8 @@ class MatcherActor extends Actor {
 
           // Send a matching notification to the actors managing the corresponding devices
           group.length match {
-            case 4 => deliverTo4Group(request :: group)
-            case 2 => deliverTo2Group(request :: group)
+            case 4 => deliverTo4Group(group)
+            case 2 => deliverTo2Group(group)
           }
         }
       }

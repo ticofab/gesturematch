@@ -1,0 +1,89 @@
+<html>
+<head>
+<script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
+</head>
+<body>
+
+<script type="text/javascript">
+
+var myWebSocket, myWebSocket2;
+
+function sendMsg() {
+    var message = document.getElementById("myMessage").value;
+    console.log("sending msg 1: " + message);
+    myWebSocket.send(message);
+}
+
+function sendMsg2() {
+    var message = document.getElementById("myMessage2").value;
+    console.log("sending msg 2: " + message);
+    myWebSocket2.send(message);
+}
+
+function connectToWS() {
+    var endpoint = document.getElementById("endpoint").value;
+
+    myWebSocket = new WebSocket(endpoint);
+    myWebSocket.onmessage = function(event) {
+        console.log("got data: " + event.data);
+    }
+
+    myWebSocket.onopen = function(evt) {
+        console.log("Connection open ...");
+     };
+
+     myWebSocket.onclose = function(evt) {
+        console.log("Connection closed.");
+    };
+}
+
+function connectToWS2() {
+    var endpoint2 = document.getElementById("endpoint2").value;
+
+    myWebSocket2 = new WebSocket(endpoint2);
+    myWebSocket2.onmessage = function(event) {
+        console.log("got data: " + event.data);
+    }
+
+    myWebSocket2.onopen = function(evt) {
+        console.log("Connection open ...");
+    };
+
+    myWebSocket2.onclose = function(evt) {
+        console.log("Connection closed.");
+    };
+}
+
+</script>
+
+TEST WS
+<br><br>
+
+<form>
+device1: <input type="text" id="endpoint" name="endpoint"
+  value="ws://localhost:9000/request?requestType=contact&latitude=12.00&longitude=12.0001&swipeStart=4&swipeEnd=3&payload=ciao&equalityParam1=uno"
+  style="width: 1000px" ><br>
+</form>
+
+<form>
+device2: <input type="text" id="endpoint2" name="endpoint2"
+  value="ws://localhost:9000/request?requestType=contact&latitude=12.00&longitude=12.0001&swipeStart=2&swipeEnd=4&payload=hola&equalityParam1=uno"
+  style="width: 1000px" ><br>
+</form>
+
+<input type="button" onclick="connectToWS()" value="connect device1" />
+<input type="button" onclick="connectToWS2()" value="connect device2" /><br><br>
+
+<form>
+    device1 message: <input type="text" id="myMessage" name="myMessage" value="hey there"> <br>
+</form>
+<input type="button" onclick="sendMsg()" value="Send message dev1" />
+
+<form>
+    device2 message: <input type="text" id="myMessage2" name="myMessage2" value="hey there"><br>
+</form>
+
+<input type="button" onclick="sendMsg2()" value="Send message dev2 " />
+
+</body>
+</html>

@@ -8,14 +8,16 @@ class ContactExchangeActor extends HandlingActor {
     case Setup(channel) => this.channel = channel
 
     case Matched2(myPosition, myPayload, otherPayload) => {
-      Logger.info(s"Actor $self, Matched2() message: $myPosition\n  my payload: $myPayload\n  others   : $otherPayload")
+      Logger.info(s"$self, Matched2() message: $myPosition\n  my payload: $myPayload\n  others    : ${otherPayload._2}")
 
-      channel.foreach(_.push(s"gotcha, you're $myPosition"))
+      channel.foreach(_.push(s"gotcha, you're $myPosition, your payload is $myPayload and the other's payload is ${otherPayload._2}"))
     }
 
     case Matched4(myPosition, myPayload, otherPayloads) => {} // TODO
 
-    case Input(input) => {} // TODO
+    case Input(input) => {
+      Logger.info(s"$self, Input() message: $input")
+    }
   }
 }
 

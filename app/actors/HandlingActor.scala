@@ -10,5 +10,5 @@ trait HandlingActor extends Actor {
 
 case class Setup(channel: Option[Concurrent.Channel[String]])
 case class Input(input: String)
-case class Matched4(position: ScreenPosition, payload: String, otherPayloads: List[(ActorRef, String)])
-case class Matched2(position: ScreenPosition, payload: String, otherPayload: (ActorRef, String))
+case class Matched4(position: ScreenPosition, payload: String, othersInfo: List[(ActorRef, String)])
+case class Matched2(position: ScreenPosition, payload: String, othersInfo: (ActorRef, String))
