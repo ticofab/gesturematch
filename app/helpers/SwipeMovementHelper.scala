@@ -4,6 +4,9 @@ import consts.SwipeMovements._
 
 object SwipeMovementHelper {
 
+  /*
+   * Translates a pair start- / end-swipe into a movement.
+   */
   def swipesToMovement(swipeStart: Int, swipeEnd: Int): SwipeMovement = {
     val swipeValue: Int = swipeStart * 10 + swipeEnd
     swipeValue match {

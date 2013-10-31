@@ -22,4 +22,5 @@ class RequestToMatch(val latitude: Double,
                      val payload: String,
                      val handlingActor: ActorRef) {
   def getServiceInfo: (ActorRef, String) = (handlingActor, payload)
+  override def toString: String = s"Request: $latitude $longitude $timestamp $swipeStart$swipeEnd $equalityParam $handlingActor\n    $payload"
 }

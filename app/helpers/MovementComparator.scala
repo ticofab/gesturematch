@@ -2,12 +2,6 @@ package helpers
 
 import consts.SwipeMovements._
 
-/**
- * Created with IntelliJ IDEA.
- * User: fabiotiriticco
- * Date: 30/10/13
- * Time: 11:20
- */
 object MovementComparator {
   /*
   * This method takes two swipe movements, coming from two different devices, and understands how many devices are
@@ -122,4 +116,98 @@ object MovementComparator {
       case _ => 0
     }
   }
+
+
+  def areMovementsCompatible(mov1: SwipeMovement, mov2: SwipeMovement, ndevices: Int): Boolean = {
+
+    if (ndevices == 2) {
+      val pair: (SwipeMovement, SwipeMovement) = (mov1, mov2)
+      pair match {
+        case (LeftInner, InnerRight) => true
+        case (InnerRight, LeftInner) => true
+        case (RightInner, InnerLeft) => true
+        case (InnerLeft, RightInner) => true
+        case (InnerBottom, TopInner) => true
+        case (TopInner, InnerBottom) => true
+        case (BottomInner, InnerTop) => true
+        case (InnerTop, BottomInner) => true
+        case _ => false
+      }
+    } else if (ndevices == 4) {
+      mov1 match {
+        case LeftInner => mov2 match {
+          case RightBottom | TopRight | BottomRight | RightTop | InnerLeft => true
+          case _ => false
+        }
+        case InnerRight => mov2 match {
+          case LeftBottom | TopLeft | LeftTop | BottomLeft | RightInner => true
+          case _ => false
+        }
+        case RightInner => mov2 match {
+          case LeftBottom | TopLeft | BottomLeft | LeftTop | InnerRight => true
+          case _ => false
+        }
+        case InnerLeft => mov2 match {
+          case RightBottom | TopRight | RightTop | BottomRight | LeftInner => true
+          case _ => false
+        }
+        case InnerBottom => mov2 match {
+          case TopRight | LeftTop | TopLeft | RightTop | BottomInner => true
+          case _ => false
+        }
+        case TopInner => mov2 match {
+          case LeftBottom | BottomRight | RightBottom | BottomLeft | InnerTop => true
+          case _ => false
+        }
+        case BottomInner => mov2 match {
+          case RightTop | TopLeft | LeftTop | TopRight | InnerBottom => true
+          case _ => false
+        }
+        case InnerTop => mov2 match {
+          case BottomRight | LeftBottom | BottomLeft | RightBottom | TopInner => true
+          case _ => false
+        }
+        case TopLeft => mov2 match {
+          case InnerRight | LeftBottom | RightInner | InnerBottom | RightTop | BottomInner => true
+          case _ => false
+        }
+        case LeftBottom => mov2 match {
+          case InnerRight | TopLeft | RightInner | BottomRight | InnerTop | TopInner => true
+          case _ => false
+        }
+        case BottomRight => mov2 match {
+          case InnerTop | LeftInner | TopInner | RightTop | LeftInner | InnerLeft => true
+          case _ => false
+        }
+        case RightBottom => mov2 match {
+          case InnerLeft | TopRight | LeftInner | TopInner | InnerTop | BottomLeft => true
+          case _ => false
+        }
+        case TopRight => mov2 match {
+          case InnerLeft | RightBottom | LeftInner | InnerBottom | LeftTop | BottomInner => true
+          case _ => false
+        }
+        case LeftTop => mov2 match {
+          case InnerBottom | BottomInner | TopRight | InnerRight | BottomLeft | RightInner => true
+          case _ => false
+        }
+        case BottomLeft => mov2 match {
+          case InnerTop | RightBottom | TopInner | RightInner | InnerRight | LeftTop => true
+          case _ => false
+        }
+        case RightTop => mov2 match {
+          case InnerLeft | LeftInner | BottomRight | TopLeft | InnerBottom | BottomInner => true
+          case _ => false
+        }
+        case _ => false
+      }
+    } else if (ndevices == 6) {
+      // not supported yet
+      false
+    } else {
+      // not supported
+      false
+    }
+  }
+
 }

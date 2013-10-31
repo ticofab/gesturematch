@@ -9,6 +9,7 @@ import models.RequestToMatch
 import actors.Setup
 import actors.Input
 import scala.Some
+import play.api.Logger
 
 object Application extends Controller {
   val system = ActorSystem("screens-system")
@@ -23,6 +24,8 @@ object Application extends Controller {
                 equalityParam: String): WebSocket[String] = WebSocket.async {
 
     def isRequestValid = {
+      Logger.info(s"New request: $latitude $longitude $swipeStart $swipeEnd $equalityParam\n    $payload")
+
       // TODO: check more things about parameters
       val validRequestType = requestType match {
         case HandlingActorFactory.PHOTO => true
@@ -35,6 +38,7 @@ object Application extends Controller {
 
     request => Future {
       if (isRequestValid) {
+        Logger.info("    Request valid.")
         val props = HandlingActorFactory.getActorProps(requestType)
 
         // setup handling actor
@@ -58,6 +62,7 @@ object Application extends Controller {
         (in, out)
       } else {
         // we don't like this request.
+        Logger.info(s"    Request invalid. Closing socket.")
         val in: Iteratee[String, Unit] = Iteratee.ignore[String]
         val out: Enumerator[String] = Enumerator.eof
         (in, out)
