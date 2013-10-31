@@ -8,12 +8,24 @@ import actors._
 import models.RequestToMatch
 import actors.Setup
 import actors.Input
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.Some
 import play.api.Logger
 
 object Application extends Controller {
+  Logger.info("******* Server starting. Creating ActorSystem.")
   val system = ActorSystem("screens-system")
   val matchingActor = system.actorOf(MatcherActor.props)
+
+  def logRequest(endpoint: String, request: RequestHeader) = {
+    Logger.info(s"aliveTest API call. Request:\n  ${request.remoteAddress} ${request.version} ${request.method} ${request.uri}")
+  }
+
+  def aliveTest = Action {
+    request => {
+      Ok("aliveTest: I'm alive!\n")
+    }
+  }
 
   def requestWS(requestType: String,
                 latitude: Double,
@@ -24,8 +36,6 @@ object Application extends Controller {
                 equalityParam: String): WebSocket[String] = WebSocket.async {
 
     def isRequestValid = {
-      Logger.info(s"New request: $latitude $longitude $swipeStart $swipeEnd $equalityParam\n    $payload")
-
       // TODO: check more things about parameters
       val validRequestType = requestType match {
         case HandlingActorFactory.PHOTO => true
@@ -37,6 +47,9 @@ object Application extends Controller {
     }
 
     request => Future {
+      logRequest("requestWS", request)
+      Logger.info(s"  parameters: $latitude $longitude $swipeStart $swipeEnd $equalityParam\n    $payload\n")
+
       if (isRequestValid) {
         Logger.info("    Request valid.")
         val props = HandlingActorFactory.getActorProps(requestType)
@@ -46,7 +59,7 @@ object Application extends Controller {
         var channel: Option[Concurrent.Channel[String]] = None
         val out: Enumerator[String] = Concurrent.unicast(c => channel = Some(c))
 
-        handlingActor ! Setup(out)
+        handlingActor ! Setup(channel)
         val in = Iteratee.foreach[String] {
           // pass everything the client sends to its managing actor
           input => handlingActor ! Input(input)

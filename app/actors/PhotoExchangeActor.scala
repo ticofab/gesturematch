@@ -4,7 +4,7 @@ import akka.actor.{Props, Actor}
 
 class PhotoExchangeActor extends HandlingActor {
   def receive: Actor.Receive = {
-    case Setup(out) => this.out = Some(out)
+    case Setup(channel) => this.channel = channel
 
     case Matched2(myPosition, myPayload, otherPayload) => {} // TODO
 

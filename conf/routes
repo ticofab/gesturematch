@@ -3,10 +3,5 @@
 # ~~~~
 
 # Home page
-GET     /request                    controllers.Application.requestWS(requestType: String,
-                                                                      latitude: Double,
-                                                                      longitude: Double,
-                                                                      swipeStart: Int,
-                                                                      swipeEnd: Int,
-                                                                      payload: String,
-                                                                      equalityParam1: String)
+GET     /                           controllers.Application.aliveTest
+GET     /request                    controllers.Application.requestWS(requestType: String, latitude: Double, longitude: Double, swipeStart: Int, swipeEnd: Int, payload: String, equalityParam1: String)
