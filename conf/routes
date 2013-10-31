@@ -3,7 +3,7 @@
 # ~~~~
 
 # Home page
-GET     /request/:requestType       controllers.Application.requestWS(requestType: String,
+GET     /request                    controllers.Application.requestWS(requestType: String,
                                                                       latitude: Double,
                                                                       longitude: Double,
                                                                       swipeStart: Int,
