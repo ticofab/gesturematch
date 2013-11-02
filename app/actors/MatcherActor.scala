@@ -2,8 +2,7 @@ package actors
 
 import akka.actor.{Props, Actor}
 import models.RequestToMatch
-import helpers.{SwipeMovementHelper, ScreenPositionHelper, MovementComparator, RequestListHelper}
-import consts.Timeouts
+import helpers.{SwipeMovementHelper, ScreenPositionHelper, MovementComparator, RequestStorageHelper}
 import consts.Areas._
 import SwipeMovementHelper._
 import consts.SwipeMovements.SwipeMovement
@@ -103,26 +102,26 @@ class MatcherActor extends Actor {
       // This operation should be fine, as the MatcherActor is designed to be a single one,
       // therefore there won't be two concurrent accesses to the RequestListHelper?
 
-      // obtain existing requests and filter by time
-      val maxOldestRequestTS = request.timestamp - Timeouts.maxOldestRequestTOMillis
-      val existingRequests = RequestListHelper.getExistingRequests filter (_.timestamp >= maxOldestRequestTS)
+      // obtain valid existing requests and filter by time
+      val existingRequests = RequestStorageHelper.getValidExistingRequests(request)
 
       // Try to create a match between the requests
+      Logger.info(s"Matching it with ${existingRequests.length} existing requests.")
       val matchedRequests: Option[List[RequestToMatch]] = extractMatchingGroup(request, existingRequests)
 
       // do we have a group back?
       matchedRequests match {
         case None => {
-          Logger.info(s"Matching it with existing requests: no group has been found.")
+          Logger.info(s"  --> no group has been found.")
 
           // simply update the requests storage with the new request and the filtered requests
-          RequestListHelper updateCurrentRequests request :: existingRequests
+          RequestStorageHelper.storeNewRequest(request)
         }
         case Some(group) => {
-          Logger.info(s"Matching it with existing requests: group found, size is ${group.length}")
+          Logger.info(s"  --> group found, size is ${group.length}")
 
-          // update the requests storage with the churned list
-          RequestListHelper updateCurrentRequests (existingRequests diff group)
+          // remove the group from the storage
+          RequestStorageHelper.removeRequests(group)
 
           // Send a matching notification to the actors managing the corresponding devices
           group.length match {

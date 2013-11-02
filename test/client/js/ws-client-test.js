@@ -1,13 +1,18 @@
-var myWebSocket1, myWebSocket2;
+var myWebSocket1, myWebSocket2, myWebSocket3, myWebSocket4;
 
 angular.module('app', []).controller('myctrl', function($scope) {
     // controls the disabling / enabling of the buttons
     $scope.isDisabled1 = true;
     $scope.isDisabled2 = true;
+    $scope.isDisabled3 = true;
+    $scope.isDisabled4 = true;
 
     // sets the initial values for the connection params
-    $scope.ep1 = {title: "ws://localhost:9000/request?requestType=contact&latitude=12.00&longitude=12.0001&swipeStart=4&swipeEnd=3&payload=ciao&equalityParam1=uno"};
-    $scope.ep2 = {title: "ws://localhost:9000/request?requestType=contact&latitude=12.00&longitude=12.0001&swipeStart=2&swipeEnd=4&payload=hola&equalityParam1=uno"};
+    $scope.ep1 = {title: "ws://localhost:9000/request?requestType=contact&latitude=12.00&longitude=12.0001&swipeStart=4&swipeEnd=3&deviceId=123&payload=payuno&equalityParam1=uno"};
+    $scope.ep2 = {title: "ws://localhost:9000/request?requestType=contact&latitude=12.00&longitude=12.0001&swipeStart=2&swipeEnd=4&deviceId=456&payload=paydue&equalityParam1=uno"};
+    $scope.ep3 = {title: "ws://localhost:9000/request?requestType=contact&latitude=12.00&longitude=12.0001&swipeStart=4&swipeEnd=1&deviceId=987&payload=paytre&equalityParam1=uno"};
+    $scope.ep4 = {title: "ws://localhost:9000/request?requestType=contact&latitude=12.00&longitude=12.0001&swipeStart=0&swipeEnd=4&deviceId=654&payload=payquattro&equalityParam1=uno"};
+
 
     // sending messages stuff
     var sendGen = function(socket, msg) {socket.send(msg);};
@@ -28,7 +33,7 @@ angular.module('app', []).controller('myctrl', function($scope) {
         // here "id" is a string. equivalent to
         //   $scope.isDisabled1 === $scope["isDisabled1"]
         $scope[id] = false;
-        console.log("Connection open ..." + id);
+        console.log("Connection open ...");
         $scope.$apply();
     }
     function onC(evt) {console.log("Connection closed.");}
@@ -48,6 +53,20 @@ angular.module('app', []).controller('myctrl', function($scope) {
         myWebSocket2.onmsg = onM;
         myWebSocket2.onopen = onO.bind(null, "isDisabled2");
         myWebSocket2.onclose = onC;
+    };
+
+    $scope.connect3 = function() {
+        myWebSocket3 = new WebSocket($scope.ep3.title);
+        myWebSocket3.onmsg = onM;
+        myWebSocket3.onopen = onO.bind(null, "isDisabled3");
+        myWebSocket3.onclose = onC;
+    };
+
+    $scope.connect4 = function() {
+        myWebSocket4 = new WebSocket($scope.ep4.title);
+        myWebSocket4.onmsg = onM;
+        myWebSocket4.onopen = onO.bind(null, "isDisabled4");
+        myWebSocket4.onclose = onC;
     };
 
 });

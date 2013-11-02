@@ -13,7 +13,7 @@ import scala.Some
 import play.api.Logger
 
 object Application extends Controller {
-  Logger.info("******* Server starting. Creating ActorSystem.")
+  Logger.info("\n******* Server starting. Creating ActorSystem.")
   val system = ActorSystem("screens-system")
   val matchingActor = system.actorOf(MatcherActor.props)
 
@@ -32,8 +32,9 @@ object Application extends Controller {
                 longitude: Double,
                 swipeStart: Int,
                 swipeEnd: Int,
-                payload: String,
-                equalityParam: String): WebSocket[String] = WebSocket.async {
+                deviceId: String,
+                equalityParam: String,
+                payload: String): WebSocket[String] = WebSocket.async {
 
     def isRequestValid = {
       // TODO: check more things about parameters
@@ -48,7 +49,7 @@ object Application extends Controller {
 
     request => Future {
       logRequest("requestWS", request)
-      Logger.info(s"  parameters: $latitude $longitude $swipeStart $swipeEnd $equalityParam\n    $payload\n")
+      Logger.info(s"  parameters: $latitude $longitude $swipeStart $swipeEnd $equalityParam $payload\n")
 
       if (isRequestValid) {
         Logger.info("    Request valid.")
@@ -69,7 +70,7 @@ object Application extends Controller {
 
         // add it to the matcher queue
         val timestamp = System.currentTimeMillis
-        val requestData = new RequestToMatch(latitude, longitude, timestamp, swipeStart,
+        val requestData = new RequestToMatch(deviceId, latitude, longitude, timestamp, swipeStart,
           swipeEnd, equalityParam, payload, handlingActor)
 
         matchingActor ! NewRequest(requestData)
