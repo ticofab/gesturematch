@@ -27,7 +27,7 @@ object Application extends Controller {
     }
   }
 
-  def requestWS(requestType: String,
+  def requestWS(`type`: String,
                 latitude: Double,
                 longitude: Double,
                 swipeStart: Int,
@@ -38,7 +38,7 @@ object Application extends Controller {
 
     def isRequestValid = {
       // TODO: check more things about parameters
-      val validRequestType = requestType match {
+      val validRequestType = `type` match {
         case HandlingActorFactory.PHOTO => true
         case HandlingActorFactory.CONTACT => true
         case _ => false
@@ -53,7 +53,7 @@ object Application extends Controller {
 
       if (isRequestValid) {
         Logger.info("    Request valid.")
-        val props = HandlingActorFactory.getActorProps(requestType)
+        val props = HandlingActorFactory.getActorProps(`type`)
 
         // setup handling actor
         val handlingActor: ActorRef = system.actorOf(props)
