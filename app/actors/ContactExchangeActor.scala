@@ -20,13 +20,9 @@ class ContactExchangeActor extends HandlingActor {
 
     case Input(input) => {
       Logger.info(s"$self, Input() message: $input")
-      channel match {
-        case None => {Logger.info("channel is empty!")}
-        case Some(x) => {
-          Logger.info("channel is not empty!")
-          x.push("thanks!")
-        }
-      }
+
+      // simple echoing back for now
+      channel.foreach(_.push(s"Thanks for $input"))
     }
   }
 }

@@ -72,10 +72,7 @@ myApp.controller('paramTable', ['$scope', function($scope) {
 
     $scope.connect1 = function() {
         myWebSocket1 = new WebSocket($scope.dev1url);
-        //myWebSocket1.onmsg = onM.bind(null, "dev1msg");
-        myWebSocket1.onmsg = function(evt) {
-            console.log(evt.data)
-        }
+        myWebSocket1.onmessage = onM.bind(null, "dev1msg");
 
         // onO.bind creates a new function with only one parameter,
         //  and the first one will be set as "isDisabled1"
@@ -85,21 +82,21 @@ myApp.controller('paramTable', ['$scope', function($scope) {
 
     $scope.connect2 = function() {
         myWebSocket2 = new WebSocket($scope.dev2url);
-        myWebSocket2.onmsg = onM.bind(null, "dev2msg");;
+        myWebSocket2.onmessage = onM.bind(null, "dev2msg");;
         myWebSocket2.onopen = onO.bind(null, "isDisabled2");
         myWebSocket2.onclose = onC.bind(null, "isDisabled2");
     };
 
     $scope.connect3 = function() {
         myWebSocket3 = new WebSocket($scope.dev3url);
-        myWebSocket3.onmsg = onM.bind(null, "dev3msg");;
+        myWebSocket3.onmessage = onM.bind(null, "dev3msg");;
         myWebSocket3.onopen = onO.bind(null, "isDisabled3");
         myWebSocket3.onclose = onC.bind(null, "isDisabled3");
     };
 
     $scope.connect4 = function() {
         myWebSocket4 = new WebSocket($scope.dev4url);
-        myWebSocket4.onmsg = onM.bind(null, "dev4msg");
+        myWebSocket4.onmessage = onM.bind(null, "dev4msg");
         myWebSocket4.onopen = onO.bind(null, "isDisabled4");
         myWebSocket4.onclose = onC.bind(null, "isDisabled4");
     };
