@@ -7,12 +7,8 @@ angular.module('app', []).controller('myctrl', function($scope) {
     $scope.isDisabled3 = true;
     $scope.isDisabled4 = true;
 
-    // sets the initial values for the connection params
-    $scope.ep1 = {title: "ws://localhost:9000/request?requestType=contact&latitude=12.00&longitude=12.0001&swipeStart=4&swipeEnd=3&deviceId=123&payload=payuno&equalityParam1=uno"};
-    $scope.ep2 = {title: "ws://localhost:9000/request?requestType=contact&latitude=12.00&longitude=12.0001&swipeStart=2&swipeEnd=4&deviceId=456&payload=paydue&equalityParam1=uno"};
-    $scope.ep3 = {title: "ws://localhost:9000/request?requestType=contact&latitude=12.00&longitude=12.0001&swipeStart=4&swipeEnd=1&deviceId=987&payload=paytre&equalityParam1=uno"};
-    $scope.ep4 = {title: "ws://localhost:9000/request?requestType=contact&latitude=12.00&longitude=12.0001&swipeStart=0&swipeEnd=4&deviceId=654&payload=payquattro&equalityParam1=uno"};
-
+    // don't know why I need this here, but otherwise no input will be shown
+    $scope.e1.title
 
     // sending messages stuff
     var sendGen = function(socket, msg) {socket.send(msg);};

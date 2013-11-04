@@ -3,6 +3,7 @@
     <script type="text/javascript" src="js/jquery-2.0.3.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script>
     <script type="text/javascript" src="js/ws-client-test.js"></script>
+    <link rel="stylesheet" href="css/client-test.css">
 </head>
 <body>
 
@@ -11,11 +12,10 @@
         TEST WS
         <br><br>
 
-        <input ng-model="ep1.title" ng-name"ep1.title" style="width: 900px"><br>
-        <input ng-model="ep2.title" ng-name"ep2.title" style="width: 900px"><br>
-        <input ng-model="ep3.title" ng-name"ep3.title" style="width: 900px"><br>
-        <input ng-model="ep4.title" ng-name"ep4.title" style="width: 900px"><br>
-
+        <input ng-model="ep1.title" ng-name"ep1.title" class="apicall" value="ws://localhost:9000/request?requestType=contact&latitude=12.00&longitude=12.0001&swipeStart=4&swipeEnd=3&deviceId=123&payload=payuno&equalityParam1=uno"><br>
+        <input ng-model="ep2.title" ng-name"ep2.title" class="apicall" value="ws://localhost:9000/request?requestType=contact&latitude=12.00&longitude=12.0001&swipeStart=2&swipeEnd=4&deviceId=456&payload=paydue&equalityParam1=uno"><br>
+        <input ng-model="ep3.title" ng-name"ep3.title" class="apicall" value="ws://localhost:9000/request?requestType=contact&latitude=12.00&longitude=12.0001&swipeStart=4&swipeEnd=1&deviceId=987&payload=paytre&equalityParam1=uno"><br>
+        <input ng-model="ep4.title" ng-name"ep4.title" class="apicall" value="ws://localhost:9000/request?requestType=contact&latitude=12.00&longitude=12.0001&swipeStart=0&swipeEnd=4&deviceId=654&payload=payquattro&equalityParam1=uno"><br>
 
         <button ng-click="connect1()">connect dev1</button>
         <button ng-click="connect2()">connect dev2</button>
