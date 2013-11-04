@@ -1,14 +1,32 @@
-var myWebSocket1, myWebSocket2, myWebSocket3, myWebSocket4;
+var myApp = angular.module('app',[]);
 
-angular.module('app', []).controller('myctrl', function($scope) {
+myApp.controller('paramTable', ['$scope', function($scope) {
+
+    initStuff();
+
+    $scope.$watchCollection("[dev1rtype,dev1devid,dev1lat,dev1lon,dev1ss,dev1se,dev1pl,dev1ep]", function(nv) {
+        $scope.dev1url = 'ws://localhost:9000/request?type=' + nv[0] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
+    });
+
+    $scope.$watchCollection("[dev2rtype,dev2devid,dev2lat,dev2lon,dev2ss,dev2se,dev2pl,dev2ep]", function(nv) {
+        $scope.dev2url = 'ws://localhost:9000/request?type=' + nv[0] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
+    });
+
+    $scope.$watchCollection("[dev3rtype,dev3devid,dev3lat,dev3lon,dev3ss,dev3se,dev3pl,dev3ep]", function(nv) {
+        $scope.dev3url = 'ws://localhost:9000/request?type=' + nv[0] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
+    });
+
+    $scope.$watchCollection("[dev4rtype,dev4devid,dev4lat,dev4lon,dev4ss,dev4se,dev4pl,dev4ep]", function(nv) {
+        $scope.dev4url = 'ws://localhost:9000/request?type=' + nv[0] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
+    });
+
+    var myWebSocket1, myWebSocket2, myWebSocket3, myWebSocket4;
+
     // controls the disabling / enabling of the buttons
     $scope.isDisabled1 = true;
     $scope.isDisabled2 = true;
     $scope.isDisabled3 = true;
     $scope.isDisabled4 = true;
-
-    // don't know why I need this here, but otherwise no input will be shown
-    $scope.e1.title
 
     // sending messages stuff
     var sendGen = function(socket, msg) {socket.send(msg);};
@@ -23,8 +41,22 @@ angular.module('app', []).controller('myctrl', function($scope) {
         console.log("sending msg 2: " + $scope.msg2);
     };
 
+    $scope.send3 = function() {
+        sendGen(myWebSocket3, $scope.msg3);
+        console.log("sending msg 3: " + $scope.msg3);
+    };
+
+    $scope.send4 = function() {
+        sendGen(myWebSocket4, $scope.msg4);
+        console.log("sending msg 4: " + $scope.msg4);
+    };
+
     // websockets connection stuff
-    function onM(evt) {console.log("got data: " + evt.data);}
+    function onM(id, evt) {
+        $scope[id] = evt.data;
+        console.log("got data: " + evt.data);
+        $scope.$apply();
+    }
     function onO(id, evt) {
         // here "id" is a string. equivalent to
         //   $scope.isDisabled1 === $scope["isDisabled1"]
@@ -32,38 +64,86 @@ angular.module('app', []).controller('myctrl', function($scope) {
         console.log("Connection open ...");
         $scope.$apply();
     }
-    function onC(evt) {console.log("Connection closed.");}
+    function onC(id, evt) {
+        $scope[id] = true;
+        console.log("Connection closed.");
+        $scope.$apply();
+    }
 
     $scope.connect1 = function() {
-        myWebSocket1 = new WebSocket($scope.ep1.title);
-        myWebSocket1.onmsg = onM;
+        myWebSocket1 = new WebSocket($scope.dev1url);
+        //myWebSocket1.onmsg = onM.bind(null, "dev1msg");
+        myWebSocket1.onmsg = function(evt) {
+            console.log(evt.data)
+        }
 
         // onO.bind creates a new function with only one parameter,
         //  and the first one will be set as "isDisabled1"
         myWebSocket1.onopen = onO.bind(null, "isDisabled1");
-        myWebSocket1.onclose = onC;
+        myWebSocket1.onclose = onC.bind(null, "isDisabled1");
     };
 
     $scope.connect2 = function() {
-        myWebSocket2 = new WebSocket($scope.ep2.title);
-        myWebSocket2.onmsg = onM;
+        myWebSocket2 = new WebSocket($scope.dev2url);
+        myWebSocket2.onmsg = onM.bind(null, "dev2msg");;
         myWebSocket2.onopen = onO.bind(null, "isDisabled2");
-        myWebSocket2.onclose = onC;
+        myWebSocket2.onclose = onC.bind(null, "isDisabled2");
     };
 
     $scope.connect3 = function() {
-        myWebSocket3 = new WebSocket($scope.ep3.title);
-        myWebSocket3.onmsg = onM;
+        myWebSocket3 = new WebSocket($scope.dev3url);
+        myWebSocket3.onmsg = onM.bind(null, "dev3msg");;
         myWebSocket3.onopen = onO.bind(null, "isDisabled3");
-        myWebSocket3.onclose = onC;
+        myWebSocket3.onclose = onC.bind(null, "isDisabled3");
     };
 
     $scope.connect4 = function() {
-        myWebSocket4 = new WebSocket($scope.ep4.title);
-        myWebSocket4.onmsg = onM;
+        myWebSocket4 = new WebSocket($scope.dev4url);
+        myWebSocket4.onmsg = onM.bind(null, "dev4msg");
         myWebSocket4.onopen = onO.bind(null, "isDisabled4");
-        myWebSocket4.onclose = onC;
+        myWebSocket4.onclose = onC.bind(null, "isDisabled4");
     };
 
-});
+    function initStuff() {
+        $scope.dev1rtype = "contact"
+        $scope.dev2rtype = "contact"
+        $scope.dev3rtype = "contact"
+        $scope.dev4rtype = "contact"
 
+        $scope.dev1devid = "id1"
+        $scope.dev2devid = "id2"
+        $scope.dev3devid = "id3"
+        $scope.dev4devid = "id4"
+
+        $scope.dev1lat = "12.00"
+        $scope.dev2lat = "12.00"
+        $scope.dev3lat = "12.00"
+        $scope.dev4lat = "12.00"
+
+        $scope.dev1lon = "12.00"
+        $scope.dev2lon = "12.00"
+        $scope.dev3lon = "12.00"
+        $scope.dev4lon = "12.00"
+
+        $scope.dev1ss = "4"
+        $scope.dev2ss = "2"
+        $scope.dev3ss = "0"
+        $scope.dev4ss = "3"
+
+        $scope.dev1se = "3"
+        $scope.dev2se = "1"
+        $scope.dev3se = "2"
+        $scope.dev4se = "4"
+
+        $scope.dev1pl = "pl1"
+        $scope.dev2pl = "pl2"
+        $scope.dev3pl = "pl3"
+        $scope.dev4pl = "pl4"
+
+        $scope.dev1ep = "uguale"
+        $scope.dev2ep = "uguale"
+        $scope.dev3ep = "uguale"
+        $scope.dev4ep = "uguale"
+    }
+
+}]);
