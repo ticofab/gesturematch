@@ -117,7 +117,6 @@ object MovementComparator {
     }
   }
 
-
   def areMovementsCompatible(mov1: SwipeMovement, mov2: SwipeMovement, ndevices: Int): Boolean = {
 
     if (ndevices == 2) {
