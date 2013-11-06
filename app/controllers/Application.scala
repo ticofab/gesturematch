@@ -11,6 +11,7 @@ import actors.Input
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.Some
 import play.api.Logger
+import helpers.SwipeMovementHelper
 
 object Application extends Controller {
   Logger.info("\n******* Server starting. Creating ActorSystem.")
@@ -70,8 +71,9 @@ object Application extends Controller {
 
         // add it to the matcher queue
         val timestamp = System.currentTimeMillis
+        val movement = SwipeMovementHelper.swipesToMovement(swipeStart, swipeEnd)
         val requestData = new RequestToMatch(deviceId, latitude, longitude, timestamp, swipeStart,
-          swipeEnd, equalityParam, payload, handlingActor)
+          swipeEnd, movement, equalityParam, payload, handlingActor)
 
         matchingActor ! NewRequest(requestData)
 

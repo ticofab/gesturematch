@@ -3,8 +3,6 @@ package helpers
 import consts.ScreenPositions._
 import consts.SwipeMovements._
 import consts.Areas._
-import scala.Left
-import scala.Right
 
 /**
  * This object is a helper to understand device positions with respect to each other.

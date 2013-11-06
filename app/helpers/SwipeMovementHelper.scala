@@ -12,7 +12,7 @@ object SwipeMovementHelper {
                                                   pos4second2: SwipeMovement) = {
     val pm1 = new PossibleMatching(2, List(pos2))
     val pm2 = new PossibleMatching(4, List(pos4common, pos4first1, pos4first2))
-    val pm3 = new PossibleMatching(4, List(pos4common, pos4first1, pos4first2))
+    val pm3 = new PossibleMatching(4, List(pos4common, pos4second1, pos4second2))
     List(pm1, pm2, pm3)
   }
 
@@ -23,7 +23,7 @@ object SwipeMovementHelper {
                                             pos4second2: SwipeMovement,
                                             pos4second3: SwipeMovement) = {
     val pm1 = new PossibleMatching(4, List(pos4first1, pos4first2, pos4first3))
-    val pm2 = new PossibleMatching(4, List(pos4first1, pos4first2, pos4first3))
+    val pm2 = new PossibleMatching(4, List(pos4second1, pos4second2, pos4second3))
     List(pm1, pm2)
   }
 
