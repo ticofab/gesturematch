@@ -2,7 +2,7 @@ package actors
 
 import akka.actor.{Props, Actor}
 import models.{PossibleMatching, MatchingGroup, RequestToMatch}
-import helpers.{SwipeMovementHelper, ScreenPositionHelper, MovementComparator, RequestStorageHelper}
+import helpers.{SwipeMovementHelper, ScreenPositionHelper, RequestStorageHelper}
 import consts.Areas._
 import play.api.Logger
 
@@ -89,7 +89,7 @@ class MatcherActor extends Actor {
     val tmp3: List[MatchingGroup] = tmp2.map(x => MatchingGroup(x._1.devicesInGroup, request :: x._2))
     val groups: List[MatchingGroup] = tmp3.filter(m => m.devicesInGroup == m.requests.size)
 
-    Logger.debug(s"groups found:\n  ${groups.toString}")
+    Logger.debug(s"groups found:\n  ${groups.toString()}")
     groups
   }
 
