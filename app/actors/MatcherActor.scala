@@ -79,9 +79,11 @@ class MatcherActor extends Actor {
 
     // get all the existing requests that could be part of one of the possible groups
     val tmp1: List[(PossibleMatching, RequestToMatch)] = for {
-      pg <- possibleMatchingGroups
-      prevReq <- existingRequests
-      if requestsAreCompatible(request, prevReq) && pg.necessaryMovements.contains(prevReq.movement)
+      pg <- possibleMatchingGroups  // for all the possible matching groups
+      prevReq <- existingRequests   // for all the previous requests, considered if
+      reqCompatible = requestsAreCompatible(request, prevReq) // the old request is compatible and
+      hasCoolMovement = pg.necessaryMovements.contains(prevReq.movement) // its movement is necessary
+      if reqCompatible && hasCoolMovement
     } yield (pg, prevReq)
 
     // data manipulation to get to a List[MatchingGroup]
