@@ -88,8 +88,8 @@ class MatcherActor extends Actor {
 
     // data manipulation to get to a List[MatchingGroup]
     val tmp2: List[(PossibleMatching, List[RequestToMatch])] = tmp1.groupBy(_._1).mapValues(_.map(_._2)).toList
-    val tmp3: List[MatchingGroup] = tmp2.map(x => MatchingGroup(x._1.devicesInGroup, request :: x._2))
-    val groups: List[MatchingGroup] = tmp3.filter(m => m.devicesInGroup == m.requests.size)
+    val tmp3: List[(PossibleMatching, List[RequestToMatch])] = tmp2.filter(x => x._1.devicesInGroup == x._2.length + 1)
+    val groups: List[MatchingGroup] = tmp3.map(x => MatchingGroup(x._1.devicesInGroup, request :: x._2))
 
     Logger.debug(s"groups found:\n  ${groups.toString()}")
     groups

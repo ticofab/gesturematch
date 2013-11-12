@@ -42,6 +42,7 @@ object Application extends Controller {
       val validRequestType = `type` match {
         case HandlingActorFactory.PHOTO => true
         case HandlingActorFactory.CONTACT => true
+        case HandlingActorFactory.CONTENT => true
         case _ => false
       }
       val differentSwipes = swipeEnd != swipeStart

@@ -6,6 +6,7 @@ import play.api.Logger
 object HandlingActorFactory {
   val PHOTO = "photo"
   val CONTACT = "contact"
+  val CONTENT = "content"
   def getActorProps(requestType: String): Props = {
     requestType match {
 
@@ -17,6 +18,11 @@ object HandlingActorFactory {
       case CONTACT => {
         Logger.info(s"HandlingActorFactory, returning props for CONTACT")
         ContactExchangeActor.props
+      }
+
+      case CONTENT => {
+        Logger.info(s"HandlingActorFactory, returning props for CONTENT")
+        ContentExchangeActor.props
       }
 
     }
