@@ -15,12 +15,13 @@ class ContentExchangeActorHTTP extends Actor {
         // there is only another request
         case 1 => {
           val jsonToSend = JsonResponseHelper.getMatched2ContentResponse(otherInfo)
-          Logger.info(s"Sending $jsonToSend to ${context.parent}, sender is $sender")
+          // TODO: do something with this
         }
 
         // there are 3 other requests
         case 3 => {
           val jsonToSend = JsonResponseHelper.getMatched4ContentResponse(otherInfo)
+          // TODO: do something with this
         }
       }
     }
