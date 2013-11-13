@@ -7,6 +7,7 @@ object JsonLabels {
   val OUTCOME_MATCHED4 = "matched4"
   val OUTCOME_UNCERTAIN = "uncertain"
   val OUTCOME_TIMEOUT = "timeout"
+  val OUTCOME_UNKNOWN_ERROR = "error"
 
   // payload of the matching devices.
   val PAYLOAD = "payload"

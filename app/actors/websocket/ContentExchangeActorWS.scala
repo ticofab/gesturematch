@@ -2,7 +2,6 @@ package actors.websocket
 
 import akka.actor.{Actor, Props}
 import play.api.Logger
-import play.api.libs.json.Json
 import consts.Timeouts
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.concurrent.Promise
@@ -29,7 +28,7 @@ class ContentExchangeActorWS extends HandlingActorWS {
         case 1 => {
           val jsonToSend = JsonResponseHelper.getMatched2ContentResponse(otherInfo)
           channel.foreach(x => {
-            x.push(Json.stringify(jsonToSend))
+            x.push(jsonToSend)
             x.eofAndEnd()
           })
         }
@@ -38,7 +37,7 @@ class ContentExchangeActorWS extends HandlingActorWS {
         case 3 => {
           val jsonToSend = JsonResponseHelper.getMatched4ContentResponse(otherInfo)
           channel.foreach(x => {
-            x.push(Json.stringify(jsonToSend))
+            x.push(jsonToSend)
             x.eofAndEnd()
           })
         }
