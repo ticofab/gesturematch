@@ -17,7 +17,10 @@ class MatcherActor extends Actor {
     // check if equality parameters are the same
     val equality = r1.equalityParam == r2.equalityParam
 
-    closeEnough && equality
+    // check if apiKey is the same
+    val sameApiKey = r1.apiKey == r2.apiKey
+
+    closeEnough && equality && sameApiKey
   }
 
   private def deliverTo2Group(group: List[RequestToMatch]): Unit = {
@@ -32,8 +35,8 @@ class MatcherActor extends Actor {
     Logger.info(s"1st mov & pos:   ${r1.movement}    ${pos1.toString}")
     Logger.info(s"2nd mov & pos:   ${r2.movement}    ${pos2.toString}")
 
-    r1.handlingActor ! Matched2(pos1, r1.payload, (r2.handlingActor, r2.payload))
-    r2.handlingActor ! Matched2(pos2, r2.payload, (r1.handlingActor, r1.payload))
+    r1.handlingActor ! Matched(pos1, r1.payload, Vector(r2.getServiceInfo))
+    r2.handlingActor ! Matched(pos2, r2.payload, Vector(r1.getServiceInfo))
   }
 
   private def deliverTo4Group(group: List[RequestToMatch]): Unit = {
@@ -67,10 +70,10 @@ class MatcherActor extends Actor {
     Logger.info(s"3rd mov & pos:   ${r3.movement}    ${pos3.toString}")
     Logger.info(s"4th pos:         ${pos4.toString}\n")
 
-    r1.handlingActor ! new Matched4(pos1, r1.payload, List(r2.getServiceInfo, r3.getServiceInfo, r4.getServiceInfo))
-    r2.handlingActor ! new Matched4(pos2, r2.payload, List(r1.getServiceInfo, r3.getServiceInfo, r4.getServiceInfo))
-    r3.handlingActor ! new Matched4(pos3, r3.payload, List(r1.getServiceInfo, r2.getServiceInfo, r4.getServiceInfo))
-    r4.handlingActor ! new Matched4(pos4, r4.payload, List(r1.getServiceInfo, r2.getServiceInfo, r3.getServiceInfo))
+    r1.handlingActor ! new Matched(pos1, r1.payload, Vector(r2.getServiceInfo, r3.getServiceInfo, r4.getServiceInfo))
+    r2.handlingActor ! new Matched(pos2, r2.payload, Vector(r1.getServiceInfo, r3.getServiceInfo, r4.getServiceInfo))
+    r3.handlingActor ! new Matched(pos3, r3.payload, Vector(r1.getServiceInfo, r2.getServiceInfo, r4.getServiceInfo))
+    r4.handlingActor ! new Matched(pos4, r4.payload, Vector(r1.getServiceInfo, r2.getServiceInfo, r3.getServiceInfo))
   }
 
   private def getMatchingGroup(request: RequestToMatch, existingRequests: List[RequestToMatch]): List[MatchingGroup] = {
@@ -79,8 +82,8 @@ class MatcherActor extends Actor {
 
     // get all the existing requests that could be part of one of the possible groups
     val tmp1: List[(PossibleMatching, RequestToMatch)] = for {
-      pg <- possibleMatchingGroups  // for all the possible matching groups
-      prevReq <- existingRequests   // for all the previous requests, considered if
+      pg <- possibleMatchingGroups // for all the possible matching groups
+      prevReq <- existingRequests // for all the previous requests, considered if
       reqCompatible = requestsAreCompatible(request, prevReq) // the old request is compatible and
       hasCoolMovement = pg.necessaryMovements.contains(prevReq.movement) // its movement is necessary
       if reqCompatible && hasCoolMovement
@@ -136,8 +139,6 @@ class MatcherActor extends Actor {
 
         case group :: tail => {
           Logger.info(s"  --> more than one group found. uncertainty.")
-
-          // TODO: send try again message
         }
       }
     }

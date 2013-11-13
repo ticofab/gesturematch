@@ -4,20 +4,20 @@ myApp.controller('paramTable', ['$scope', function($scope) {
 
     initStuff();
 
-    $scope.$watchCollection("[dev1rtype,dev1devid,dev1lat,dev1lon,dev1ss,dev1se,dev1pl,dev1ep]", function(nv) {
-        $scope.dev1url = 'ws://localhost:9000/request?type=' + nv[0] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
+    $scope.$watchCollection("[dev1rtype,dev1devid,dev1lat,dev1lon,dev1ss,dev1se,dev1pl,dev1ep,dev1apikey]", function(nv) {
+        $scope.dev1url = 'ws://localhost:9000/request?type=' + nv[0] + '&apiKey=' + nv[8] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
     });
 
-    $scope.$watchCollection("[dev2rtype,dev2devid,dev2lat,dev2lon,dev2ss,dev2se,dev2pl,dev2ep]", function(nv) {
-        $scope.dev2url = 'ws://localhost:9000/request?type=' + nv[0] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
+    $scope.$watchCollection("[dev2rtype,dev2devid,dev2lat,dev2lon,dev2ss,dev2se,dev2pl,dev2ep,dev2apikey]", function(nv) {
+        $scope.dev2url = 'ws://localhost:9000/request?type=' + nv[0] + '&apiKey=' + nv[8] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
     });
 
-    $scope.$watchCollection("[dev3rtype,dev3devid,dev3lat,dev3lon,dev3ss,dev3se,dev3pl,dev3ep]", function(nv) {
-        $scope.dev3url = 'ws://localhost:9000/request?type=' + nv[0] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
+    $scope.$watchCollection("[dev3rtype,dev3devid,dev3lat,dev3lon,dev3ss,dev3se,dev3pl,dev3ep,dev3apikey]", function(nv) {
+        $scope.dev3url = 'ws://localhost:9000/request?type=' + nv[0] + '&apiKey=' + nv[8] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
     });
 
-    $scope.$watchCollection("[dev4rtype,dev4devid,dev4lat,dev4lon,dev4ss,dev4se,dev4pl,dev4ep]", function(nv) {
-        $scope.dev4url = 'ws://localhost:9000/request?type=' + nv[0] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
+    $scope.$watchCollection("[dev4rtype,dev4devid,dev4lat,dev4lon,dev4ss,dev4se,dev4pl,dev4ep,dev4apikey]", function(nv) {
+        $scope.dev4url = 'ws://localhost:9000/request?type=' + nv[0] + '&apiKey=' + nv[8] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
     });
 
     var myWebSocket1, myWebSocket2, myWebSocket3, myWebSocket4;
@@ -102,10 +102,15 @@ myApp.controller('paramTable', ['$scope', function($scope) {
     };
 
     function initStuff() {
-        $scope.dev1rtype = "contact"
-        $scope.dev2rtype = "contact"
-        $scope.dev3rtype = "contact"
-        $scope.dev4rtype = "contact"
+        $scope.dev1rtype = "content"
+        $scope.dev2rtype = "content"
+        $scope.dev3rtype = "content"
+        $scope.dev4rtype = "content"
+
+        $scope.dev1apikey = "contact-api-key"
+        $scope.dev2apikey = "contact-api-key"
+        $scope.dev3apikey = "contact-api-key"
+        $scope.dev4apikey = "contact-api-key"
 
         $scope.dev1devid = "id1"
         $scope.dev2devid = "id2"

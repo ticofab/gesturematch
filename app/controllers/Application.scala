@@ -29,6 +29,7 @@ object Application extends Controller {
   }
 
   def requestWS(`type`: String,
+                apiKey: String,
                 latitude: Double,
                 longitude: Double,
                 swipeStart: Int,
@@ -39,12 +40,11 @@ object Application extends Controller {
 
     def isRequestValid = {
       // TODO: check more things about parameters
-      val validRequestType = `type` match {
-        case HandlingActorFactory.PHOTO => true
-        case HandlingActorFactory.CONTACT => true
-        case HandlingActorFactory.CONTENT => true
-        case _ => false
-      }
+      //    - api key must be valid
+      //    - payload must be there
+      //    - ....
+
+      val validRequestType = HandlingActorFactory.getValidRequests.contains(`type`)
       val differentSwipes = swipeEnd != swipeStart
       validRequestType && differentSwipes
     }
@@ -73,7 +73,7 @@ object Application extends Controller {
         // add it to the matcher queue
         val timestamp = System.currentTimeMillis
         val movement = SwipeMovementHelper.swipesToMovement(swipeStart, swipeEnd)
-        val requestData = new RequestToMatch(deviceId, latitude, longitude, timestamp, swipeStart,
+        val requestData = new RequestToMatch(apiKey, deviceId, latitude, longitude, timestamp, swipeStart,
           swipeEnd, movement, equalityParam, payload, handlingActor)
 
         matchingActor ! NewRequest(requestData)

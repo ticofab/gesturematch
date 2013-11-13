@@ -13,7 +13,8 @@ import consts.SwipeMovements.SwipeMovement
  * @param payload          The request payload
  * @param handlingActor    The reference to the actor managing this request
  */
-class RequestToMatch(val deviceId: String,
+class RequestToMatch(val apiKey: String,
+                     val deviceId: String,
                      val latitude: Double,
                      val longitude: Double,
                      val timestamp: Long,
@@ -25,5 +26,5 @@ class RequestToMatch(val deviceId: String,
                      val handlingActor: ActorRef) {
   def getServiceInfo: (ActorRef, String) = (handlingActor, payload)
 
-  override def toString: String = s"Request: $deviceId $latitude $longitude $timestamp $areaStart$areaEnd $movement $equalityParam $handlingActor $payload"
+  override def toString: String = s"Request: $apiKey $deviceId $latitude $longitude $timestamp $areaStart$areaEnd $movement $equalityParam $handlingActor $payload"
 }
