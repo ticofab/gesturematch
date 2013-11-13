@@ -2,7 +2,8 @@ package actors
 
 import akka.actor.{Actor, Props}
 import play.api.Logger
-import views.html.helper.input
+import play.api.libs.json.Json
+import consts.JsonLabels
 
 /**
  * This actor will simply pass the content to the actors of the other matched requests.
@@ -14,13 +15,35 @@ class ContentExchangeActor extends HandlingActor {
     }
 
     case Matched2(myPosition, myPayload, otherInfo) => {
-      Logger.info(s"$self, Matched2() message: $myPosition\n  my payload: $myPayload\n  others    : ${otherInfo._2}")
-      channel.foreach(x => {x.push(s"${otherInfo._2}"); x.eofAndEnd()})
+      Logger.info(s"$self, Matched2() message: $myPosition\n  my payload: $myPayload\n  other's: ${otherInfo._2}")
+
+      val jsonToSend = Json.obj(
+        JsonLabels.OUTCOME -> JsonLabels.OUTCOME_MATCHED2,
+        JsonLabels.PAYLOAD -> otherInfo._2
+      )
+      channel.foreach(x => {
+        x.push(Json.stringify(jsonToSend))
+        x.eofAndEnd()
+      })
     }
 
     case Matched4(myPosition, myPayload, otherPayloads) => {
       Logger.info(s"$self, Matched4() message: $myPosition\n  my payload: $myPayload")
-      channel.foreach(_.push(s"gotcha, you're $myPosition, your payload is $myPayload"))
+
+      val jsonToSend = Json.obj(
+        JsonLabels.OUTCOME -> JsonLabels.OUTCOME_MATCHED4,
+        JsonLabels.PAYLOAD -> Json.arr(
+          Json.obj(
+            JsonLabels.FIRST_DEVICE -> otherPayloads(0)._2,
+            JsonLabels.SECOND_DEVICE -> otherPayloads(1)._2,
+            JsonLabels.THIRD_DEVICE -> otherPayloads(2)._2
+          )
+        )
+      )
+      channel.foreach(x => {
+        x.push(Json.stringify(jsonToSend))
+        x.eofAndEnd()
+      })
     }
 
     case Input(input) => {
