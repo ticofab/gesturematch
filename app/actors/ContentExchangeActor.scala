@@ -3,9 +3,10 @@ package actors
 import akka.actor.{Actor, Props}
 import play.api.Logger
 import play.api.libs.json.Json
-import consts.{Timeouts, JsonLabels}
+import consts.Timeouts
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.concurrent.Promise
+import helpers.JsonResponseHelper
 
 /**
  * This actor will simply pass the content to the actors of the other matched requests.
@@ -25,10 +26,7 @@ class ContentExchangeActor extends HandlingActor {
       otherInfo.length match {
         // there is only another request
         case 1 => {
-          val jsonToSend = Json.obj(
-            JsonLabels.OUTCOME -> JsonLabels.OUTCOME_MATCHED2,
-            JsonLabels.PAYLOAD -> otherInfo.head._2
-          )
+          val jsonToSend = JsonResponseHelper.getMatched2ContentResponse(otherInfo)
           channel.foreach(x => {
             x.push(Json.stringify(jsonToSend))
             x.eofAndEnd()
@@ -37,16 +35,7 @@ class ContentExchangeActor extends HandlingActor {
 
         // there are 3 other requests
         case 3 => {
-          val jsonToSend = Json.obj(
-            JsonLabels.OUTCOME -> JsonLabels.OUTCOME_MATCHED4,
-            JsonLabels.PAYLOAD -> Json.arr(
-              Json.obj(
-                JsonLabels.FIRST_DEVICE -> otherInfo(0)._2,
-                JsonLabels.SECOND_DEVICE -> otherInfo(1)._2,
-                JsonLabels.THIRD_DEVICE -> otherInfo(2)._2
-              )
-            )
-          )
+          val jsonToSend = JsonResponseHelper.getMatched4ContentResponse(otherInfo)
           channel.foreach(x => {
             x.push(Json.stringify(jsonToSend))
             x.eofAndEnd()
@@ -59,7 +48,6 @@ class ContentExchangeActor extends HandlingActor {
       Logger.info(s"$self, Input() message: $input")
       // don't do anything with it.
     }
-
 
   }
 }

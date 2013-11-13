@@ -14,13 +14,9 @@ import play.api.Logger
 import helpers.SwipeMovementHelper
 
 object Application extends Controller {
-  Logger.info("\n******* Server starting. Creating ActorSystem.")
+  Logger.info("\n******* Server starting. Creating ActorSystem. ********")
   val system = ActorSystem("screens-system")
   val matchingActor = system.actorOf(MatcherActor.props)
-
-  def logRequest(endpoint: String, request: RequestHeader) = {
-    Logger.info(s"$endpoint API call. Request:\n  ${request.remoteAddress} ${request.version} ${request.method} ${request.uri}")
-  }
 
   def aliveTest = Action {
     request => {
@@ -40,7 +36,8 @@ object Application extends Controller {
                 payload: String): WebSocket[String] = WebSocket.async {
 
     def isRequestValid = {
-      // TODO: check more things about parameters
+      // TODO:
+      //    check more things about parameters
       //    - api key must be valid
       //    - app id must be valid
       //    - .....
@@ -50,8 +47,8 @@ object Application extends Controller {
       validRequestType && differentSwipes
     }
 
-    request => Future {
-      logRequest("requestWS", request)
+    (request: RequestHeader) => Future {
+      Logger.info(s"requestWS API call. Request:\n  ${request.remoteAddress} ${request.version} ${request.method} ${request.uri}")
       Logger.info(s"  parameters: $latitude $longitude $swipeStart $swipeEnd $equalityParam $payload\n")
 
       if (isRequestValid) {
