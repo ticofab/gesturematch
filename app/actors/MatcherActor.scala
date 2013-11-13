@@ -20,7 +20,10 @@ class MatcherActor extends Actor {
     // check if apiKey is the same
     val sameApiKey = r1.apiKey == r2.apiKey
 
-    closeEnough && equality && sameApiKey
+    // check if appId is the same
+    val sameAppId = r1.appId == r2.appId
+
+    closeEnough && equality && sameApiKey && sameAppId
   }
 
   private def deliverTo2Group(group: List[RequestToMatch]): Unit = {

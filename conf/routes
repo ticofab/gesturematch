@@ -4,4 +4,4 @@
 
 # Home page
 GET     /                           controllers.Application.aliveTest
-GET     /request                    controllers.Application.requestWS(type: String, apiKey: String, latitude: Double, longitude: Double, swipeStart: Int, swipeEnd: Int, deviceId: String, equalityParam1: String, payload: String)
+GET     /request                    controllers.Application.requestWS(type: String, apiKey: String, appId: String, latitude: Double, longitude: Double, swipeStart: Int, swipeEnd: Int, deviceId: String, equalityParam1: String, payload: String)
