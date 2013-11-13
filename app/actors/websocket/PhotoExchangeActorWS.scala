@@ -1,8 +1,9 @@
-package actors
+package actors.websocket
 
 import akka.actor.{Props, Actor}
+import actors.{Setup, Input, Matched}
 
-class PhotoExchangeActor extends HandlingActor {
+class PhotoExchangeActorWS extends HandlingActorWS {
   def receive: Actor.Receive = {
     case Setup(channel) => this.channel = channel
     case Matched(myPosition, myPayload, otherInfo) => {} // TODO
@@ -10,7 +11,7 @@ class PhotoExchangeActor extends HandlingActor {
   }
 }
 
-object PhotoExchangeActor {
-  def props: Props = Props(classOf[PhotoExchangeActor])
+object PhotoExchangeActorWS {
+  def props: Props = Props(classOf[PhotoExchangeActorWS])
 }
 

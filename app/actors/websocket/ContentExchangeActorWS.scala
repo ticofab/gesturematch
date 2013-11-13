@@ -1,4 +1,4 @@
-package actors
+package actors.websocket
 
 import akka.actor.{Actor, Props}
 import play.api.Logger
@@ -7,11 +7,12 @@ import consts.Timeouts
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.concurrent.Promise
 import helpers.JsonResponseHelper
+import actors.{Input, Matched, Setup}
 
 /**
  * This actor will simply pass the content to the actors of the other matched requests.
  */
-class ContentExchangeActor extends HandlingActor {
+class ContentExchangeActorWS extends HandlingActorWS {
   def receive: Actor.Receive = {
     case Setup(channel) => {
       this.channel = channel
@@ -21,7 +22,7 @@ class ContentExchangeActor extends HandlingActor {
     }
 
     case Matched(myPosition, myPayload, otherInfo) => {
-      Logger.info(s"$self, Matched2() message: $myPosition\n  my payload: $myPayload\n")
+      Logger.info(s"$self, Matched message: $myPosition\n  my payload: $myPayload\n")
 
       otherInfo.length match {
         // there is only another request
@@ -52,6 +53,6 @@ class ContentExchangeActor extends HandlingActor {
   }
 }
 
-object ContentExchangeActor {
-  def props: Props = Props(classOf[ContentExchangeActor])
+object ContentExchangeActorWS {
+  def props: Props = Props(classOf[ContentExchangeActorWS])
 }

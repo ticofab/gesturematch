@@ -3,7 +3,7 @@ package controllers
 import play.api.mvc._
 import scala.concurrent.Future
 import play.api.libs.iteratee.{Concurrent, Iteratee, Enumerator}
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.ActorRef
 import actors._
 import models.RequestToMatch
 import actors.Setup
@@ -13,16 +13,7 @@ import scala.Some
 import play.api.Logger
 import helpers.SwipeMovementHelper
 
-object Application extends Controller {
-  Logger.info("\n******* Server starting. Creating ActorSystem. ********")
-  val system = ActorSystem("screens-system")
-  val matchingActor = system.actorOf(MatcherActor.props)
-
-  def aliveTest = Action {
-    request => {
-      Ok("aliveTest: I'm alive!\n")
-    }
-  }
+object ApplicationWS extends MyController {
 
   def requestWS(`type`: String,
                 apiKey: String,
@@ -35,28 +26,16 @@ object Application extends Controller {
                 equalityParam: String,
                 payload: String): WebSocket[String] = WebSocket.async {
 
-    def isRequestValid = {
-      // TODO:
-      //    check more things about parameters
-      //    - api key must be valid
-      //    - app id must be valid
-      //    - .....
-
-      val validRequestType = HandlingActorFactory.getValidRequests.contains(`type`)
-      val differentSwipes = swipeEnd != swipeStart
-      validRequestType && differentSwipes
-    }
-
-    (request: RequestHeader) => Future {
+    request => Future {
       Logger.info(s"requestWS API call. Request:\n  ${request.remoteAddress} ${request.version} ${request.method} ${request.uri}")
       Logger.info(s"  parameters: $latitude $longitude $swipeStart $swipeEnd $equalityParam $payload\n")
 
-      if (isRequestValid) {
+      if (isRequestValid(`type`, swipeStart, swipeEnd)) {
         Logger.info("    Request valid.")
-        val props = HandlingActorFactory.getActorProps(`type`)
+        val props = HandlingActorFactory.getActorProps(`type`, HandlingActorFactory.WEBSOCKET)
 
         // setup handling actor
-        val handlingActor: ActorRef = system.actorOf(props)
+        val handlingActor: ActorRef = MyController.system.actorOf(props)
         var channel: Option[Concurrent.Channel[String]] = None
         val out: Enumerator[String] = Concurrent.unicast(c => {
           channel = Some(c)
@@ -74,7 +53,7 @@ object Application extends Controller {
         val requestData = new RequestToMatch(apiKey, appId, deviceId, latitude, longitude, timestamp, swipeStart,
           swipeEnd, movement, equalityParam, payload, handlingActor)
 
-        matchingActor ! NewRequest(requestData)
+        MyController.matchingActor ! NewRequest(requestData)
 
         (in, out)
       } else {

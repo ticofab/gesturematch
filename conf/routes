@@ -2,6 +2,8 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-# Home page
-GET     /                           controllers.Application.aliveTest
-GET     /request                    controllers.Application.requestWS(type: String, apiKey: String, appId: String, latitude: Double, longitude: Double, swipeStart: Int, swipeEnd: Int, deviceId: String, equalityParam1: String, payload: String)
+# Http
+GET     /request         controllers.ApplicationHTTP.requestHTTP(type: String, apiKey: String, appId: String, latitude: Double, longitude: Double, swipeStart: Int, swipeEnd: Int, deviceId: String, equalityParam1: String, payload: String)
+
+# Websocket
+GET     /requestWS       controllers.ApplicationWS.requestWS(type: String, apiKey: String, appId: String, latitude: Double, longitude: Double, swipeStart: Int, swipeEnd: Int, deviceId: String, equalityParam1: String, payload: String)
