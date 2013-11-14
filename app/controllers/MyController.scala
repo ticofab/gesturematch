@@ -1,9 +1,10 @@
 package controllers
 
 import play.api.Logger
-import akka.actor.ActorSystem
+import play.api.Play.current
 import actors.{HandlingActorFactory, MatcherActor}
 import play.api.mvc.Controller
+import play.api.libs.concurrent.Akka
 
 class MyController extends Controller {
   def isRequestValid(`type`: String, swipeStart: Int, swipeEnd: Int) = {
@@ -21,6 +22,5 @@ class MyController extends Controller {
 
 object MyController extends Controller {
   Logger.info("\n******* Server starting. Creating ActorSystem. ********")
-  val system = ActorSystem("screens-system")
-  val matchingActor = system.actorOf(MatcherActor.props)
+  val matchingActor = Akka.system.actorOf(MatcherActor.props)
 }

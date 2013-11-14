@@ -4,13 +4,15 @@ import play.api.mvc.Action
 import akka.pattern.{AskTimeoutException, ask}
 import scala.concurrent.Future
 import play.api.Logger
-import actors.{NewRequest, HandlingActorFactory}
+import actors.HandlingActorFactory
 import akka.actor.ActorRef
 import helpers.{JsonResponseHelper, SwipeMovementHelper}
 import models.RequestToMatch
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.ExecutionContext.Implicits.global
 import actors.http.Match
+import play.api.libs.concurrent.Akka
+import play.api.Play.current
 
 object ApplicationHTTP extends MyController {
   def requestHTTP(`type`: String,
@@ -39,7 +41,7 @@ object ApplicationHTTP extends MyController {
         val props = HandlingActorFactory.getActorProps(`type`, HandlingActorFactory.HTTP)
 
         // setup handling actor
-        val handlingActor: ActorRef = MyController.system.actorOf(props)
+        val handlingActor: ActorRef = Akka.system.actorOf(props)
 
         // add it to the matcher queue
         val timestamp = System.currentTimeMillis

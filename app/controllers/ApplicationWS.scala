@@ -12,6 +12,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.Some
 import play.api.Logger
 import helpers.SwipeMovementHelper
+import play.api.libs.concurrent.Akka
+import play.api.Play.current
 
 object ApplicationWS extends MyController {
 
@@ -35,7 +37,7 @@ object ApplicationWS extends MyController {
         val props = HandlingActorFactory.getActorProps(`type`, HandlingActorFactory.WEBSOCKET)
 
         // setup handling actor
-        val handlingActor: ActorRef = MyController.system.actorOf(props)
+        val handlingActor: ActorRef = Akka.system.actorOf(props)
         var channel: Option[Concurrent.Channel[String]] = None
         val out: Enumerator[String] = Concurrent.unicast(c => {
           channel = Some(c)
