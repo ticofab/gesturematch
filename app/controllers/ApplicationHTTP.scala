@@ -10,6 +10,7 @@ import helpers.{JsonResponseHelper, SwipeMovementHelper}
 import models.RequestToMatch
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.ExecutionContext.Implicits.global
+import actors.http.Match
 
 object ApplicationHTTP extends MyController {
   def requestHTTP(`type`: String,
@@ -46,7 +47,7 @@ object ApplicationHTTP extends MyController {
         val requestData = new RequestToMatch(apiKey, appId, deviceId, latitude, longitude, timestamp, swipeStart,
           swipeEnd, movement, equalityParam, payload, handlingActor)
 
-        val future: Future[String] = (MyController.matchingActor ? NewRequest(requestData))(10.seconds).mapTo[String]
+        val future: Future[String] = (handlingActor ? Match(requestData, MyController.matchingActor))(5.seconds).mapTo[String]
 
         future.map(result => Ok(result)).recover {
           case ex: AskTimeoutException => Ok(JsonResponseHelper.getTimeoutResponse)
