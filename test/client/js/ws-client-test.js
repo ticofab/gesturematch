@@ -4,40 +4,28 @@ myApp.controller('paramTable', ['$scope', function($scope) {
 
     initStuff();
 
-    // var serverUrl = 'thawing-escarpment-8488.herokuapp.com';
-
-    serverUrl = $scope.serverUrl;
-
-    $scope.$watchCollection("[dev1rtype,dev1devid,dev1lat,dev1lon,dev1ss,dev1se,dev1pl,dev1ep,dev1apikey,dev1appId]", function(nv) {
-        $scope.dev1url = 'ws://' + serverUrl + '/requestWS?type=' + nv[0] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
+    $scope.$watchCollection("[dev1rtype,dev1devid,dev1lat,dev1lon,dev1ss,dev1se,dev1pl,dev1ep,dev1apikey,dev1appId,serverUrl]", function(nv) {
+        var allParams = nv[0] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
+        $scope.dev1url = 'ws://' + nv[10] + '/requestWS?type=' + allParams;
+        $scope.dev1urlHTTP = 'http://' + nv[10] + '/requestHTTP?type=' + allParams;
     });
 
-    $scope.$watchCollection("[dev2rtype,dev2devid,dev2lat,dev2lon,dev2ss,dev2se,dev2pl,dev2ep,dev2apikey,dev2appId]", function(nv) {
-        $scope.dev2url = 'ws://' + serverUrl + '/requestWS?type=' + nv[0] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
+    $scope.$watchCollection("[dev2rtype,dev2devid,dev2lat,dev2lon,dev2ss,dev2se,dev2pl,dev2ep,dev2apikey,dev2appId,serverUrl]", function(nv) {
+        var allParams = nv[0] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
+        $scope.dev2url = 'ws://' + nv[10] + '/requestWS?type=' + allParams;
+        $scope.dev2urlHTTP = 'http://' + nv[10] + '/requestHTTP?type=' + allParams;
     });
 
-    $scope.$watchCollection("[dev3rtype,dev3devid,dev3lat,dev3lon,dev3ss,dev3se,dev3pl,dev3ep,dev3apikey,dev3appId]", function(nv) {
-        $scope.dev3url = 'ws://' + serverUrl + '/requestWS?type=' + nv[0] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
+    $scope.$watchCollection("[dev3rtype,dev3devid,dev3lat,dev3lon,dev3ss,dev3se,dev3pl,dev3ep,dev3apikey,dev3appId,serverUrl]", function(nv) {
+        var allParams = nv[0] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
+        $scope.dev3url = 'ws://' + nv[10] + '/requestWS?type=' + allParams;
+        $scope.dev3urlHTTP = 'http://' + nv[10] + '/requestHTTP?type=' + allParams;
     });
 
-    $scope.$watchCollection("[dev4rtype,dev4devid,dev4lat,dev4lon,dev4ss,dev4se,dev4pl,dev4ep,dev4apikey,dev4appId]", function(nv) {
-        $scope.dev4url = 'ws://' + serverUrl + '/requestWS?type=' + nv[0] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
-    });
-
-    $scope.$watchCollection("[dev1rtype,dev1devid,dev1lat,dev1lon,dev1ss,dev1se,dev1pl,dev1ep,dev1apikey,dev1appId]", function(nv) {
-        $scope.dev1urlHTTP = 'http://' + serverUrl + '/requestHTTP?type=' + nv[0] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
-    });
-
-    $scope.$watchCollection("[dev2rtype,dev2devid,dev2lat,dev2lon,dev2ss,dev2se,dev2pl,dev2ep,dev2apikey,dev2appId]", function(nv) {
-        $scope.dev2urlHTTP = 'http://' + serverUrl + '/requestHTTP?type=' + nv[0] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
-    });
-
-    $scope.$watchCollection("[dev3rtype,dev3devid,dev3lat,dev3lon,dev3ss,dev3se,dev3pl,dev3ep,dev3apikey,dev3appId]", function(nv) {
-        $scope.dev3urlHTTP = 'http://' + serverUrl + '/requestHTTP?type=' + nv[0] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
-    });
-
-    $scope.$watchCollection("[dev4rtype,dev4devid,dev4lat,dev4lon,dev4ss,dev4se,dev4pl,dev4ep,dev4apikey,dev4appId]", function(nv) {
-        $scope.dev4urlHTTP = 'http://' + serverUrl + '/requestHTTP?type=' + nv[0] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
+    $scope.$watchCollection("[dev4rtype,dev4devid,dev4lat,dev4lon,dev4ss,dev4se,dev4pl,dev4ep,dev4apikey,dev4appId,serverUrl]", function(nv) {
+        var allParams = nv[0] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
+        $scope.dev4url = 'ws://' + nv[10] + '/requestWS?type=' + allParams;
+        $scope.dev4urlHTTP = 'http://' + nv[10] + '/requestHTTP?type=' + allParams;
     });
 
     var myWebSocket1, myWebSocket2, myWebSocket3, myWebSocket4;
@@ -157,7 +145,7 @@ $scope.connect4HTTP = function() {
 
 
     function initStuff() {
-        
+
         $scope.serverUrl = "thawing-escarpment-8488.herokuapp.com"
 
         $scope.dev1rtype = "content"
