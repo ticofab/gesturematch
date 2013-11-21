@@ -146,7 +146,8 @@ $scope.connect4HTTP = function() {
 
     function initStuff() {
 
-        $scope.serverUrl = "thawing-escarpment-8488.herokuapp.com"
+        $scope.serverUrl = "localhost:9000"
+        //$scope.serverUrl = "thawing-escarpment-8488.herokuapp.com"
 
         $scope.dev1rtype = "content"
         $scope.dev2rtype = "content"
@@ -158,10 +159,10 @@ $scope.connect4HTTP = function() {
         $scope.dev3apikey = "contact-api-key"
         $scope.dev4apikey = "contact-api-key"
 
-        $scope.dev1devid = "id1"
-        $scope.dev2devid = "id2"
-        $scope.dev3devid = "id3"
-        $scope.dev4devid = "id4"
+        $scope.dev1devid = "idjs1"
+        $scope.dev2devid = "idjs2"
+        $scope.dev3devid = "idjs3"
+        $scope.dev4devid = "idjs4"
 
         $scope.dev1lat = "12.00"
         $scope.dev2lat = "12.00"
@@ -179,17 +180,17 @@ $scope.connect4HTTP = function() {
         $scope.dev4ss = "3"
 
         $scope.dev1se = "3"
-        $scope.dev2se = "1"
+        $scope.dev2se = "4"
         $scope.dev3se = "2"
         $scope.dev4se = "4"
 
-        $scope.dev1pl = "pl1"
-        $scope.dev2pl = "pl2"
-        $scope.dev3pl = "pl3"
-        $scope.dev4pl = "pl4"
+        $scope.dev1pl = "[{\"type\":\"NAME\",\"content\":{\"value\":\"Fabio1\"}}]"
+        $scope.dev2pl = "[{\"type\":\"NAME\",\"content\":{\"value\":\"Fabio2\"}}]"
+        $scope.dev3pl = "[{\"type\":\"NAME\",\"content\":{\"value\":\"Fabio3\"}}]"
+        $scope.dev4pl = "[{\"type\":\"NAME\",\"content\":{\"value\":\"Fabio4\"}}]"
 
         $scope.dev1ep = "uguale"
-        $scope.dev2ep = "uguale"
+        $scope.dev2ep = "red"
         $scope.dev3ep = "uguale"
         $scope.dev4ep = "uguale"
 
