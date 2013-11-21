@@ -53,7 +53,7 @@ object ApplicationWS extends MyController {
         val timestamp = System.currentTimeMillis
         val movement = SwipeMovementHelper.swipesToMovement(swipeStart, swipeEnd)
         val requestData = new RequestToMatch(apiKey, appId, deviceId, latitude, longitude, timestamp, swipeStart,
-          swipeEnd, movement, equalityParam, payload.replace("\\", ""), handlingActor)
+          swipeEnd, movement, equalityParam, payload, handlingActor)
 
         MyController.matchingActor ! NewRequest(requestData)
 
