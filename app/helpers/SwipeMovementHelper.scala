@@ -1,7 +1,8 @@
 package helpers
 
 import consts.SwipeMovements._
-import models.PossibleMatching
+import models.{RequestToMatch, PossibleMatching}
+import consts.SwipeMovements
 
 object SwipeMovementHelper {
   private def makePossibleMatchingsListTwoAndFour(pos2: SwipeMovement,
@@ -82,6 +83,86 @@ object SwipeMovementHelper {
       case 42 => InnerLeft
       case 43 => InnerRight
       case _ => Unknown
+    }
+  }
+
+  /**
+   * Given a list of requests, it identifies the longest pattern that matches them all.
+   *
+   * @param matchingRequests
+   *  All the requests that we've been able to match based on other criteria.
+   *
+   * @return
+   * The longest closed sequence possible given the starting point and the other requests.
+   */
+  def getMatchedPattern(matchingRequests: List[RequestToMatch]): List[RequestToMatch] = {
+    def getLongestComb(res: List[List[RequestToMatch]]) =
+      res match {
+        case Nil => Nil
+        case x :: xs => res.reduceLeft((a, b) => if (a.length > b.length) a else b)
+      }
+
+    def getValidCombs(res: List[List[RequestToMatch]]) = {
+      def validCombFilter(res: List[RequestToMatch]): Boolean = {
+
+        val coolHead = res.head.movement match {
+          case LeftInner | RightInner | TopInner | BottomInner => true
+          case _ => false
+        }
+        val coolEnd = res.last.movement match {
+          case InnerLeft | InnerRight | InnerTop | InnerBottom => true
+          case _ => false
+        }
+        coolHead && coolEnd
+      }
+
+      res.filter(validCombFilter(_))
+    }
+
+    def getCombinations(tileHistory: List[RequestToMatch], availableNewTiles: List[RequestToMatch]): List[(List[RequestToMatch], List[RequestToMatch])] = {
+
+      def expand = availableNewTiles.filter(SwipeMovements.getLegalNextOnes(tileHistory.head.movement).contains(_)).map(elem => (elem :: tileHistory, availableNewTiles.diff(List(elem))))
+
+      availableNewTiles match {
+        case Nil => List()
+        case x :: xs => {
+          val expanded = expand
+
+          def addChunks = {
+            if (expanded == Nil) Nil
+            else (for (xs <- expanded) yield getCombinations(xs._1, xs._2)).flatten
+          }
+
+          if (expanded == Nil) Nil
+          else expanded ++ addChunks
+        }
+      }
+    }
+
+    def isInnerX(movement: SwipeMovement): Boolean = movement match {
+      case InnerLeft | InnerRight | InnerTop | InnerBottom => true
+      case _ => false
+    }
+
+    // find the one with Inner and use it as first
+    val (head, tail) = matchingRequests.partition(r => isInnerX(r.movement))
+
+    head match {
+
+      // good, only one InnerX
+      case x :: Nil => {
+        // these intermediate vals are here for clarity
+        val skimmedResults = getCombinations(head, tail).map(x => x._1)
+        val longestValidResult = getLongestComb(getValidCombs(skimmedResults)).reverse
+        longestValidResult
+      }
+
+      // error, not a single InnerX request
+      case Nil => List()
+
+      // error, two or more InnerX requests
+      case x :: xs :: Nil => List()
+
     }
   }
 }

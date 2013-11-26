@@ -23,5 +23,22 @@ object SwipeMovements extends Enumeration {
   BottomLeft,
   TopLeft,
   BottomRight,
+  LeftRight,
+  RightLeft,
+  TopBottom,
+  BottomTop,
   TopRight = Value
+
+  def getLegalNextOnes(movement: SwipeMovement): List[SwipeMovement] = {
+    movement match {
+      case InnerRight | LeftRight | BottomRight | TopRight => List(LeftRight, LeftInner, LeftBottom, LeftTop)
+      case InnerLeft | RightLeft | BottomLeft | TopLeft => List(RightLeft, RightInner, RightTop, RightBottom)
+      case LeftBottom | RightBottom | TopBottom | InnerBottom => List(TopLeft, TopInner, TopRight, TopBottom)
+      case LeftTop | RightTop | InnerTop | BottomTop => List(BottomLeft, BottomRight, BottomTop, BottomInner)
+      case LeftInner | RightInner | TopInner | BottomInner => List()
+    }
+  }
+
 }
+
+

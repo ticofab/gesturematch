@@ -152,4 +152,3 @@ object MatcherActor {
   val props = Props(classOf[MatcherActor])
 }
 
-case class NewRequest(request: RequestToMatch)
