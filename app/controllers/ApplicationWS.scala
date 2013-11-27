@@ -14,10 +14,12 @@ import play.api.Logger
 import helpers.{RequestAnalyticsHelper, SwipeMovementHelper}
 import play.api.libs.concurrent.Akka
 import play.api.Play.current
+import consts.Areas
 
 object ApplicationWS extends MyController {
 
   def requestWS(`type`: String,
+                criteria: String,
                 apiKey: String,
                 appId: String,
                 latitude: Double,
@@ -52,8 +54,9 @@ object ApplicationWS extends MyController {
         // add it to the matcher queue
         val timestamp = System.currentTimeMillis
         val movement = SwipeMovementHelper.swipesToMovement(swipeStart, swipeEnd)
-        val requestData = new RequestToMatch(apiKey, appId, deviceId, latitude, longitude, timestamp, swipeStart,
-          swipeEnd, movement, equalityParam, payload, handlingActor)
+        val requestData = new RequestToMatch(criteria, apiKey, appId, deviceId, latitude, longitude,
+          timestamp, Areas.withName(swipeStart.toString), Areas.withName(swipeStart.toString),
+          movement, equalityParam, payload, handlingActor)
 
         MyController.matchingActor ! NewRequest(requestData)
 

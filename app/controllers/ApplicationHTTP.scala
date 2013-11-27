@@ -13,9 +13,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import actors.http.Match
 import play.api.libs.concurrent.Akka
 import play.api.Play.current
+import consts.Areas
 
 object ApplicationHTTP extends MyController {
   def requestHTTP(`type`: String,
+                  criteria: String,
                   apiKey: String,
                   appId: String,
                   latitude: Double,
@@ -46,8 +48,9 @@ object ApplicationHTTP extends MyController {
         // add it to the matcher queue
         val timestamp = System.currentTimeMillis
         val movement = SwipeMovementHelper.swipesToMovement(swipeStart, swipeEnd)
-        val requestData = new RequestToMatch(apiKey, appId, deviceId, latitude, longitude, timestamp, swipeStart,
-          swipeEnd, movement, equalityParam, payload, handlingActor)
+        val requestData = new RequestToMatch(criteria, apiKey, appId, deviceId, latitude, longitude,
+          timestamp, Areas.withName(swipeStart.toString), Areas.withName(swipeStart.toString),
+          movement, equalityParam, payload, handlingActor)
 
         val future: Future[String] = (handlingActor ? Match(requestData, MyController.matchingActor))(5.seconds).mapTo[String]
 

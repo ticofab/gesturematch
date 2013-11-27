@@ -94,7 +94,7 @@ object ScreenPositionHelper {
   /*
    * Given one "arrival" position, it infers where the starting one must have been.
    */
-  def getCorrespondingEntrance(exitArea: Int) = {
+  def getCorrespondingEntrance(exitArea: Areas) = {
     exitArea match {
       case Bottom => Top
       case Top => Bottom

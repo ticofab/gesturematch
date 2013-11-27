@@ -3,7 +3,7 @@
 # ~~~~
 
 # Http
-GET     /requestHTTP     controllers.ApplicationHTTP.requestHTTP(type: String, apiKey: String, appId: String, latitude: Double, longitude: Double, swipeStart: Int, swipeEnd: Int, deviceId: String, equalityParam1: String, payload: String)
+GET     /requestHTTP     controllers.ApplicationHTTP.requestHTTP(type: String, criteria: String, apiKey: String, appId: String, latitude: Double, longitude: Double, swipeStart: Int, swipeEnd: Int, deviceId: String, equalityParam1: String, payload: String)
 
 # Websocket
-GET     /requestWS       controllers.ApplicationWS.requestWS(type: String, apiKey: String, appId: String, latitude: Double, longitude: Double, swipeStart: Int, swipeEnd: Int, deviceId: String, equalityParam1: String, payload: String)
+GET     /requestWS       controllers.ApplicationWS.requestWS(type: String, criteria: String, apiKey: String, appId: String, latitude: Double, longitude: Double, swipeStart: Int, swipeEnd: Int, deviceId: String, equalityParam1: String, payload: String)

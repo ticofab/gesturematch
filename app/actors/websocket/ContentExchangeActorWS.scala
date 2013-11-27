@@ -2,11 +2,11 @@ package actors.websocket
 
 import akka.actor.{Actor, Props}
 import play.api.Logger
-import consts.Timeouts
+import consts.{MatcheeInfo, Timeouts}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.concurrent.Promise
 import helpers.JsonResponseHelper
-import actors.{Input, Matched, Setup}
+import actors.{MatchedGroup, Input, MatchedPosition, Setup}
 
 /**
  * This actor will simply pass the content to the actors of the other matched requests.
@@ -20,13 +20,14 @@ class ContentExchangeActorWS extends HandlingActorWS {
       Promise.timeout(channel.foreach(x => x.eofAndEnd()), Timeouts.maxOldestRequestInterval)
     }
 
-    case Matched(myPosition, myPayload, otherInfo) => {
+    case MatchedPosition(myPosition, myPayload, matcheeInfo) => {
       Logger.info(s"$self, Matched message: $myPosition\n  my payload: $myPayload\n")
+      matches = Some(matcheeInfo)
 
-      otherInfo.length match {
+      matcheeInfo.length match {
         // there is only another request
         case 1 => {
-          val jsonToSend = JsonResponseHelper.getMatched2ContentResponse(otherInfo)
+          val jsonToSend = JsonResponseHelper.getMatched2ContentResponse(matcheeInfo)
           channel.foreach(x => {
             x.push(jsonToSend)
             x.eofAndEnd()
@@ -35,7 +36,7 @@ class ContentExchangeActorWS extends HandlingActorWS {
 
         // there are 3 other requests
         case 3 => {
-          val jsonToSend = JsonResponseHelper.getMatched4ContentResponse(otherInfo)
+          val jsonToSend = JsonResponseHelper.getMatched4ContentResponse(matcheeInfo)
           channel.foreach(x => {
             x.push(jsonToSend)
             x.eofAndEnd()
@@ -44,11 +45,16 @@ class ContentExchangeActorWS extends HandlingActorWS {
       }
     }
 
+    case MatchedGroup(group: List[MatcheeInfo]) => {
+      // I've been matched in a touch-only group
+      Logger.info(s"$self, MatchedGroup message, group size: ${group.size}")
+      matches = Some(group)
+    }
+
     case Input(input) => {
       Logger.info(s"$self, Input() message: $input")
       // don't do anything with it.
     }
-
   }
 }
 

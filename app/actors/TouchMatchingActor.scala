@@ -26,18 +26,25 @@ class TouchMatchingActor extends Actor {
       // try to find a touch pattern
       val requestsInPattern: List[RequestToMatch] = SwipeMovementHelper.getMatchedPattern(possiblyMatchingRequests)
 
+      requestsInPattern match {
+        case Nil => {
+          // no match. add the request to the storage
+        }
 
+        case x :: Nil => {
+          // only one element. wrong!
+        }
+
+        case x :: xs => {
+          // we identified a group!
+          val matcheesInfo = requestsInPattern.map(x => x.getMatcheeInfo)
+          requestsInPattern.foreach(r => r.handlingActor ! MatchedGroup(matcheesInfo))
+        }
+      }
     }
-
-
   }
-
-
 }
 
 object TouchMatchingActor {
   val props = Props(classOf[TouchMatchingActor])
 }
-
-
-

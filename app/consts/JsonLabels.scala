@@ -8,6 +8,10 @@ object JsonLabels {
   val OUTCOME_UNCERTAIN = "uncertain"
   val OUTCOME_TIMEOUT = "timeout"
   val OUTCOME_UNKNOWN_ERROR = "error"
+  val OUTCOME_MATCHED_GROUP = "matchedGroup"
+
+  // group messages labels
+  val GROUP_SIZE = "groupSize"
 
   // payload of the matching devices.
   val PAYLOAD = "payload"

@@ -1,7 +1,7 @@
 package actors.http
 
 import akka.actor.{ActorRef, Props, Actor}
-import actors.{NewRequest, Matched}
+import actors.{NewRequest, MatchedPosition}
 import play.api.Logger
 import helpers.JsonResponseHelper
 import models.RequestToMatch
@@ -11,7 +11,7 @@ class ContentExchangeActorHTTP extends Actor {
 
   def receive: Actor.Receive = {
 
-    case Matched(myPosition, myPayload, otherInfo) => {
+    case MatchedPosition(myPosition, myPayload, otherInfo) => {
       Logger.info(s"$self, Matched message: $myPosition\n  my payload: $myPayload\n")
 
       otherInfo.length match {

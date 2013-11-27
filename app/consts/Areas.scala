@@ -30,11 +30,12 @@ package consts
  * the APIs when a client sends a matching request.
  */
 
-object Areas {
-  val Top: Int = 0
-  val Bottom: Int = 1
-  val Left: Int = 2
-  val Right: Int = 3
-  val Inner: Int = 4
-  val Invalid: Int = 5
+object Areas extends Enumeration {
+  type Areas = Value
+  val Top = Value(0)
+  val Bottom = Value(1)
+  val Left = Value(2)
+  val Right = Value(3)
+  val Inner = Value(4)
+  val Invalid = Value(5)
 }

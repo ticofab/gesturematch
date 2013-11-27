@@ -2,8 +2,11 @@ package models
 
 import akka.actor.ActorRef
 import consts.SwipeMovements.SwipeMovement
+import consts.Areas.Areas
+import consts.MatcheeInfo
 
 /**
+ * TODO: redo this
  * This is the object that represents a matching request that came from a client.
  * @param latitude         The client's latitude (to best approximation)
  * @param longitude        The client's longitude (to best approximation)
@@ -13,19 +16,19 @@ import consts.SwipeMovements.SwipeMovement
  * @param payload          The request payload
  * @param handlingActor    The reference to the actor managing this request
  */
-class RequestToMatch(val apiKey: String,
+class RequestToMatch(val criteria: String,
+                     val apiKey: String,
                      val appId: String,
                      val deviceId: String,
                      val latitude: Double,
                      val longitude: Double,
                      val timestamp: Long,
-                     val areaStart: Int,
-                     val areaEnd: Int,
+                     val areaStart: Areas,
+                     val areaEnd: Areas,
                      val movement: SwipeMovement,
                      val equalityParam: String,
                      val payload: String,
                      val handlingActor: ActorRef) {
-  def getServiceInfo: (ActorRef, String) = (handlingActor, payload)
-
-  override def toString: String = s"Request: $apiKey $appId $deviceId $latitude $longitude $timestamp $areaStart$areaEnd $movement $equalityParam $handlingActor $payload"
+  def getMatcheeInfo: MatcheeInfo = (handlingActor, payload)
+  override def toString: String = s"Request: $criteria $apiKey $appId $deviceId $latitude $longitude $timestamp $areaStart$areaEnd $movement $equalityParam $handlingActor $payload"
 }

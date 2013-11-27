@@ -9,7 +9,7 @@ object RequestAnalyticsHelper {
     //    check more things about parameters
     //    - api key must be valid
     //    - app id must be valid
-    //    - .....
+    //    - criteria must be valid
 
     val validRequestType = HandlingActorFactory.getValidRequestsTypes.contains(`type`)
     val differentSwipes = swipeEnd != swipeStart
