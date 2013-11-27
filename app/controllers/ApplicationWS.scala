@@ -11,7 +11,7 @@ import actors.Input
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.Some
 import play.api.Logger
-import helpers.SwipeMovementHelper
+import helpers.{RequestAnalyticsHelper, SwipeMovementHelper}
 import play.api.libs.concurrent.Akka
 import play.api.Play.current
 
@@ -32,7 +32,7 @@ object ApplicationWS extends MyController {
       Logger.info(s"requestWS API call. Request:\n  ${request.remoteAddress} ${request.version} ${request.method} ${request.uri}")
       Logger.info(s"  parameters: $latitude $longitude $swipeStart $swipeEnd $equalityParam $payload\n")
 
-      if (isRequestValid(`type`, swipeStart, swipeEnd)) {
+      if (RequestAnalyticsHelper.requestIsValid(`type`, swipeStart, swipeEnd)) {
         Logger.info("    Request valid.")
         val props = HandlingActorFactory.getActorProps(`type`, HandlingActorFactory.WEBSOCKET)
 

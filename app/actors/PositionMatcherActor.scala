@@ -2,29 +2,11 @@ package actors
 
 import akka.actor.{Props, Actor}
 import models.{PossibleMatching, MatchingGroup, RequestToMatch}
-import helpers.{SwipeMovementHelper, ScreenPositionHelper, RequestStorageHelper}
+import helpers.{RequestAnalyticsHelper, SwipeMovementHelper, ScreenPositionHelper, RequestStorageHelper}
 import consts.Areas._
 import play.api.Logger
 
-class MatcherActor extends Actor {
-
-  private def requestsAreCompatible(r1: RequestToMatch, r2: RequestToMatch): Boolean = {
-    // check on latitude
-    val latDiff: Double = scala.math.pow(r1.latitude - r2.latitude, 2)
-    val lonDiff: Double = scala.math.pow(r1.longitude - r2.longitude, 2)
-    val closeEnough: Boolean = latDiff < 0.01 && lonDiff < 0.01
-
-    // check if equality parameters are the same
-    val equality = r1.equalityParam == r2.equalityParam
-
-    // check if apiKey is the same
-    val sameApiKey = r1.apiKey == r2.apiKey
-
-    // check if appId is the same
-    val sameAppId = r1.appId == r2.appId
-
-    closeEnough && equality && sameApiKey && sameAppId
-  }
+class PositionMatcherActor extends Actor {
 
   private def deliverTo2Group(group: List[RequestToMatch]): Unit = {
     // the new request
@@ -80,6 +62,7 @@ class MatcherActor extends Actor {
   }
 
   private def getMatchingGroup(request: RequestToMatch, existingRequests: List[RequestToMatch]): List[MatchingGroup] = {
+
     // get all possible matching groups for the given request
     val possibleMatchingGroups: List[PossibleMatching] = SwipeMovementHelper.getPossibleMatching(request.movement)
 
@@ -87,7 +70,7 @@ class MatcherActor extends Actor {
     val tmp1: List[(PossibleMatching, RequestToMatch)] = for {
       pg <- possibleMatchingGroups // for all the possible matching groups
       prevReq <- existingRequests // for all the previous requests, considered if
-      reqCompatible = requestsAreCompatible(request, prevReq) // the old request is compatible and
+      reqCompatible = RequestAnalyticsHelper.requestsAreCompatible(request, prevReq) // the old request is compatible and
       hasCoolMovement = pg.necessaryMovements.contains(prevReq.movement) // its movement is necessary
       if reqCompatible && hasCoolMovement
     } yield (pg, prevReq)
@@ -148,7 +131,7 @@ class MatcherActor extends Actor {
   }
 }
 
-object MatcherActor {
-  val props = Props(classOf[MatcherActor])
+object PositionMatcherActor {
+  val props = Props(classOf[PositionMatcherActor])
 }
 

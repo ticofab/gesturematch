@@ -14,7 +14,7 @@ object HandlingActorFactory {
   val PHOTO = "photo"
   val CONTENT = "content"
 
-  def getValidRequests: List[String] = List(PHOTO, CONTENT)
+  def getValidRequestsTypes: List[String] = List(PHOTO, CONTENT)
 
   def getActorProps(requestType: String, protocolType: Int): Props = {
 

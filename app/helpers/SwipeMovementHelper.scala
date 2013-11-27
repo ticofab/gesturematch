@@ -90,7 +90,7 @@ object SwipeMovementHelper {
    * Given a list of requests, it identifies the longest pattern that matches them all.
    *
    * @param matchingRequests
-   *  All the requests that we've been able to match based on other criteria.
+   * All the requests that we've been able to match based on other criteria.
    *
    * @return
    * The longest closed sequence possible given the starting point and the other requests.
@@ -104,15 +104,8 @@ object SwipeMovementHelper {
 
     def getValidCombs(res: List[List[RequestToMatch]]) = {
       def validCombFilter(res: List[RequestToMatch]): Boolean = {
-
-        val coolHead = res.head.movement match {
-          case LeftInner | RightInner | TopInner | BottomInner => true
-          case _ => false
-        }
-        val coolEnd = res.last.movement match {
-          case InnerLeft | InnerRight | InnerTop | InnerBottom => true
-          case _ => false
-        }
+        val coolHead = isInnerX(res.head.movement)
+        val coolEnd = isXInner(res.last.movement)
         coolHead && coolEnd
       }
 
@@ -144,6 +137,11 @@ object SwipeMovementHelper {
       case _ => false
     }
 
+    def isXInner(movement: SwipeMovement): Boolean = movement match {
+      case InnerLeft | InnerRight | InnerTop | InnerBottom => true
+      case _ => false
+    }
+
     // find the one with Inner and use it as first
     val (head, tail) = matchingRequests.partition(r => isInnerX(r.movement))
 
@@ -151,7 +149,7 @@ object SwipeMovementHelper {
 
       // good, only one InnerX
       case x :: Nil => {
-        // these intermediate vals are here for clarity
+        // these intermediate values are here for clarity
         val skimmedResults = getCombinations(head, tail).map(x => x._1)
         val longestValidResult = getLongestComb(getValidCombs(skimmedResults)).reverse
         longestValidResult
@@ -161,7 +159,7 @@ object SwipeMovementHelper {
       case Nil => List()
 
       // error, two or more InnerX requests
-      case x :: xs :: Nil => List()
+      case _ => List()
 
     }
   }

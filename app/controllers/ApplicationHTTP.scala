@@ -6,7 +6,7 @@ import scala.concurrent.Future
 import play.api.Logger
 import actors.HandlingActorFactory
 import akka.actor.ActorRef
-import helpers.{JsonResponseHelper, SwipeMovementHelper}
+import helpers.{RequestAnalyticsHelper, JsonResponseHelper, SwipeMovementHelper}
 import models.RequestToMatch
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -30,7 +30,7 @@ object ApplicationHTTP extends MyController {
       Logger.info(s"requestHTTP API call. Request:\n  ${request.remoteAddress} ${request.version} ${request.method} ${request.uri}")
       Logger.info(s"  parameters: $latitude $longitude $swipeStart $swipeEnd $equalityParam $payload\n")
 
-      if (!isRequestValid(`type`, swipeStart, swipeEnd)) {
+      if (!RequestAnalyticsHelper.requestIsValid(`type`, swipeStart, swipeEnd)) {
 
         val result = BadRequest("Invalid request!")
         Future.successful(result)
