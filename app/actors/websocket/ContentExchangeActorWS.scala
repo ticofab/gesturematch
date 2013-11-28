@@ -49,6 +49,7 @@ class ContentExchangeActorWS extends HandlingActorWS {
       // I've been matched in a touch-only group
       Logger.info(s"$self, MatchedGroup message, group size: ${group.size}")
       matches = Some(group)
+      channel.foreach(_.eofAndEnd)
     }
 
     case Input(input) => {
