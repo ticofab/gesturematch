@@ -30,5 +30,5 @@ class RequestToMatch(val apiKey: String,
                      val payload: String,
                      val handlingActor: ActorRef) {
   def getMatcheeInfo: MatcheeInfo = (handlingActor, payload)
-  override def toString: String = s"Request: $apiKey $appId $deviceId $latitude $longitude $timestamp $areaStart$areaEnd $movement $equalityParam $handlingActor $payload"
+  override def toString: String = s"Request: $apiKey $appId $deviceId $latitude $longitude $timestamp $areaStart $areaEnd $movement $equalityParam $handlingActor $payload"
 }

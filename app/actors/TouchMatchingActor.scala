@@ -26,8 +26,9 @@ class TouchMatchingActor extends Actor {
         if RequestAnalyticsHelper.requestsAreCompatible(request, existingRequest)
       } yield (existingRequest)
 
+
       // try to find a touch pattern
-      val group: List[RequestToMatch] = SwipeMovementHelper.getMatchedPattern(possiblyMatchingRequests)
+      val group: List[RequestToMatch] = SwipeMovementHelper.getMatchedPattern(request :: possiblyMatchingRequests)
 
       group match {
         case Nil => {
