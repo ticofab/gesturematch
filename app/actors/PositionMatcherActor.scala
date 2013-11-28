@@ -21,8 +21,8 @@ class PositionMatcherActor extends Actor {
     Logger.info(s"1st mov & pos:   ${r1.movement}    ${pos1.toString}")
     Logger.info(s"2nd mov & pos:   ${r2.movement}    ${pos2.toString}")
 
-    r1.handlingActor ! MatchedPosition(pos1, r1.payload, List(r2.getMatcheeInfo))
-    r2.handlingActor ! MatchedPosition(pos2, r2.payload, List(r1.getMatcheeInfo))
+    r1.handlingActor ! MatchedPosition(pos1, List(r2.getMatcheeInfo))
+    r2.handlingActor ! MatchedPosition(pos2, List(r1.getMatcheeInfo))
   }
 
   private def deliverTo4Group(group: List[RequestToMatch]): Unit = {
@@ -56,10 +56,10 @@ class PositionMatcherActor extends Actor {
     Logger.info(s"3rd mov & pos:   ${r3.movement}    ${pos3.toString}")
     Logger.info(s"4th pos:         ${pos4.toString}\n")
 
-    r1.handlingActor ! new MatchedPosition(pos1, r1.payload, List(r2.getMatcheeInfo, r3.getMatcheeInfo, r4.getMatcheeInfo))
-    r2.handlingActor ! new MatchedPosition(pos2, r2.payload, List(r1.getMatcheeInfo, r3.getMatcheeInfo, r4.getMatcheeInfo))
-    r3.handlingActor ! new MatchedPosition(pos3, r3.payload, List(r1.getMatcheeInfo, r2.getMatcheeInfo, r4.getMatcheeInfo))
-    r4.handlingActor ! new MatchedPosition(pos4, r4.payload, List(r1.getMatcheeInfo, r2.getMatcheeInfo, r3.getMatcheeInfo))
+    r1.handlingActor ! new MatchedPosition(pos1, List(r2.getMatcheeInfo, r3.getMatcheeInfo, r4.getMatcheeInfo))
+    r2.handlingActor ! new MatchedPosition(pos2, List(r1.getMatcheeInfo, r3.getMatcheeInfo, r4.getMatcheeInfo))
+    r3.handlingActor ! new MatchedPosition(pos3, List(r1.getMatcheeInfo, r2.getMatcheeInfo, r4.getMatcheeInfo))
+    r4.handlingActor ! new MatchedPosition(pos4, List(r1.getMatcheeInfo, r2.getMatcheeInfo, r3.getMatcheeInfo))
   }
 
   private def getMatchingGroup(request: RequestToMatch, existingRequests: List[RequestToMatch]): List[MatchingGroup] = {

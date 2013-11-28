@@ -1,7 +1,7 @@
 package helpers
 
 import play.api.libs.json.Json
-import consts.{MatcheeInfo, JsonLabels}
+import consts.JsonLabels
 
 object JsonResponseHelper {
 
@@ -14,27 +14,18 @@ object JsonResponseHelper {
     )
   }
 
-  def getMatched2ContentResponse(matcheeInfo: List[MatcheeInfo]) = {
+  def getMatched2ContentResponse = {
     Json.stringify(
       Json.obj(
-        JsonLabels.OUTCOME -> JsonLabels.OUTCOME_MATCHED2,
-        JsonLabels.PAYLOAD -> matcheeInfo.head._2
+        JsonLabels.OUTCOME -> JsonLabels.OUTCOME_MATCHED2
       )
     )
   }
 
-  def getMatched4ContentResponse(matcheesInfo: List[MatcheeInfo]) = {
-    val matcheesInfoVector = matcheesInfo.toVector
+  def getMatched4ContentResponse = {
     Json.stringify(
       Json.obj(
-        JsonLabels.OUTCOME -> JsonLabels.OUTCOME_MATCHED4,
-        JsonLabels.PAYLOAD -> Json.arr(
-          Json.obj(
-            JsonLabels.FIRST_DEVICE -> matcheesInfoVector(0)._2,
-            JsonLabels.SECOND_DEVICE -> matcheesInfoVector(1)._2,
-            JsonLabels.THIRD_DEVICE -> matcheesInfoVector(2)._2
-          )
-        )
+        JsonLabels.OUTCOME -> JsonLabels.OUTCOME_MATCHED4
       )
     )
   }

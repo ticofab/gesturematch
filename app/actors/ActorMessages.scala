@@ -10,7 +10,7 @@ case class NewRequest(request: RequestToMatch)
 
 // request handling actors
 case class Setup(channel: Option[Concurrent.Channel[String]])
-case class MatchedPosition(position: ScreenPosition, payload: String, othersInfo: List[MatcheeInfo])
+case class MatchedPosition(position: ScreenPosition, othersInfo: List[MatcheeInfo])
 case class MatchedGroup(group: List[MatcheeInfo])
 case class Input(input: String)
 

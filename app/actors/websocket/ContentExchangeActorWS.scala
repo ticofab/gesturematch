@@ -20,14 +20,14 @@ class ContentExchangeActorWS extends HandlingActorWS {
       Promise.timeout(channel.foreach(x => x.eofAndEnd()), Timeouts.maxOldestRequestInterval)
     }
 
-    case MatchedPosition(myPosition, myPayload, matcheeInfo) => {
-      Logger.info(s"$self, Matched message: $myPosition\n  my payload: $myPayload\n")
+    case MatchedPosition(myPosition, matcheeInfo) => {
+      Logger.info(s"$self, Matched message: $myPosition\n")
       matches = Some(matcheeInfo)
 
       matcheeInfo.length match {
         // there is only another request
         case 1 => {
-          val jsonToSend = JsonResponseHelper.getMatched2ContentResponse(matcheeInfo)
+          val jsonToSend = JsonResponseHelper.getMatched2ContentResponse
           channel.foreach(x => {
             x.push(jsonToSend)
             x.eofAndEnd()
@@ -36,7 +36,7 @@ class ContentExchangeActorWS extends HandlingActorWS {
 
         // there are 3 other requests
         case 3 => {
-          val jsonToSend = JsonResponseHelper.getMatched4ContentResponse(matcheeInfo)
+          val jsonToSend = JsonResponseHelper.getMatched4ContentResponse
           channel.foreach(x => {
             x.push(jsonToSend)
             x.eofAndEnd()

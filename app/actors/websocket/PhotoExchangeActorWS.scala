@@ -6,7 +6,7 @@ import actors.{Setup, Input, MatchedPosition}
 class PhotoExchangeActorWS extends HandlingActorWS {
   def receive: Actor.Receive = {
     case Setup(channel) => this.channel = channel
-    case MatchedPosition(myPosition, myPayload, otherInfo) => {} // TODO
+    case MatchedPosition(myPosition, otherInfo) => {} // TODO
     case Input(input) => {} // TODO
   }
 }

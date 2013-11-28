@@ -4,7 +4,6 @@ import akka.actor.ActorRef
 import consts.SwipeMovements.SwipeMovement
 import consts.Areas.Areas
 import consts.MatcheeInfo
-import consts.Criteria.Criteria
 
 /**
  * TODO: redo this
@@ -14,7 +13,6 @@ import consts.Criteria.Criteria
  * @param timestamp        The timestamp at the request arrival
  * @param movement         The swipe movement
  * @param equalityParam    The equality param (an arbitrary parameter)
- * @param payload          The request payload
  * @param handlingActor    The reference to the actor managing this request
  */
 class RequestToMatch(val apiKey: String,
@@ -27,8 +25,7 @@ class RequestToMatch(val apiKey: String,
                      val areaEnd: Areas,
                      val movement: SwipeMovement,
                      val equalityParam: String,
-                     val payload: String,
                      val handlingActor: ActorRef) {
-  def getMatcheeInfo: MatcheeInfo = (handlingActor, payload)
-  override def toString: String = s"Request: $apiKey $appId $deviceId $latitude $longitude $timestamp $areaStart $areaEnd $movement $equalityParam $handlingActor $payload"
+  def getMatcheeInfo: MatcheeInfo = (handlingActor)
+  override def toString: String = s"Request: $apiKey $appId $deviceId $latitude $longitude $timestamp $areaStart $areaEnd $movement $equalityParam $handlingActor"
 }

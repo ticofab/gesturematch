@@ -28,8 +28,7 @@ object ApplicationWS extends MyController {
                 areaStart: String,
                 areaEnd: String,
                 deviceId: String,
-                equalityParam: String,
-                payload: String): WebSocket[String] = WebSocket.async {
+                equalityParam: String): WebSocket[String] = WebSocket.async {
 
     request => Future {
       Logger.info(s"requestWS API call. Request:\n  ${request.remoteAddress} ${request.version} ${request.method} ${request.uri}")
@@ -52,7 +51,7 @@ object ApplicationWS extends MyController {
 
         case Success(isValid) => {
           Logger.info("    Request valid.")
-          val props = HandlingActorFactory.getActorProps(typeValue, criteriaValue, HandlingActorFactory.WEBSOCKET)
+          val props = HandlingActorFactory.getActorProps(typeValue, criteriaValue)
 
           // setup handling actor
           val handlingActor: ActorRef = Akka.system.actorOf(props)
@@ -71,7 +70,7 @@ object ApplicationWS extends MyController {
           val timestamp = System.currentTimeMillis
           val movement = SwipeMovementHelper.swipesToMovement(areaStartValue, areaEndValue)
           val requestData = new RequestToMatch(apiKey, appId, deviceId, latitude, longitude,
-            timestamp, areaStartValue, areaEndValue, movement, equalityParam, payload, handlingActor)
+            timestamp, areaStartValue, areaEndValue, movement, equalityParam, handlingActor)
 
           criteriaValue match {
             // we only get here if the criteria is valid
