@@ -29,7 +29,7 @@ class PositionMatcherActor extends Actor {
     // as at that point I wouldn't be able to see where they are placed.
 
     // 1. filter out the one which starts with an inner position
-    val partition1 = group partition (_.areaStart == Inner)
+    val partition1 = group partition (_.areaStart == INNER)
     val r1 = partition1._1.head
 
     // 2. find second request
@@ -43,7 +43,7 @@ class PositionMatcherActor extends Actor {
 
     // 4. find final movement
     val pos4 = ScreenPositionHelper.getCorrespondingFinalPosition(r1.movement, pos1)
-    val partition3 = partition2._2 partition (_.areaEnd == Inner)
+    val partition3 = partition2._2 partition (_.areaEnd == INNER)
     val r4 = partition3._1.head
 
     // 5. find third movement

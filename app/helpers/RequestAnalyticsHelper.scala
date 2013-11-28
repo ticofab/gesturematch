@@ -1,19 +1,41 @@
 package helpers
 
 import models.RequestToMatch
-import actors.HandlingActorFactory
+import consts.{Areas, Criteria, RequestTypes}
+import consts.Criteria.Criteria
+import consts.RequestTypes.RequestTypes
+import consts.Areas.Areas
+
+case class InvalidRequestException(message: String) extends Exception(message)
 
 object RequestAnalyticsHelper {
-  def requestIsValid(`type`: String, swipeStart: Int, swipeEnd: Int) = {
+
+
+  def requestIsValid(requestType: RequestTypes, criteria: Criteria, areaStart: Areas, areaEnd: Areas) = {
     // TODO:
     //    check more things about parameters
     //    - api key must be valid
     //    - app id must be valid
-    //    - criteria must be valid
 
-    val validRequestType = HandlingActorFactory.getValidRequestsTypes.contains(`type`)
-    val differentSwipes = swipeEnd != swipeStart
-    validRequestType && differentSwipes
+    lazy val invReqHead = "Invalid request: invalid "
+    lazy val allowedValues = ". Allowed values are: "
+
+    if (requestType == RequestTypes.INVALID)
+      throw InvalidRequestException(s"$invReqHead type $allowedValues ${RequestTypes.getValidOnes}")
+
+    if (criteria == Criteria.INVALID)
+      throw InvalidRequestException(s"$invReqHead criteria $allowedValues ${Criteria.getValidOnes}")
+
+    if (areaStart == Areas.INVALID)
+      throw InvalidRequestException(s"$invReqHead areaStart $allowedValues ${Areas.getValidOnes}")
+
+    if (areaEnd == Areas.INVALID)
+      throw InvalidRequestException(s"$invReqHead areaEnd $allowedValues ${Areas.getValidOnes}")
+
+    if (areaStart == areaEnd)
+      throw InvalidRequestException("Invalid request: starting and ending areas are equal.")
+
+    true
   }
 
   def requestsAreCompatible(r1: RequestToMatch, r2: RequestToMatch): Boolean = {

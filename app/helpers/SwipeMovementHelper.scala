@@ -3,6 +3,8 @@ package helpers
 import consts.SwipeMovements._
 import models.{RequestToMatch, PossibleMatching}
 import consts.SwipeMovements
+import consts.Areas.Areas
+import scala.util.Try
 
 object SwipeMovementHelper {
   private def makePossibleMatchingsListTwoAndFour(pos2: SwipeMovement,
@@ -63,27 +65,9 @@ object SwipeMovementHelper {
   /*
    * Translates a pair start- / end-swipe into a movement.
    */
-  def swipesToMovement(swipeStart: Int, swipeEnd: Int): SwipeMovement = {
-    val swipeValue: Int = swipeStart * 10 + swipeEnd
-    swipeValue match {
-      case 2 => TopLeft
-      case 3 => TopRight
-      case 4 => TopInner
-      case 12 => BottomLeft
-      case 13 => BottomRight
-      case 14 => BottomInner
-      case 20 => LeftTop
-      case 21 => LeftBottom
-      case 24 => LeftInner
-      case 30 => RightTop
-      case 31 => RightBottom
-      case 34 => RightInner
-      case 40 => InnerTop
-      case 41 => InnerBottom
-      case 42 => InnerLeft
-      case 43 => InnerRight
-      case _ => Unknown
-    }
+  def swipesToMovement(swipeStart: Areas, swipeEnd: Areas): SwipeMovement = {
+    val areasMix = swipeStart.toString + swipeEnd.toString
+    Try(SwipeMovements.withName(areasMix)) getOrElse(Unknown)
   }
 
   /**

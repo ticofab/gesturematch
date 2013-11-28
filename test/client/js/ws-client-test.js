@@ -4,27 +4,27 @@ myApp.controller('paramTable', ['$scope', function($scope) {
 
     initStuff();
 
-    $scope.$watchCollection("[dev1rtype,dev1devid,dev1lat,dev1lon,dev1ss,dev1se,dev1pl,dev1ep,dev1apikey,dev1appId,serverUrl]", function(nv) {
-        var allParams = nv[0] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
-        $scope.dev1url = 'ws://' + nv[10] + '/requestWS?type=' + allParams;
+    $scope.$watchCollection("[dev1rtype,dev1devid,dev1lat,dev1lon,dev1ss,dev1se,dev1pl,dev1ep,dev1apikey,dev1appId,serverUrl,dev1criteria]", function(nv) {
+        var allParams = '?type=' + nv[0] + '&criteria=' + nv[11] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&areaStart=' + nv[4] + '&areaEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
+        $scope.dev1url = 'ws://' + nv[10] + '/requestWS' + allParams;
         $scope.dev1urlHTTP = 'http://' + nv[10] + '/requestHTTP?type=' + allParams;
     });
 
     $scope.$watchCollection("[dev2rtype,dev2devid,dev2lat,dev2lon,dev2ss,dev2se,dev2pl,dev2ep,dev2apikey,dev2appId,serverUrl]", function(nv) {
-        var allParams = nv[0] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
-        $scope.dev2url = 'ws://' + nv[10] + '/requestWS?type=' + allParams;
+        var allParams = '?type=' + nv[0] + '&criteria=' + nv[11] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&areaStart=' + nv[4] + '&areaEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
+        $scope.dev2url = 'ws://' + nv[10] + '/requestWS' + allParams;
         $scope.dev2urlHTTP = 'http://' + nv[10] + '/requestHTTP?type=' + allParams;
     });
 
     $scope.$watchCollection("[dev3rtype,dev3devid,dev3lat,dev3lon,dev3ss,dev3se,dev3pl,dev3ep,dev3apikey,dev3appId,serverUrl]", function(nv) {
-        var allParams = nv[0] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
-        $scope.dev3url = 'ws://' + nv[10] + '/requestWS?type=' + allParams;
+        var allParams = '?type=' + nv[0] + '&criteria=' + nv[11] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&areaStart=' + nv[4] + '&areaEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
+        $scope.dev3url = 'ws://' + nv[10] + '/requestWS' + allParams;
         $scope.dev3urlHTTP = 'http://' + nv[10] + '/requestHTTP?type=' + allParams;
     });
 
     $scope.$watchCollection("[dev4rtype,dev4devid,dev4lat,dev4lon,dev4ss,dev4se,dev4pl,dev4ep,dev4apikey,dev4appId,serverUrl]", function(nv) {
-        var allParams = nv[0] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&swipeStart=' + nv[4] + '&swipeEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
-        $scope.dev4url = 'ws://' + nv[10] + '/requestWS?type=' + allParams;
+        var allParams = '?type=' + nv[0] + '&criteria=' + nv[11] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&areaStart=' + nv[4] + '&areaEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
+        $scope.dev4url = 'ws://' + nv[10] + '/requestWS' + allParams;
         $scope.dev4urlHTTP = 'http://' + nv[10] + '/requestHTTP?type=' + allParams;
     });
 
@@ -154,6 +154,11 @@ $scope.connect4HTTP = function() {
         $scope.dev3rtype = "content"
         $scope.dev4rtype = "content"
 
+        $scope.dev1criteria = "presence"
+        $scope.dev2criteria = "presence"
+        $scope.dev3criteria = "presence"
+        $scope.dev4criteria = "presence"
+
         $scope.dev1apikey = "contact-api-key"
         $scope.dev2apikey = "contact-api-key"
         $scope.dev3apikey = "contact-api-key"
@@ -174,15 +179,15 @@ $scope.connect4HTTP = function() {
         $scope.dev3lon = "12.00"
         $scope.dev4lon = "12.00"
 
-        $scope.dev1ss = "4"
-        $scope.dev2ss = "2"
-        $scope.dev3ss = "0"
-        $scope.dev4ss = "3"
+        $scope.dev1ss = "inner"
+        $scope.dev2ss = "left"
+        $scope.dev3ss = "left"
+        $scope.dev4ss = "left"
 
-        $scope.dev1se = "3"
-        $scope.dev2se = "4"
-        $scope.dev3se = "2"
-        $scope.dev4se = "4"
+        $scope.dev1se = "right"
+        $scope.dev2se = "right"
+        $scope.dev3se = "right"
+        $scope.dev4se = "inner"
 
         $scope.dev1pl = "[{\"type\":\"NAME\",\"content\":{\"value\":\"Fabio1\"}}]"
         $scope.dev2pl = "[{\"type\":\"NAME\",\"content\":{\"value\":\"Fabio2\"}}]"
@@ -190,7 +195,7 @@ $scope.connect4HTTP = function() {
         $scope.dev4pl = "[{\"type\":\"NAME\",\"content\":{\"value\":\"Fabio4\"}}]"
 
         $scope.dev1ep = "uguale"
-        $scope.dev2ep = "red"
+        $scope.dev2ep = "uguale"
         $scope.dev3ep = "uguale"
         $scope.dev4ep = "uguale"
 

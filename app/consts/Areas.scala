@@ -1,5 +1,7 @@
 package consts
 
+import scala.util.Try
+
 /**
  * The device screen is split into 5 areas plus 4 invalid ones:
  *
@@ -32,10 +34,14 @@ package consts
 
 object Areas extends Enumeration {
   type Areas = Value
-  val Top = Value(0)
-  val Bottom = Value(1)
-  val Left = Value(2)
-  val Right = Value(3)
-  val Inner = Value(4)
-  val Invalid = Value(5)
+  val TOP = Value("top")
+  val BOTTOM = Value("bottom")
+  val LEFT = Value("left")
+  val RIGHT = Value("right")
+  val INNER = Value("inner")
+  val INVALID = Value("invalid")
+
+  def getAreaFromString(area: String): Areas = Try(Areas.withName(area)) getOrElse(INVALID)
+
+  def getValidOnes = this.values.filter(_ != INVALID)
 }

@@ -96,11 +96,11 @@ object ScreenPositionHelper {
    */
   def getCorrespondingEntrance(exitArea: Areas) = {
     exitArea match {
-      case Bottom => Top
-      case Top => Bottom
-      case Left => Right
-      case Right => Left
-      case _ => Invalid
+      case BOTTOM => TOP
+      case TOP => BOTTOM
+      case LEFT => RIGHT
+      case RIGHT => LEFT
+      case _ => INVALID
     }
   }
 }

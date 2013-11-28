@@ -16,6 +16,13 @@ import play.api.Play.current
 import consts.Areas
 
 object ApplicationHTTP extends MyController {
+
+  // simple alive response
+  def alive() = Action {
+    request => Ok("I'm alive!\n")
+  }
+
+  /*
   def requestHTTP(`type`: String,
                   criteria: String,
                   apiKey: String,
@@ -52,7 +59,7 @@ object ApplicationHTTP extends MyController {
           timestamp, Areas.withName(swipeStart.toString), Areas.withName(swipeStart.toString),
           movement, equalityParam, payload, handlingActor)
 
-        val future: Future[String] = (handlingActor ? Match(requestData, MyController.matchingActor))(5.seconds).mapTo[String]
+        val future: Future[String] = (handlingActor ? Match(requestData, MyController.positionMatchingActor))(5.seconds).mapTo[String]
 
         future.map(result => Ok(result)).recover {
           case ex: AskTimeoutException => Ok(JsonResponseHelper.getTimeoutResponse)
@@ -61,4 +68,5 @@ object ApplicationHTTP extends MyController {
       }
     }
   }
+  */
 }

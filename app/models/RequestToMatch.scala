@@ -4,6 +4,7 @@ import akka.actor.ActorRef
 import consts.SwipeMovements.SwipeMovement
 import consts.Areas.Areas
 import consts.MatcheeInfo
+import consts.Criteria.Criteria
 
 /**
  * TODO: redo this
@@ -16,7 +17,7 @@ import consts.MatcheeInfo
  * @param payload          The request payload
  * @param handlingActor    The reference to the actor managing this request
  */
-class RequestToMatch(val criteria: String,
+class RequestToMatch(val criteria: Criteria,
                      val apiKey: String,
                      val appId: String,
                      val deviceId: String,
