@@ -10,19 +10,19 @@ myApp.controller('paramTable', ['$scope', function($scope) {
         $scope.dev1urlHTTP = 'http://' + nv[10] + '/requestHTTP?type=' + allParams;
     });
 
-    $scope.$watchCollection("[dev2rtype,dev2devid,dev2lat,dev2lon,dev2ss,dev2se,dev2pl,dev2ep,dev2apikey,dev2appId,serverUrl]", function(nv) {
+    $scope.$watchCollection("[dev2rtype,dev2devid,dev2lat,dev2lon,dev2ss,dev2se,dev2pl,dev2ep,dev2apikey,dev2appId,serverUrl,dev2criteria]", function(nv) {
         var allParams = '?type=' + nv[0] + '&criteria=' + nv[11] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&areaStart=' + nv[4] + '&areaEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
         $scope.dev2url = 'ws://' + nv[10] + '/requestWS' + allParams;
         $scope.dev2urlHTTP = 'http://' + nv[10] + '/requestHTTP?type=' + allParams;
     });
 
-    $scope.$watchCollection("[dev3rtype,dev3devid,dev3lat,dev3lon,dev3ss,dev3se,dev3pl,dev3ep,dev3apikey,dev3appId,serverUrl]", function(nv) {
+    $scope.$watchCollection("[dev3rtype,dev3devid,dev3lat,dev3lon,dev3ss,dev3se,dev3pl,dev3ep,dev3apikey,dev3appId,serverUrl,dev3criteria]", function(nv) {
         var allParams = '?type=' + nv[0] + '&criteria=' + nv[11] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&areaStart=' + nv[4] + '&areaEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
         $scope.dev3url = 'ws://' + nv[10] + '/requestWS' + allParams;
         $scope.dev3urlHTTP = 'http://' + nv[10] + '/requestHTTP?type=' + allParams;
     });
 
-    $scope.$watchCollection("[dev4rtype,dev4devid,dev4lat,dev4lon,dev4ss,dev4se,dev4pl,dev4ep,dev4apikey,dev4appId,serverUrl]", function(nv) {
+    $scope.$watchCollection("[dev4rtype,dev4devid,dev4lat,dev4lon,dev4ss,dev4se,dev4pl,dev4ep,dev4apikey,dev4appId,serverUrl,dev4criteria]", function(nv) {
         var allParams = '?type=' + nv[0] + '&criteria=' + nv[11] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&areaStart=' + nv[4] + '&areaEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
         $scope.dev4url = 'ws://' + nv[10] + '/requestWS' + allParams;
         $scope.dev4urlHTTP = 'http://' + nv[10] + '/requestHTTP?type=' + allParams;

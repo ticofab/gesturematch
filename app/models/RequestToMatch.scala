@@ -17,8 +17,7 @@ import consts.Criteria.Criteria
  * @param payload          The request payload
  * @param handlingActor    The reference to the actor managing this request
  */
-class RequestToMatch(val criteria: Criteria,
-                     val apiKey: String,
+class RequestToMatch(val apiKey: String,
                      val appId: String,
                      val deviceId: String,
                      val latitude: Double,
@@ -31,5 +30,5 @@ class RequestToMatch(val criteria: Criteria,
                      val payload: String,
                      val handlingActor: ActorRef) {
   def getMatcheeInfo: MatcheeInfo = (handlingActor, payload)
-  override def toString: String = s"Request: $criteria $apiKey $appId $deviceId $latitude $longitude $timestamp $areaStart$areaEnd $movement $equalityParam $handlingActor $payload"
+  override def toString: String = s"Request: $apiKey $appId $deviceId $latitude $longitude $timestamp $areaStart$areaEnd $movement $equalityParam $handlingActor $payload"
 }

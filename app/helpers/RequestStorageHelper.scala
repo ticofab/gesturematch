@@ -1,9 +1,10 @@
 package helpers
 
 import models.RequestToMatch
-import consts.Timeouts
-import storage.RequestStorage
+import consts.{Criteria, Timeouts}
+import storage.{RequestStorage, TouchRequestStorage, PositionRequestStorage}
 import play.api.Logger
+import consts.Criteria.Criteria
 
 // This object is an helper to access the storage of previously received requests.
 object RequestStorageHelper {
@@ -16,17 +17,27 @@ object RequestStorageHelper {
   private def sameDeviceRequestFilter(rNew: RequestToMatch, rOld: RequestToMatch): Boolean =
     !(rNew.deviceId == rOld.deviceId && rNew.timestamp <= rOld.timestamp + Timeouts.maxOldestRequestIntervalMillis)
 
-  def getValidExistingRequests(r: RequestToMatch): List[RequestToMatch] = {
+  private def getCorrespondingStorage(criteria: Criteria): RequestStorage = {
+    criteria match {
+      case Criteria.POSITION => PositionRequestStorage
+      case Criteria.PRESENCE => TouchRequestStorage
+    }
+  }
+
+  def getValidExistingRequests(criteria: Criteria, r: RequestToMatch): List[RequestToMatch] = {
     // filters the current requests, updates and returns
-    RequestStorage.skimRequests(oldRequestsFilter)
-    RequestStorage.skimRequests(sameDeviceRequestFilter, r)
-    RequestStorage.getRequests
+    val storage = getCorrespondingStorage(criteria)
+    storage.skimRequests(oldRequestsFilter)
+    storage.skimRequests(sameDeviceRequestFilter, r)
+    storage.getRequests
   }
 
-  def storeNewRequest(newRequest: RequestToMatch) = {
-    Logger.info("RequestStorageHelper, adding " + newRequest.toString)
-    RequestStorage.addRequest(newRequest)
+  def storeNewRequest(criteria: Criteria, newRequest: RequestToMatch) = {
+    Logger.info(s"RequestStorageHelper, adding new request to the $criteria storage")
+    getCorrespondingStorage(criteria).addRequest(newRequest)
   }
 
-  def removeRequests(requests: List[RequestToMatch]) = RequestStorage.skimRequests(r => !requests.contains(r))
+  def removeRequests(criteria: Criteria, requests: List[RequestToMatch]) = {
+    getCorrespondingStorage(criteria).skimRequests(r => !requests.contains(r))
+  }
 }

@@ -5,6 +5,7 @@ import models.{PossibleMatching, MatchingGroup, RequestToMatch}
 import helpers.{RequestAnalyticsHelper, SwipeMovementHelper, ScreenPositionHelper, RequestStorageHelper}
 import consts.Areas._
 import play.api.Logger
+import consts.Criteria
 
 class PositionMatcherActor extends Actor {
 
@@ -92,7 +93,7 @@ class PositionMatcherActor extends Actor {
       // therefore there won't be two concurrent accesses to the RequestListHelper?
 
       // obtain valid existing requests and filter by time
-      val existingRequests = RequestStorageHelper.getValidExistingRequests(request)
+      val existingRequests = RequestStorageHelper.getValidExistingRequests(Criteria.POSITION, request)
 
       // Try to create a match between the requests
       Logger.info(s"Matching it with ${existingRequests.length} existing requests.")
@@ -107,14 +108,14 @@ class PositionMatcherActor extends Actor {
           Logger.info(s"  --> no group has been found.")
 
           // simply update the requests storage with the new request and the filtered requests
-          RequestStorageHelper.storeNewRequest(request)
+          RequestStorageHelper.storeNewRequest(Criteria.POSITION, request)
         }
 
         case group :: Nil => {
           Logger.info(s"  --> one group found, size is ${group.devicesInGroup}")
 
           // remove the group from the storage
-          RequestStorageHelper.removeRequests(group.requests)
+          RequestStorageHelper.removeRequests(Criteria.POSITION, group.requests)
 
           // Send a matching notification to the actors managing the corresponding devices
           group.devicesInGroup match {

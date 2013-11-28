@@ -10,7 +10,6 @@ case class InvalidRequestException(message: String) extends Exception(message)
 
 object RequestAnalyticsHelper {
 
-
   def requestIsValid(requestType: RequestTypes, criteria: Criteria, areaStart: Areas, areaEnd: Areas) = {
     // TODO:
     //    check more things about parameters

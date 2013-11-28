@@ -33,7 +33,6 @@ object ApplicationWS extends MyController {
 
     request => Future {
       Logger.info(s"requestWS API call. Request:\n  ${request.remoteAddress} ${request.version} ${request.method} ${request.uri}")
-      Logger.info(s"  parameters: $latitude $longitude $areaStart $areaEnd $equalityParam $payload\n")
 
       val typeValue = RequestTypes.getTypeFromString(`type`)
       val areaStartValue = Areas.getAreaFromString(areaStart)
@@ -53,7 +52,7 @@ object ApplicationWS extends MyController {
 
         case Success(isValid) => {
           Logger.info("    Request valid.")
-          val props = HandlingActorFactory.getActorProps(typeValue, HandlingActorFactory.WEBSOCKET)
+          val props = HandlingActorFactory.getActorProps(typeValue, criteriaValue, HandlingActorFactory.WEBSOCKET)
 
           // setup handling actor
           val handlingActor: ActorRef = Akka.system.actorOf(props)
@@ -71,7 +70,7 @@ object ApplicationWS extends MyController {
           // add it to the matcher queue
           val timestamp = System.currentTimeMillis
           val movement = SwipeMovementHelper.swipesToMovement(areaStartValue, areaEndValue)
-          val requestData = new RequestToMatch(criteriaValue, apiKey, appId, deviceId, latitude, longitude,
+          val requestData = new RequestToMatch(apiKey, appId, deviceId, latitude, longitude,
             timestamp, areaStartValue, areaEndValue, movement, equalityParam, payload, handlingActor)
 
           criteriaValue match {

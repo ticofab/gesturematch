@@ -5,14 +5,15 @@ import play.api.Logger
 import actors.websocket.{ContentExchangeActorWS, PhotoExchangeActorWS}
 import actors.http.{ContentExchangeActorHTTP, PhotoExchangeActorHTTP}
 import consts.RequestTypes.RequestTypes
-import consts.RequestTypes
+import consts.{Criteria, RequestTypes}
+import consts.Criteria.Criteria
 
 object HandlingActorFactory {
   // protocol type
   val HTTP = 0
   val WEBSOCKET = 1
 
-  def getActorProps(requestType: RequestTypes, protocolType: Int): Props = {
+  def getActorProps(requestType: RequestTypes, criteria: Criteria, protocolType: Int): Props = {
 
     protocolType match {
       case HTTP => {
@@ -39,10 +40,19 @@ object HandlingActorFactory {
           }
 
           case RequestTypes.CONTENT => {
-            Logger.info(s"HandlingActorFactory, returning props for CONTENT")
-            ContentExchangeActorWS.props
-          }
 
+            criteria match {
+              case Criteria.POSITION => {
+                Logger.info(s"HandlingActorFactory, returning props for ${RequestTypes.CONTENT} - ${Criteria.POSITION}")
+                ContentExchangeActorWS.props
+
+              }
+              case Criteria.PRESENCE => {
+                Logger.info(s"HandlingActorFactory, returning props for ${RequestTypes.CONTENT} - ${Criteria.PRESENCE}")
+                ContentExchangeActorWS.props
+              }
+            }
+          }
         }
       }
     }
