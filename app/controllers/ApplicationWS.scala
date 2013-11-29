@@ -51,7 +51,7 @@ object ApplicationWS extends MyController {
 
         case Success(isValid) => {
           Logger.info("    Request valid.")
-          val props = HandlingActorFactory.getActorProps(typeValue, criteriaValue)
+          val props = HandlingActorFactory.getActorProps(typeValue)
 
           // setup handling actor
           val handlingActor: ActorRef = Akka.system.actorOf(props)
