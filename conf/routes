@@ -4,8 +4,6 @@
 
 # Http
 GET     /                controllers.ApplicationHTTP.alive
-# GET     /requestHTTP     controllers.ApplicationHTTP.requestHTTP(type: String, criteria: String, apiKey: String, appId: String, latitude: Double, longitude: Double, areaStart: Int, areaEnd: Int, deviceId: String, equalityParam1: String, payload: String)
-
 
 # Websocket
 GET     /requestWS       controllers.ApplicationWS.requestWS(type, criteria, apiKey, appId, latitude: Double, longitude: Double, areaStart, areaEnd, deviceId, equalityParam1)
