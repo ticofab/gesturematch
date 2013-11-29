@@ -4,34 +4,17 @@ import akka.actor.Props
 import play.api.Logger
 import actors.websocket.{ContentExchangeActorWS, PhotoExchangeActorWS}
 import consts.RequestTypes.RequestTypes
-import consts.{Criteria, RequestTypes}
-import consts.Criteria.Criteria
+import consts.RequestTypes
 
 object HandlingActorFactory {
 
-  def getActorProps(requestType: RequestTypes, criteria: Criteria): Props = {
+  def getActorProps(requestType: RequestTypes): Props = {
+    Logger.info(s"HandlingActorFactory, returning props for $requestType")
 
+    // the _ case is not handled as we'll never get here if the request is not valid
     requestType match {
-
-      case RequestTypes.PHOTO => {
-        Logger.info(s"HandlingActorFactory, returning props for PHOTO")
-        PhotoExchangeActorWS.props
-      }
-
-      case RequestTypes.CONTENT => {
-
-        criteria match {
-          case Criteria.POSITION => {
-            Logger.info(s"HandlingActorFactory, returning props for ${RequestTypes.CONTENT} - ${Criteria.POSITION}")
-            ContentExchangeActorWS.props
-
-          }
-          case Criteria.PRESENCE => {
-            Logger.info(s"HandlingActorFactory, returning props for ${RequestTypes.CONTENT} - ${Criteria.PRESENCE}")
-            ContentExchangeActorWS.props
-          }
-        }
-      }
+      case RequestTypes.PHOTO => PhotoExchangeActorWS.props
+      case RequestTypes.CONTENT => ContentExchangeActorWS.props
     }
   }
 }
