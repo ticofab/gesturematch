@@ -19,7 +19,4 @@ object JsonLabels {
 
   // payload of the matching devices.
   val PAYLOAD = "payload"
-  val FIRST_DEVICE = "a"
-  val SECOND_DEVICE = "b"
-  val THIRD_DEVICE = "c"
 }

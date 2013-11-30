@@ -24,6 +24,15 @@ class ContentExchangeActorWS extends HandlingActorWS {
       Promise.timeout(channel.foreach(x => x.eofAndEnd()), Timeouts.maxOldestRequestInterval)
     }
 
+    case MatchedDetail(info: MatcheeInfo, othersInfo: List[MatcheeInfo]) => {
+      myInfo = Some(info)
+      matcheesInfo = Some(othersInfo)
+
+      Logger.info(s"$self, MatchedDetail message. myInfo: $myInfo, others: $matcheesInfo")
+
+      sendToClients
+    }
+
     case Matched(groupMatcheesInfo: List[MatcheeInfo]) => {
       {
         val yo = groupMatcheesInfo.partition(x => x.handlingActor == self)
@@ -33,18 +42,22 @@ class ContentExchangeActorWS extends HandlingActorWS {
 
       Logger.info(s"$self, Matched message. myInfo: $myInfo, others: $matcheesInfo")
 
-      // TODO: be safer with Options
-      val jsonToSend = JsonResponseHelper.getMatchedResponse(myInfo.get, matcheesInfo.get)
-      channel.foreach(x => {
-        x.push(jsonToSend)
-        x.eofAndEnd()
-      })
+      sendToClients
     }
 
     case Input(input) => {
       Logger.info(s"$self, Input() message: $input")
       // don't do anything with it.
     }
+  }
+
+  def sendToClients = {
+    // TODO: be safer with Options
+    val jsonToSend = JsonResponseHelper.getMatchedResponse(myInfo.get, matcheesInfo.get)
+    channel.foreach(x => {
+      x.push(jsonToSend)
+      x.eofAndEnd()
+    })
   }
 }
 
