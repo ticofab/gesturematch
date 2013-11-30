@@ -24,8 +24,8 @@ class PositionMatcherActor extends Actor {
     val matchee1Info = MatcheeInfo(r1.handlingActor, 0, pos1)
     val matchee2Info = MatcheeInfo(r2.handlingActor, 1, pos2)
 
-    r1.handlingActor ! MatchedDetail(matchee1Info, List(matchee2Info))
-    r2.handlingActor ! MatchedDetail(matchee2Info, List(matchee1Info))
+    r1.handlingActor ! Matched(matchee1Info, List(matchee2Info))
+    r2.handlingActor ! Matched(matchee2Info, List(matchee1Info))
   }
 
   private def deliverTo4Group(group: List[RequestToMatch]): Unit = {
@@ -64,10 +64,10 @@ class PositionMatcherActor extends Actor {
     val match3Info = MatcheeInfo(r3.handlingActor, 2, pos3)
     val match4Info = MatcheeInfo(r4.handlingActor, 3, pos4)
 
-    r1.handlingActor ! MatchedDetail(match1Info, List(match2Info, match3Info, match4Info))
-    r2.handlingActor ! MatchedDetail(match2Info, List(match1Info, match3Info, match4Info))
-    r3.handlingActor ! MatchedDetail(match3Info, List(match1Info, match2Info, match4Info))
-    r4.handlingActor ! MatchedDetail(match4Info, List(match1Info, match2Info, match4Info))
+    r1.handlingActor ! Matched(match1Info, List(match2Info, match3Info, match4Info))
+    r2.handlingActor ! Matched(match2Info, List(match1Info, match3Info, match4Info))
+    r3.handlingActor ! Matched(match3Info, List(match1Info, match2Info, match4Info))
+    r4.handlingActor ! Matched(match4Info, List(match1Info, match2Info, match4Info))
   }
 
   private def getMatchingGroup(request: RequestToMatch, existingRequests: List[RequestToMatch]): List[MatchingGroup] = {

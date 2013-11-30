@@ -8,7 +8,6 @@ case class NewRequest(request: RequestToMatch)
 
 // request handling actors
 case class Setup(channel: Option[Concurrent.Channel[String]])
-case class MatchedDetail(myInfo: MatcheeInfo, matcheesInfo: List[MatcheeInfo])
-case class Matched(matcheesInfo: List[MatcheeInfo])
+case class Matched(myInfo: MatcheeInfo, matcheesInfo: List[MatcheeInfo])
 case class Input(input: String)
 

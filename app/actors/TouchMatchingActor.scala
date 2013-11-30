@@ -47,8 +47,12 @@ class TouchMatchingActor extends Actor {
           Logger.info(s"$myName, group found, size: ${group.size}")
           RequestStorageHelper.removeRequests(Criteria.PRESENCE, group)
 
-          val matcheesInfo = group.zipWithIndex.map(x => MatcheeInfo(x._1.handlingActor, x._2))
-          group.foreach(r => r.handlingActor ! Matched(matcheesInfo))
+          val matcheesInfo: List[MatcheeInfo] = group.zipWithIndex.map(x => MatcheeInfo(x._1.handlingActor, x._2))
+          group.foreach(r => {
+            // this could maybe be done by each actor, but this way it's cleaner
+            val (myInfo, othersInfo) = matcheesInfo.partition(m => m.handlingActor == r.handlingActor)
+            r.handlingActor ! Matched(myInfo.head, othersInfo)
+          })
         }
       }
     }
