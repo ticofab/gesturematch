@@ -3,7 +3,6 @@ package models
 import akka.actor.ActorRef
 import consts.SwipeMovements.SwipeMovement
 import consts.Areas.Areas
-import consts.MatcheeInfo
 
 /**
  * TODO: redo this
@@ -26,6 +25,5 @@ class RequestToMatch(val apiKey: String,
                      val movement: SwipeMovement,
                      val equalityParam: String,
                      val handlingActor: ActorRef) {
-  def getMatcheeInfo: MatcheeInfo = (handlingActor)
   override def toString: String = s"Request: $apiKey $appId $deviceId $latitude $longitude $timestamp $areaStart $areaEnd $movement $equalityParam $handlingActor"
 }

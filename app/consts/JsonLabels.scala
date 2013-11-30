@@ -3,15 +3,19 @@ package consts
 object JsonLabels {
   // possible outcomes
   val OUTCOME = "outcome"
-  val OUTCOME_MATCHED2 = "matched2"
-  val OUTCOME_MATCHED4 = "matched4"
+  val OUTCOME_MATCHED = "matched"
   val OUTCOME_UNCERTAIN = "uncertain"
   val OUTCOME_TIMEOUT = "timeout"
   val OUTCOME_UNKNOWN_ERROR = "error"
-  val OUTCOME_MATCHED_GROUP = "matchedGroup"
 
-  // group messages labels
+  // matched messages labels
   val GROUP_SIZE = "groupSize"
+  val MY_CONNECTION_INFO = "myConnectionInfo"
+  val OTHERS_CONNECTION_INFO = "othersConnectionInfo"
+
+  // info object
+  val ID_IN_GROUP = "idInGroup"
+  val POSITION_IN_GROUP = "position"
 
   // payload of the matching devices.
   val PAYLOAD = "payload"

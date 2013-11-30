@@ -3,7 +3,7 @@ package actors
 import akka.actor.{Actor, Props}
 import helpers.{SwipeMovementHelper, RequestAnalyticsHelper, RequestStorageHelper}
 import play.api.Logger
-import models.RequestToMatch
+import models.{MatcheeInfo, RequestToMatch}
 import consts.Criteria
 
 class TouchMatchingActor extends Actor {
@@ -47,8 +47,8 @@ class TouchMatchingActor extends Actor {
           Logger.info(s"$myName, group found, size: ${group.size}")
           RequestStorageHelper.removeRequests(Criteria.PRESENCE, group)
 
-          val matcheesInfo = group.map(x => x.getMatcheeInfo)
-          group.foreach(r => r.handlingActor ! MatchedGroup(matcheesInfo))
+          val matcheesInfo = group.zipWithIndex.map(x => MatcheeInfo(x._1.handlingActor, x._2))
+          group.foreach(r => r.handlingActor ! Matched(matcheesInfo))
         }
       }
     }

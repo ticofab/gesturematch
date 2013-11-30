@@ -1,7 +1,7 @@
 package actors
 
 import akka.actor.{Props, Actor}
-import models.{PossibleMatching, MatchingGroup, RequestToMatch}
+import models.{MatcheeInfo, PossibleMatching, MatchingGroup, RequestToMatch}
 import helpers.{RequestAnalyticsHelper, SwipeMovementHelper, ScreenPositionHelper, RequestStorageHelper}
 import consts.Areas._
 import play.api.Logger
@@ -21,8 +21,12 @@ class PositionMatcherActor extends Actor {
     Logger.info(s"1st mov & pos:   ${r1.movement}    ${pos1.toString}")
     Logger.info(s"2nd mov & pos:   ${r2.movement}    ${pos2.toString}")
 
-    r1.handlingActor ! MatchedPosition(pos1, List(r2.getMatcheeInfo))
-    r2.handlingActor ! MatchedPosition(pos2, List(r1.getMatcheeInfo))
+    val matchee1Info = MatcheeInfo(r1.handlingActor, 0, pos1)
+    val matchee2Info = MatcheeInfo(r2.handlingActor, 1, pos2)
+    val message = Matched(List(matchee1Info, matchee2Info))
+
+    r1.handlingActor ! message
+    r2.handlingActor ! message
   }
 
   private def deliverTo4Group(group: List[RequestToMatch]): Unit = {
@@ -56,10 +60,16 @@ class PositionMatcherActor extends Actor {
     Logger.info(s"3rd mov & pos:   ${r3.movement}    ${pos3.toString}")
     Logger.info(s"4th pos:         ${pos4.toString}\n")
 
-    r1.handlingActor ! new MatchedPosition(pos1, List(r2.getMatcheeInfo, r3.getMatcheeInfo, r4.getMatcheeInfo))
-    r2.handlingActor ! new MatchedPosition(pos2, List(r1.getMatcheeInfo, r3.getMatcheeInfo, r4.getMatcheeInfo))
-    r3.handlingActor ! new MatchedPosition(pos3, List(r1.getMatcheeInfo, r2.getMatcheeInfo, r4.getMatcheeInfo))
-    r4.handlingActor ! new MatchedPosition(pos4, List(r1.getMatcheeInfo, r2.getMatcheeInfo, r3.getMatcheeInfo))
+    val match1Info = MatcheeInfo(r1.handlingActor, 0, pos1)
+    val match2Info = MatcheeInfo(r2.handlingActor, 1, pos2)
+    val match3Info = MatcheeInfo(r3.handlingActor, 2, pos3)
+    val match4Info = MatcheeInfo(r4.handlingActor, 3, pos4)
+    val message = Matched(List(match1Info, match2Info, match3Info, match4Info))
+
+    r1.handlingActor ! message
+    r2.handlingActor ! message
+    r3.handlingActor ! message
+    r4.handlingActor ! message
   }
 
   private def getMatchingGroup(request: RequestToMatch, existingRequests: List[RequestToMatch]): List[MatchingGroup] = {

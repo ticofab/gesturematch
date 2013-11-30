@@ -1,33 +1,25 @@
 package helpers
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import consts.JsonLabels
+import models.MatcheeInfo
 
 object JsonResponseHelper {
 
-  def getMatchedTouch(groupSize: Int) = {
-    Json.stringify(
-      Json.obj(
-        JsonLabels.OUTCOME -> JsonLabels.OUTCOME_MATCHED_GROUP,
-        JsonLabels.GROUP_SIZE -> groupSize
-      )
-    )
-  }
+  def getMatchedResponse(myInfo: MatcheeInfo, otherInfos: List[MatcheeInfo]) = {
 
-  def getMatched2ContentResponse = {
-    Json.stringify(
-      Json.obj(
-        JsonLabels.OUTCOME -> JsonLabels.OUTCOME_MATCHED2
-      )
-    )
-  }
+    val objList: List[JsObject] = otherInfos.map(info => MatcheeInfo.getInfoObj(info))
+    val jsonArray = Json.toJson(objList)
 
-  def getMatched4ContentResponse = {
     Json.stringify(
       Json.obj(
-        JsonLabels.OUTCOME -> JsonLabels.OUTCOME_MATCHED4
+        JsonLabels.OUTCOME -> JsonLabels.OUTCOME_MATCHED,
+        JsonLabels.GROUP_SIZE -> (otherInfos.size + 1),
+        JsonLabels.MY_CONNECTION_INFO -> MatcheeInfo.getInfoObj(myInfo),
+        JsonLabels.OTHERS_CONNECTION_INFO -> jsonArray
       )
     )
+
   }
 
   def getTimeoutResponse = {

@@ -2,11 +2,15 @@ package actors.websocket
 
 import akka.actor.{Actor, Props}
 import play.api.Logger
-import consts.{MatcheeInfo, Timeouts}
+import consts.Timeouts
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.concurrent.Promise
 import helpers.JsonResponseHelper
-import actors.{MatchedGroup, Input, MatchedPosition, Setup}
+import actors._
+import actors.Setup
+import models.MatcheeInfo
+import actors.Input
+import scala.Some
 
 /**
  * This actor will simply pass the content to the actors of the other matched requests.
@@ -20,36 +24,21 @@ class ContentExchangeActorWS extends HandlingActorWS {
       Promise.timeout(channel.foreach(x => x.eofAndEnd()), Timeouts.maxOldestRequestInterval)
     }
 
-    case MatchedPosition(myPosition, matcheeInfo) => {
-      Logger.info(s"$self, Matched message: $myPosition\n")
-      matches = Some(matcheeInfo)
-
-      matcheeInfo.length match {
-        // there is only another request
-        case 1 => {
-          val jsonToSend = JsonResponseHelper.getMatched2ContentResponse
-          channel.foreach(x => {
-            x.push(jsonToSend)
-            x.eofAndEnd()
-          })
-        }
-
-        // there are 3 other requests
-        case 3 => {
-          val jsonToSend = JsonResponseHelper.getMatched4ContentResponse
-          channel.foreach(x => {
-            x.push(jsonToSend)
-            x.eofAndEnd()
-          })
-        }
+    case Matched(groupMatcheesInfo: List[MatcheeInfo]) => {
+      {
+        val yo = groupMatcheesInfo.partition(x => x.handlingActor == self)
+        myInfo = Some(yo._1.head)
+        matcheesInfo = Some(yo._2)
       }
-    }
 
-    case MatchedGroup(group: List[MatcheeInfo]) => {
-      // I've been matched in a touch-only group
-      Logger.info(s"$self, MatchedGroup message, group size: ${group.size}")
-      matches = Some(group)
-      channel.foreach(_.eofAndEnd)
+      Logger.info(s"$self, Matched message. myInfo: $myInfo, others: $matcheesInfo")
+
+      // TODO: be safer with Options
+      val jsonToSend = JsonResponseHelper.getMatchedResponse(myInfo.get, matcheesInfo.get)
+      channel.foreach(x => {
+        x.push(jsonToSend)
+        x.eofAndEnd()
+      })
     }
 
     case Input(input) => {
