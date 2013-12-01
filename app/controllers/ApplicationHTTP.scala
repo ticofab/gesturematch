@@ -8,5 +8,4 @@ object ApplicationHTTP extends MyController {
   def alive() = Action {
     request => Ok("I'm alive!\n")
   }
-
 }

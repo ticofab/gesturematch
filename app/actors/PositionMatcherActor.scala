@@ -112,7 +112,7 @@ class PositionMatcherActor extends Actor {
       //   2. have univocally identified a group
       //   3. have identified multiple groups, which is uncertainty.
       matchedGroups match {
-        case List() => {
+        case Nil => {
           Logger.info(s"  --> no group has been found.")
 
           // simply update the requests storage with the new request and the filtered requests

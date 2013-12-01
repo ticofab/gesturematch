@@ -3,7 +3,7 @@
 # ~~~~
 
 # Http
-GET     /                controllers.ApplicationHTTP.alive
+GET     /               controllers.ApplicationHTTP.alive
 
 # Websocket
-GET     /requestWS       controllers.ApplicationWS.requestWS(type, criteria, apiKey, appId, latitude: Double, longitude: Double, areaStart, areaEnd, deviceId, equalityParam1)
+GET     /openWS         controllers.ApplicationWS.openWS

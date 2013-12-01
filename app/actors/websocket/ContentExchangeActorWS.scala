@@ -2,17 +2,20 @@ package actors.websocket
 
 import akka.actor.{Actor, Props}
 import play.api.Logger
-import consts.Timeouts
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.concurrent.Promise
-import helpers.{JsonInputHelper, JsonResponseHelper}
+import helpers.{SwipeMovementHelper, RequestAnalyticsHelper, JsonResponseHelper, JsonInputHelper}
 import actors._
 import actors.Setup
-import models.MatcheeInfo
+import models.{RequestToMatch, MatcheeInfo}
 import actors.Input
 import scala.Some
 import scala.util.{Success, Failure, Try}
-import models.ClientInputMessages.{ClientInputMessageDisconnect, BreakMatchInputMessage}
+import models.ClientInputMessages._
+import controllers.MyController
+import consts.Timeouts
+import consts.Areas
+import consts.Criteria
 
 /**
  * This actor will simply pass the content to the actors of the other matched requests.
@@ -39,16 +42,20 @@ class ContentExchangeActorWS extends HandlingActorWS {
       Logger.info(s"$self, Input() message: $input")
       // try to parse it to Json
       Try(JsonInputHelper.parseInput(input)) match {
+
         case Success(parsedMessage) => {
+
           // successfully parsed
           parsedMessage match {
             case disconnect: ClientInputMessageDisconnect => onDisconnectMsg(disconnect)
-            case break: BreakMatchInputMessage => {} // TODO
+            case matchRequest: ClientInputMessageMatch => onMatchRequest(matchRequest)
+            case breakMatching: ClientInputMessageBreakMatch => onBreakConnectionMsg(breakMatching)
             case _ => {} // TODO: error
           }
         }
 
         case Failure(e) => {
+          Logger.info(s"Couldn't parse client message: ${e.getMessage}")
           // couldn't parse the input message
           // TODO
         }
@@ -62,6 +69,44 @@ class ContentExchangeActorWS extends HandlingActorWS {
       channel.foreach(x => {
         x.push(jsonToSend)
       })
+    }
+  }
+
+  def onMatchRequest(matchRequest: ClientInputMessageMatch) = {
+
+    val areaStartValue = Areas.getAreaFromString(matchRequest.areaStart)
+    val areaEndValue = Areas.getAreaFromString(matchRequest.areaEnd)
+    val criteriaValue = Criteria.getCriteriaFromString(matchRequest.criteria)
+
+    val testValidity = Try(RequestAnalyticsHelper.requestIsValid2(criteriaValue, areaStartValue, areaEndValue))
+
+    testValidity match {
+
+      case Failure(e) => {
+        // request issue
+        Logger.info(s"    Request invalid, reason: ${e.getMessage}")
+        // TODO: make a Json message
+        channel.foreach(x => x.push(s"invalid request: ${e.getMessage}"))
+      }
+
+      case Success(isValid) => {
+        Logger.info("    Request valid.")
+
+        // add request to the matcher queue
+        val timestamp = System.currentTimeMillis
+        val movement = SwipeMovementHelper.swipesToMovement(areaStartValue, areaEndValue)
+        val requestData = new RequestToMatch(matchRequest.apiKey, matchRequest.appId, matchRequest.deviceId,
+          matchRequest.latitude, matchRequest.longitude, timestamp, areaStartValue, areaEndValue, movement,
+          matchRequest.equalityParam, self)
+
+        criteriaValue match {
+          // we only get here if the criteria is valid
+
+          // TODO: where to put these matching actors?
+          case Criteria.POSITION => MyController.positionMatchingActor ! NewRequest(requestData)
+          case Criteria.PRESENCE => MyController.touchMatchingActor ! NewRequest(requestData)
+        }
+      }
     }
   }
 
@@ -80,7 +125,7 @@ class ContentExchangeActorWS extends HandlingActorWS {
     }
   }
 
-  def onBreakConnectionMsg(break: BreakMatchInputMessage) = {
+  def onBreakConnectionMsg(break: ClientInputMessageBreakMatch) = {
     // send messages to the other ones in the connection and simply forget about them
     break.reason match {
       case Some(reason) => sendMessageToMatchees(MatcheeBrokeConnection(Some(reason)))
