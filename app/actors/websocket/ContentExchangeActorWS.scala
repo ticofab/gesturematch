@@ -5,12 +5,14 @@ import play.api.Logger
 import consts.Timeouts
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.concurrent.Promise
-import helpers.JsonResponseHelper
+import helpers.{JsonInputHelper, JsonResponseHelper}
 import actors._
 import actors.Setup
 import models.MatcheeInfo
 import actors.Input
 import scala.Some
+import scala.util.{Success, Failure, Try}
+import models.ClientInputMessages.{ClientInputMessageDisconnect, BreakMatchInputMessage}
 
 /**
  * This actor will simply pass the content to the actors of the other matched requests.
@@ -30,23 +32,62 @@ class ContentExchangeActorWS extends HandlingActorWS {
 
       Logger.info(s"$self, MatchedDetail message. myInfo: $myInfo, others: $matcheesInfo")
 
-      sendToClient()
+      sendMatchedResponseToClient()
     }
 
     case Input(input) => {
       Logger.info(s"$self, Input() message: $input")
-      // don't do anything with it.... for now
+      // try to parse it to Json
+      Try(JsonInputHelper.parseInput(input)) match {
+        case Success(parsedMessage) => {
+          // successfully parsed
+          parsedMessage match {
+            case disconnect: ClientInputMessageDisconnect => onDisconnectMsg(disconnect)
+            case break: BreakMatchInputMessage => {} // TODO
+            case _ => {} // TODO: error
+          }
+        }
+
+        case Failure(e) => {
+          // couldn't parse the input message
+          // TODO
+        }
+      }
     }
   }
 
-  def sendToClient() = {
+  def sendMatchedResponseToClient() = {
     if (!myInfo.isEmpty && !matcheesInfo.isEmpty) {
-      val jsonToSend = JsonResponseHelper.getMatchedResponse(myInfo.get, matcheesInfo.get)
+      val jsonToSend = JsonResponseHelper.createMatchedResponse(myInfo.get, matcheesInfo.get)
       channel.foreach(x => {
         x.push(jsonToSend)
-        x.eofAndEnd() // TODO: get rid of this
       })
     }
+  }
+
+  def sendMessageToMatchees(message: MatcheeMessage) = {
+    matcheesInfo match {
+      case Some(matcheeList) => matcheeList.foreach(matchee => matchee.handlingActor ! message)
+      case None => {} // do nothing
+    }
+  }
+
+  def onDisconnectMsg(disconnect: ClientInputMessageDisconnect) = {
+    channel.foreach(x => x.eofAndEnd()) // TODO: send ack message before this
+    disconnect.reason match {
+      case Some(reason) => sendMessageToMatchees(MatcheeDisconnected(Some(reason)))
+      case None => sendMessageToMatchees(MatcheeDisconnected(None))
+    }
+  }
+
+  def onBreakConnectionMsg(break: BreakMatchInputMessage) = {
+    // send messages to the other ones in the connection and simply forget about them
+    break.reason match {
+      case Some(reason) => sendMessageToMatchees(MatcheeBrokeConnection(Some(reason)))
+      case None => sendMessageToMatchees(MatcheeBrokeConnection(None))
+    }
+    matcheesInfo = None
+    // TODO: send ack message to client
   }
 }
 

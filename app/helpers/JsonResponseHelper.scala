@@ -6,7 +6,7 @@ import models.MatcheeInfo
 
 object JsonResponseHelper {
 
-  def getMatchedResponse(myInfo: MatcheeInfo, otherInfos: List[MatcheeInfo]) = {
+  def createMatchedResponse(myInfo: MatcheeInfo, otherInfos: List[MatcheeInfo]) = {
 
     val objList: List[JsObject] = otherInfos.map(info => MatcheeInfo.getInfoObj(info))
     val jsonArray = Json.toJson(objList)
