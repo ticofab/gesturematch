@@ -1,4 +1,4 @@
-package helpers
+package helpers.movements
 
 import consts.SwipeMovements._
 

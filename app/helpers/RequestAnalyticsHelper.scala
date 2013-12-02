@@ -1,16 +1,15 @@
 package helpers
 
 import models.RequestToMatch
-import consts.{Areas, Criteria, RequestTypes}
+import consts.{Areas, Criteria}
 import consts.Criteria.Criteria
-import consts.RequestTypes.RequestTypes
 import consts.Areas.Areas
 
 case class InvalidRequestException(message: String) extends Exception(message)
 
 object RequestAnalyticsHelper {
 
-  def requestIsValid2(criteria: Criteria, areaStart: Areas, areaEnd: Areas) = {
+  def requestIsValid(criteria: Criteria, areaStart: Areas, areaEnd: Areas) = {
     // TODO:
     //    check more things about parameters
     //    - api key must be valid
@@ -18,33 +17,6 @@ object RequestAnalyticsHelper {
 
     lazy val invReqHead = "Invalid request: invalid "
     lazy val allowedValues = ". Allowed values are: "
-
-    if (criteria == Criteria.INVALID)
-      throw InvalidRequestException(s"$invReqHead criteria $allowedValues ${Criteria.getValidOnes}")
-
-    if (areaStart == Areas.INVALID)
-      throw InvalidRequestException(s"$invReqHead areaStart $allowedValues ${Areas.getValidOnes}")
-
-    if (areaEnd == Areas.INVALID)
-      throw InvalidRequestException(s"$invReqHead areaEnd $allowedValues ${Areas.getValidOnes}")
-
-    if (areaStart == areaEnd)
-      throw InvalidRequestException("Invalid request: starting and ending areas are equal.")
-
-    true
-  }
-
-  def requestIsValid(requestType: RequestTypes, criteria: Criteria, areaStart: Areas, areaEnd: Areas) = {
-    // TODO:
-    //    check more things about parameters
-    //    - api key must be valid
-    //    - app id must be valid
-
-    lazy val invReqHead = "Invalid request: invalid "
-    lazy val allowedValues = ". Allowed values are: "
-
-    if (requestType == RequestTypes.INVALID)
-      throw InvalidRequestException(s"$invReqHead type $allowedValues ${RequestTypes.getValidOnes}")
 
     if (criteria == Criteria.INVALID)
       throw InvalidRequestException(s"$invReqHead criteria $allowedValues ${Criteria.getValidOnes}")

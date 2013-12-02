@@ -4,16 +4,6 @@ import akka.actor.ActorRef
 import consts.SwipeMovements.SwipeMovement
 import consts.Areas.Areas
 
-/**
- * TODO: redo this
- * This is the object that represents a matching request that came from a client.
- * @param latitude         The client's latitude (to best approximation)
- * @param longitude        The client's longitude (to best approximation)
- * @param timestamp        The timestamp at the request arrival
- * @param movement         The swipe movement
- * @param equalityParam    The equality param (an arbitrary parameter)
- * @param handlingActor    The reference to the actor managing this request
- */
 class RequestToMatch(val apiKey: String,
                      val appId: String,
                      val deviceId: String,

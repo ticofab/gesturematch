@@ -2,10 +2,11 @@ package actors
 
 import akka.actor.{Props, Actor}
 import models._
-import helpers.{RequestAnalyticsHelper, SwipeMovementHelper, ScreenPositionHelper, RequestStorageHelper}
+import helpers.{RequestAnalyticsHelper, ScreenPositionHelper, RequestStorageHelper}
 import consts.Areas._
 import play.api.Logger
 import consts.Criteria
+import helpers.movements.SwipeMovementHelper
 
 class PositionMatcherActor extends Actor {
 

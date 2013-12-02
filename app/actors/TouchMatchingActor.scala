@@ -1,10 +1,11 @@
 package actors
 
 import akka.actor.{Actor, Props}
-import helpers.{SwipeMovementHelper, RequestAnalyticsHelper, RequestStorageHelper}
+import helpers.{RequestAnalyticsHelper, RequestStorageHelper}
 import play.api.Logger
 import models.{NewRequest, Matched, MatcheeInfo, RequestToMatch}
 import consts.Criteria
+import helpers.movements.SwipeMovementHelper
 
 class TouchMatchingActor extends Actor {
 

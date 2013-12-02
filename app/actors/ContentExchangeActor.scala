@@ -4,7 +4,7 @@ import akka.actor.{Actor, Props}
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-import helpers.{SwipeMovementHelper, RequestAnalyticsHelper}
+import helpers.{RequestAnalyticsHelper}
 import models._
 import scala.util.Try
 import models.ClientInputMessages._
@@ -17,6 +17,7 @@ import scala.util.Failure
 import scala.Some
 import scala.util.Success
 import helpers.json.{JsonMessageHelper, JsonResponseHelper, JsonInputHelper}
+import helpers.movements.SwipeMovementHelper
 
 class ContentExchangeActorWS extends Actor {
   var channel: Option[Concurrent.Channel[String]] = None
@@ -106,7 +107,7 @@ class ContentExchangeActorWS extends Actor {
     val areaEndValue = Areas.getAreaFromString(matchRequest.areaEnd)
     val criteriaValue = Criteria.getCriteriaFromString(matchRequest.criteria)
 
-    val testValidity = Try(RequestAnalyticsHelper.requestIsValid2(criteriaValue, areaStartValue, areaEndValue))
+    val testValidity = Try(RequestAnalyticsHelper.requestIsValid(criteriaValue, areaStartValue, areaEndValue))
 
     testValidity match {
 
