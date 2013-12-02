@@ -22,7 +22,6 @@ class ContentExchangeActorWS extends HandlingActorWS {
 
       val in = Iteratee.foreach[String] {
         input => onInput(input)
-        channel.foreach(x => x.push("thanks"))
       }
 
       val out: Enumerator[String] = Concurrent.unicast(c => {
