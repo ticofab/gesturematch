@@ -1,15 +1,13 @@
 package actors
 
-import play.api.libs.iteratee.Concurrent
 import models.{MatcheeInfo, RequestToMatch}
 
 // matching stuff
 case class NewRequest(request: RequestToMatch)
 
 // client handling actor messages
-case class Setup(channel: Option[Concurrent.Channel[String]])
+case class ClientConnected()
 case class Matched(myInfo: MatcheeInfo, matcheesInfo: List[MatcheeInfo])
-case class Input(input: String)
 
 // inter actor messages
 sealed trait MatcheeMessage

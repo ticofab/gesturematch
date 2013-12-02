@@ -3,30 +3,37 @@ package actors.websocket
 import akka.actor.{Actor, Props}
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.concurrent.Promise
+
 import helpers.{SwipeMovementHelper, RequestAnalyticsHelper, JsonResponseHelper, JsonInputHelper}
 import actors._
-import actors.Setup
 import models.{RequestToMatch, MatcheeInfo}
-import actors.Input
 import scala.Some
 import scala.util.{Success, Failure, Try}
 import models.ClientInputMessages._
 import controllers.MyController
-import consts.Timeouts
 import consts.Areas
 import consts.Criteria
+import play.api.libs.iteratee.{Concurrent, Enumerator, Iteratee}
 
-/**
- * This actor will simply pass the content to the actors of the other matched requests.
- */
 class ContentExchangeActorWS extends HandlingActorWS {
-  def receive: Actor.Receive = {
-    case Setup(c) => {
-      this.channel = c
 
-      // start a timeout to close the connection after a while
-      Promise.timeout(channel.foreach(x => x.eofAndEnd()), Timeouts.maxOldestRequestInterval)
+  def receive: Actor.Receive = {
+    case ClientConnected() => {
+
+      val in = Iteratee.foreach[String] {
+        input => onInput(input)
+        channel.foreach(x => x.push("thanks"))
+      }
+
+      val out: Enumerator[String] = Concurrent.unicast(c => {
+        channel = Some(c)
+
+        // TODO: start a timeout to close the connection after a while
+        //Promise.timeout(channel.foreach(x => x.eofAndEnd()), Timeouts.maxOldestRequestInterval)
+      })
+
+      val wsLink = (in, out)
+      sender ! wsLink
     }
 
     case Matched(info: MatcheeInfo, othersInfo: List[MatcheeInfo]) => {
@@ -38,37 +45,29 @@ class ContentExchangeActorWS extends HandlingActorWS {
       sendMatchedResponseToClient()
     }
 
-    case Input(input) => {
-      Logger.info(s"$self, Input() message: $input")
-      // try to parse it to Json
-      Try(JsonInputHelper.parseInput(input)) match {
-
-        case Success(parsedMessage) => {
-
-          // successfully parsed
-          parsedMessage match {
-            case disconnect: ClientInputMessageDisconnect => onDisconnectMsg(disconnect)
-            case matchRequest: ClientInputMessageMatch => onMatchRequest(matchRequest)
-            case breakMatching: ClientInputMessageBreakMatch => onBreakConnectionMsg(breakMatching)
-            case _ => {} // TODO: error
-          }
-        }
-
-        case Failure(e) => {
-          Logger.info(s"Couldn't parse client message: ${e.getMessage}")
-          // TODO: send a more helpful message back
-          channel.foreach(x => x.push(JsonResponseHelper.getInvalidInputResponse))
-        }
-      }
-    }
   }
 
-  def sendMatchedResponseToClient() = {
-    if (!myInfo.isEmpty && !matcheesInfo.isEmpty) {
-      val jsonToSend = JsonResponseHelper.createMatchedResponse(myInfo.get, matcheesInfo.get)
-      channel.foreach(x => {
-        x.push(jsonToSend)
-      })
+  def onInput(input: String) = {
+    Logger.info(s"$self, input message: $input")
+    // try to parse it to Json
+    Try(JsonInputHelper.parseInput(input)) match {
+
+      case Success(parsedMessage) => {
+
+        // successfully parsed
+        parsedMessage match {
+          case disconnect: ClientInputMessageDisconnect => onDisconnectMsg(disconnect)
+          case matchRequest: ClientInputMessageMatch => onMatchRequest(matchRequest)
+          case breakMatching: ClientInputMessageBreakMatch => onBreakConnectionMsg(breakMatching)
+          case _ => {} // TODO: error
+        }
+      }
+
+      case Failure(e) => {
+        Logger.info(s"Couldn't parse client message: ${e.getMessage}")
+        // TODO: send a more helpful message back
+        channel.foreach(x => x.push(JsonResponseHelper.getInvalidInputResponse))
+      }
     }
   }
 
@@ -136,6 +135,15 @@ class ContentExchangeActorWS extends HandlingActorWS {
     }
     matcheesInfo = None
     channel.foreach(x => x.push(JsonResponseHelper.getMatchBrokenResponse))
+  }
+
+  def sendMatchedResponseToClient() = {
+    if (!myInfo.isEmpty && !matcheesInfo.isEmpty) {
+      val jsonToSend = JsonResponseHelper.createMatchedResponse(myInfo.get, matcheesInfo.get)
+      channel.foreach(x => {
+        x.push(jsonToSend)
+      })
+    }
   }
 }
 
