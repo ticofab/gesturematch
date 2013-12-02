@@ -5,10 +5,10 @@ import scala.concurrent.duration.DurationInt
 import play.api.libs.iteratee.{Iteratee, Enumerator}
 import akka.actor.ActorRef
 import akka.pattern.ask
-import actors.ClientConnected
+import actors.ContentExchangeActorWS
 import play.api.libs.concurrent.Akka
 import play.api.Play.current
-import actors.websocket.ContentExchangeActorWS
+import models.ClientConnected
 
 object ApplicationWS extends MyController {
 

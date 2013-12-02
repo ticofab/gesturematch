@@ -1,7 +1,7 @@
 package actors
 
 import akka.actor.{Props, Actor}
-import models.{MatcheeInfo, PossibleMatching, MatchingGroup, RequestToMatch}
+import models._
 import helpers.{RequestAnalyticsHelper, SwipeMovementHelper, ScreenPositionHelper, RequestStorageHelper}
 import consts.Areas._
 import play.api.Logger

@@ -1,21 +1,26 @@
-package actors.websocket
+package actors
 
 import akka.actor.{Actor, Props}
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import helpers.{SwipeMovementHelper, RequestAnalyticsHelper, JsonResponseHelper, JsonInputHelper}
-import actors._
-import models.{RequestToMatch, MatcheeInfo}
-import scala.Some
-import scala.util.{Success, Failure, Try}
+import models._
+import scala.util.Try
 import models.ClientInputMessages._
 import controllers.MyController
 import consts.Areas
 import consts.Criteria
 import play.api.libs.iteratee.{Concurrent, Enumerator, Iteratee}
+import models.NewRequest
+import scala.util.Failure
+import scala.Some
+import scala.util.Success
 
-class ContentExchangeActorWS extends HandlingActorWS {
+class ContentExchangeActorWS extends Actor {
+  var channel: Option[Concurrent.Channel[String]] = None
+  var matcheesInfo: Option[List[MatcheeInfo]] = None
+  var myInfo: Option[MatcheeInfo] = None
 
   def receive: Actor.Receive = {
     case ClientConnected() => {

@@ -1,6 +1,4 @@
-package actors
-
-import models.{MatcheeInfo, RequestToMatch}
+package models
 
 // matching stuff
 case class NewRequest(request: RequestToMatch)
