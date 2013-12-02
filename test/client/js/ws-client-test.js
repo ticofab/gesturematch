@@ -9,19 +9,19 @@ myApp.controller('paramTable', ['$scope', function($scope) {
   })
 
     $scope.$watchCollection("[dev1rtype,dev1devid,dev1lat,dev1lon,dev1ss,dev1se,dev1pl,dev1ep,dev1apikey,dev1appId,dev1criteria]", function(nv) {
-        $scope.match1url = createMatchJson(nv)
+        $scope.match1json = createMatchJson(nv)
     });
 
     $scope.$watchCollection("[dev2rtype,dev2devid,dev2lat,dev2lon,dev2ss,dev2se,dev2pl,dev2ep,dev2apikey,dev2appId,dev2criteria]", function(nv) {
-        $scope.match2url = createMatchJson(nv)
+        $scope.match2json = createMatchJson(nv)
     });
 
     $scope.$watchCollection("[dev3rtype,dev3devid,dev3lat,dev3lon,dev3ss,dev3se,dev3pl,dev3ep,dev3apikey,dev3appId,dev3criteria]", function(nv) {
-        $scope.match3url = createMatchJson(nv)
+        $scope.match3json = createMatchJson(nv)
     });
 
     $scope.$watchCollection("[dev4rtype,dev4devid,dev4lat,dev4lon,dev4ss,dev4se,dev4pl,dev4ep,dev4apikey,dev4appId,dev4criteria]", function(nv) {
-        $scope.match4url = createMatchJson(nv)
+        $scope.match4json = createMatchJson(nv)
     });
 
     var myWebSocket1, myWebSocket2, myWebSocket3, myWebSocket4;
@@ -105,39 +105,20 @@ myApp.controller('paramTable', ['$scope', function($scope) {
         myWebSocket4.onclose = onC.bind(null, "isDisabled4");
     };
 
-    $scope.disconnect1 = function() {
-        var disconnectMsg = createDisconnectJson();
-        myWebSocket1.send(disconnectMsg);
-    };
-    $scope.disconnect2 = function() {
-        var disconnectMsg = createDisconnectJson();
-        myWebSocket2.send(disconnectMsg);
-    };
-    $scope.disconnect3 =function() {
-        var disconnectMsg = createDisconnectJson();
-        myWebSocket3.send(disconnectMsg);
-    };
-    $scope.disconnect4 = function() {
-        var disconnectMsg = createDisconnectJson();
-        myWebSocket4.send(disconnectMsg);
-    };
+    $scope.disconnect1 = function() {myWebSocket1.send(createDisconnectJson());};
+    $scope.disconnect2 = function() {myWebSocket2.send(createDisconnectJson());};
+    $scope.disconnect3 = function() {myWebSocket3.send(createDisconnectJson());};
+    $scope.disconnect4 = function() {myWebSocket4.send(createDisconnectJson());};
 
-    $scope.match1 = function() {
-        myWebSocket1.send($scope.match1url)
-    }
+    $scope.match1 = function() {myWebSocket1.send($scope.match1json)}
+    $scope.match2 = function() {myWebSocket2.send($scope.match2json)}
+    $scope.match3 = function() {myWebSocket3.send($scope.match3json)}
+    $scope.match4 = function() {myWebSocket4.send($scope.match4json)}
 
-    $scope.match2 = function() {
-        myWebSocket2.send($scope.match2url)
-    }
-
-    $scope.match3 = function() {
-        myWebSocket3.send($scope.match3url)
-    }
-
-    $scope.match4 = function() {
-        myWebSocket4.send($scope.match4url)
-    }
-
+    $scope.breakmatch1 = function() {myWebSocket1.send(createBreakMatchJson());}
+    $scope.breakmatch2 = function() {myWebSocket2.send(createBreakMatchJson());}
+    $scope.breakmatch3 = function() {myWebSocket3.send(createBreakMatchJson());}
+    $scope.breakmatch4 = function() {myWebSocket4.send(createBreakMatchJson());}
 
     function initStuff() {
 

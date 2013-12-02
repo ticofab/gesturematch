@@ -1,9 +1,6 @@
-package consts
+package consts.json
 
 object JsonInputLabels {
-
-  // payload of the matching devices.
-  val PAYLOAD = "payload"
 
   // input types
   val INPUT_TYPE = "type"

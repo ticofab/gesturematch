@@ -38,8 +38,7 @@ object ClientInputMessageMatch {
     val deviceId = (jsonValue \ MATCH_MESSAGE_DEVICEID).asOpt[String]
     val equalityParam = (jsonValue \ MATCH_MESSAGE_EQUALITYPARAM).asOpt[String]
 
-    //if we got here, it means that everything is fine
-    // TODO: get the JsValue direttamente all'endpoint
+    // if we got here, it means that everything is fine
     ClientInputMessageMatch(criteria.get, apiKey.get, appId.get, latitude.get.toDouble,
       longitude.get.toDouble, areaStart.get, areaEnd.get, deviceId.get, equalityParam.get)
   }

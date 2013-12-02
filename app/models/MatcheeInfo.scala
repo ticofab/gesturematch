@@ -2,8 +2,9 @@ package models
 
 import akka.actor.ActorRef
 import consts.ScreenPositions.ScreenPosition
-import consts.{JsonResponseLabels, ScreenPositions}
+import consts.{ScreenPositions}
 import play.api.libs.json.{JsObject, Json}
+import consts.json.JsonResponseLabels
 
 case class MatcheeInfo(handlingActor: ActorRef,
                        idInGroup: Int,

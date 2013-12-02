@@ -1,6 +1,9 @@
 function createDisconnectJson() {
-    var request = {"type":"disconnect"}
-    return JSON.stringify(request);
+    return JSON.stringify({"type":"disconnect"});
+}
+
+function createBreakMatchJson() {
+    return JSON.stringify({"type":"breakMatch"});
 }
 
 // nv are the parametes in the order in which they're observed...

@@ -1,9 +1,9 @@
-package helpers
+package helpers.json
 
 import play.api.libs.json.{JsValue, Json}
 import models.ClientInputMessages.{ClientInputMessageBreakMatch, ClientInputMessageMatch, ClientInputMessageDisconnect, ClientInputMessage}
-import consts.JsonInputLabels
 import play.api.Logger
+import consts.json.JsonInputLabels
 
 object JsonInputHelper {
   def parseInput(input: String): ClientInputMessage = {

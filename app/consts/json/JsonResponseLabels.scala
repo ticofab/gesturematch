@@ -1,4 +1,4 @@
-package consts
+package consts.json
 
 object JsonResponseLabels {
   // possible outcomes
@@ -17,6 +17,7 @@ object JsonResponseLabels {
   val OUTCOME_DISCONNECTED = "disconnected"
 
   // -- outcomes to break match request
+  val OUTCOME_NO_MATCH_TO_BREAK = "nothingToBreak"
   val OUTCOME_MATCH_BROKEN = "matchBroken"
 
   // -- outcomes to delivery request

@@ -1,8 +1,8 @@
-package helpers
+package helpers.json
 
 import play.api.libs.json.{JsObject, Json}
-import consts.JsonResponseLabels
 import models.MatcheeInfo
+import consts.json.JsonResponseLabels
 
 object JsonResponseHelper {
 
@@ -35,6 +35,7 @@ object JsonResponseHelper {
   def getMatchBrokenResponse = getSimpleOutcomeResponse(JsonResponseLabels.OUTCOME_MATCH_BROKEN)
   def getDisconnectResponse = getSimpleOutcomeResponse(JsonResponseLabels.OUTCOME_DISCONNECTED)
   def getInvalidInputResponse = getSimpleOutcomeResponse(JsonResponseLabels.OUTCOME_INPUT_INVALID)
+  def getNothingToBreakResponse = getSimpleOutcomeResponse(JsonResponseLabels.OUTCOME_NO_MATCH_TO_BREAK)
 
   private def getSimpleOutcomeResponse(outcomeResponse: String) = {
     Json.stringify(

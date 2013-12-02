@@ -13,7 +13,12 @@ import play.api.Logger
 
 object ApplicationWS extends MyController {
 
-
+  /*
+   Endpoint to open the WebSocket connection.
+   NOTES:
+     - I chose not to use WebSocket[JsValue] because this would lead to horrible exceptions
+       in case the content of inputs doesn't come as a valid JsonString.
+   */
   def openWS(): WebSocket[String] = WebSocket.async {
     request => {
       Logger.info(s"openWS endpoint connection: $request")
