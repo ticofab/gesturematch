@@ -1,13 +1,15 @@
 package models.ClientInputMessages
 
 import play.api.libs.json.JsValue
+import consts.JsonInputLabels
 
 case class ClientInputMessageDisconnect(reason: Option[String]) extends ClientInputMessage {
 
 }
 
 object ClientInputMessageDisconnect {
-  def fromJson(jsonMsg: JsValue): ClientInputMessageDisconnect = {
-    ClientInputMessageDisconnect(Some("fabio"))
+  def fromJson(jsonValue: JsValue): ClientInputMessageDisconnect = {
+    val reason = (jsonValue \ JsonInputLabels.INPUT_REASON).asOpt[String]
+    ClientInputMessageDisconnect(reason)
   }
 }

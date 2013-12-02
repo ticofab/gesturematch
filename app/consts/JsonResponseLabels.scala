@@ -1,12 +1,26 @@
 package consts
 
-object JsonLabels {
+object JsonResponseLabels {
   // possible outcomes
   val OUTCOME = "outcome"
+
+  // -- outcomes to match request
+  val OUTCOME_INVALID_REQUEST = "invalidRequest"
+  val OUTCOME_REASON = "reason"
   val OUTCOME_MATCHED = "matched"
   val OUTCOME_UNCERTAIN = "uncertain"
   val OUTCOME_TIMEOUT = "timeout"
   val OUTCOME_UNKNOWN_ERROR = "error"
+  val OUTCOME_INPUT_INVALID = "invalid_input"
+
+  // -- outcomes to disconnect request
+  val OUTCOME_DISCONNECTED = "disconnected"
+
+  // -- outcomes to break match request
+  val OUTCOME_MATCH_BROKEN = "matchBroken"
+
+  // -- outcomes to delivery request
+  val OUTCOME_PAYLOAD_DELIVERED = "delivered"
 
   // matched messages labels
   val GROUP_SIZE = "groupSize"
@@ -16,14 +30,4 @@ object JsonLabels {
   // info object
   val ID_IN_GROUP = "idInGroup"
   val POSITION_IN_GROUP = "position"
-
-  // payload of the matching devices.
-  val PAYLOAD = "payload"
-
-  // input types
-  val INPUT_TYPE = "type"
-  val INPUT_TYPE_MATCH = "match"
-  val INPUT_TYPE_BREAK_MATCH = "breakMatch"
-  val INPUT_TYPE_DISCONNECT = "disconnect"
-  val INPUT_TYPE_DELIVERY = "delivery"
 }

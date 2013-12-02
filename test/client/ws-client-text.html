@@ -2,11 +2,10 @@
 <head>
     <script type="text/javascript" src="js/angular.min.js"></script>
     <script type="text/javascript" src="js/ws-client-test.js"></script>
+    <script type="text/javascript" src="js/jsonHelper.js"></script>
     <link rel="stylesheet" href="css/client-test.css">
 </head>
 <body>
-
-
 
     <div ng-controller="paramTable">
 
@@ -106,26 +105,16 @@
         <span class="result-api-call">{{dev4url}}</span>
         <br><br>
 
-    <!--
-        <br>
-        <span class="result-api-call">{{dev1urlHTTP}}</span><br>
-        <span class="result-api-call">{{dev2urlHTTP}}</span><br>
-        <span class="result-api-call">{{dev3urlHTTP}}</span><br>
-        <span class="result-api-call">{{dev4urlHTTP}}</span>
-        <br><br>
-    -->
-
         <button ng-click="connect1()">connect dev1</button>
         <button ng-click="connect2()">connect dev2</button>
         <button ng-click="connect3()">connect dev3</button>
         <button ng-click="connect4()">connect dev4</button><br><br>
 
-    <!--
-        <button ng-click="connect1HTTP()">connect dev1 HTTP</button>
-        <button ng-click="connect2HTTP()">connect dev2 HTTP</button>
-        <button ng-click="connect3HTTP()">connect dev3 HTTP</button>
-        <button ng-click="connect4HTTP()">connect dev4 HTTP</button><br><br>
-    -->
+        <button ng-click="disconnect1()">disconnect dev1</button>
+        <button ng-click="disconnect2()">disconnect dev2</button>
+        <button ng-click="disconnect3()">disconnect dev3</button>
+        <button ng-click="disconnect4()">disconnect dev4</button><br><br>
+
 
         <input type="text" ng-model="msg1" ng-name"msg1" value="hey">
         <button ng-click="send1()" ng-disabled="isDisabled1" ng-model="isDisabled1">Send msg dev1</button>

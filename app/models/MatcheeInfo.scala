@@ -2,7 +2,7 @@ package models
 
 import akka.actor.ActorRef
 import consts.ScreenPositions.ScreenPosition
-import consts.{JsonLabels, ScreenPositions}
+import consts.{JsonResponseLabels, ScreenPositions}
 import play.api.libs.json.{JsObject, Json}
 
 case class MatcheeInfo(handlingActor: ActorRef,
@@ -13,8 +13,8 @@ object MatcheeInfo {
 
   def getInfoObj(info: MatcheeInfo): JsObject = {
     Json.obj(
-      JsonLabels.ID_IN_GROUP -> info.idInGroup,
-      JsonLabels.POSITION_IN_GROUP -> info.position.toString
+      JsonResponseLabels.ID_IN_GROUP -> info.idInGroup,
+      JsonResponseLabels.POSITION_IN_GROUP -> info.position.toString
     )
   }
 }

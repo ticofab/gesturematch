@@ -56,8 +56,8 @@ class ContentExchangeActorWS extends HandlingActorWS {
 
         case Failure(e) => {
           Logger.info(s"Couldn't parse client message: ${e.getMessage}")
-          // couldn't parse the input message
-          // TODO
+          // TODO: send a more helpful message back
+          channel.foreach(x => x.push(JsonResponseHelper.getInvalidInputResponse))
         }
       }
     }
@@ -85,8 +85,7 @@ class ContentExchangeActorWS extends HandlingActorWS {
       case Failure(e) => {
         // request issue
         Logger.info(s"    Request invalid, reason: ${e.getMessage}")
-        // TODO: make a Json message
-        channel.foreach(x => x.push(s"invalid request: ${e.getMessage}"))
+        channel.foreach(x => x.push(JsonResponseHelper.getInvalidMatchRequestResponse))
       }
 
       case Success(isValid) => {
@@ -118,7 +117,11 @@ class ContentExchangeActorWS extends HandlingActorWS {
   }
 
   def onDisconnectMsg(disconnect: ClientInputMessageDisconnect) = {
-    channel.foreach(x => x.eofAndEnd()) // TODO: send ack message before this
+    Logger.info(s"$self, client disconnected. Reason: ${disconnect.reason}")
+    channel.foreach(x => {
+      x.push(JsonResponseHelper.getDisconnectResponse)
+      x.eofAndEnd()
+    })
     disconnect.reason match {
       case Some(reason) => sendMessageToMatchees(MatcheeDisconnected(Some(reason)))
       case None => sendMessageToMatchees(MatcheeDisconnected(None))
@@ -132,7 +135,7 @@ class ContentExchangeActorWS extends HandlingActorWS {
       case None => sendMessageToMatchees(MatcheeBrokeConnection(None))
     }
     matcheesInfo = None
-    // TODO: send ack message to client
+    channel.foreach(x => x.push(JsonResponseHelper.getMatchBrokenResponse))
   }
 }
 
