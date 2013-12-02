@@ -31,16 +31,17 @@ object ClientInputMessageMatch {
     val criteria = (jsonValue \ MATCH_MESSAGE_CRITERIA).asOpt[String]
     val apiKey = (jsonValue \ MATCH_MESSAGE_APIKEY).asOpt[String]
     val appId = (jsonValue \ MATCH_MESSAGE_APPID).asOpt[String]
-    val latitude = (jsonValue \ MATCH_MESSAGE_LATITUDE).asOpt[Double]
-    val longitude = (jsonValue \ MATCH_MESSAGE_LONGITUDE).asOpt[Double]
+    val latitude = (jsonValue \ MATCH_MESSAGE_LATITUDE).asOpt[String]
+    val longitude = (jsonValue \ MATCH_MESSAGE_LONGITUDE).asOpt[String]
     val areaStart = (jsonValue \ MATCH_MESSAGE_AREASTART).asOpt[String]
     val areaEnd = (jsonValue \ MATCH_MESSAGE_AREAEND).asOpt[String]
     val deviceId = (jsonValue \ MATCH_MESSAGE_DEVICEID).asOpt[String]
     val equalityParam = (jsonValue \ MATCH_MESSAGE_EQUALITYPARAM).asOpt[String]
 
     //if we got here, it means that everything is fine
-    ClientInputMessageMatch(criteria.get, apiKey.get, appId.get, latitude.get,
-      longitude.get, areaStart.get, areaEnd.get, deviceId.get, equalityParam.get)
+    // TODO: get the JsValue direttamente all'endpoint
+    ClientInputMessageMatch(criteria.get, apiKey.get, appId.get, latitude.get.toDouble,
+      longitude.get.toDouble, areaStart.get, areaEnd.get, deviceId.get, equalityParam.get)
   }
 
 }

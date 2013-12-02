@@ -24,6 +24,7 @@ class ContentExchangeActorWS extends Actor {
 
   def receive: Actor.Receive = {
     case ClientConnected() => {
+      Logger.info(s"ClientConnected message")
 
       val in = Iteratee.foreach[String] {
         input => onInput(input)

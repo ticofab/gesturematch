@@ -4,25 +4,24 @@ myApp.controller('paramTable', ['$scope', function($scope) {
 
     initStuff();
 
-    $scope.$watchCollection("[dev1rtype,dev1devid,dev1lat,dev1lon,dev1ss,dev1se,dev1pl,dev1ep,dev1apikey,dev1appId,serverUrl,dev1criteria]", function(nv) {
-        var allParams = '?type=' + nv[0] + '&criteria=' + nv[11] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&areaStart=' + nv[4] + '&areaEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
-        $scope.dev1url = 'ws://' + nv[10] + '/openWS';
-        $scope.dev1urlHTTP = 'http://' + nv[10] + '/requestHTTP?type=' + allParams;
+    $scope.$watch("serverUrl", function() {
+      $scope.openWSUrl =  "ws://" + $scope.serverUrl + "/openWS"
+  })
+
+    $scope.$watchCollection("[dev1rtype,dev1devid,dev1lat,dev1lon,dev1ss,dev1se,dev1pl,dev1ep,dev1apikey,dev1appId,dev1criteria]", function(nv) {
+        $scope.match1url = createMatchJson(nv)
     });
 
-    $scope.$watchCollection("[dev2rtype,dev2devid,dev2lat,dev2lon,dev2ss,dev2se,dev2pl,dev2ep,dev2apikey,dev2appId,serverUrl,dev2criteria]", function(nv) {
-        var allParams = '?type=' + nv[0] + '&criteria=' + nv[11] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&areaStart=' + nv[4] + '&areaEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
-        $scope.dev2url = 'ws://' + nv[10] + '/openWS';
+    $scope.$watchCollection("[dev2rtype,dev2devid,dev2lat,dev2lon,dev2ss,dev2se,dev2pl,dev2ep,dev2apikey,dev2appId,dev2criteria]", function(nv) {
+        $scope.match2url = createMatchJson(nv)
     });
 
-    $scope.$watchCollection("[dev3rtype,dev3devid,dev3lat,dev3lon,dev3ss,dev3se,dev3pl,dev3ep,dev3apikey,dev3appId,serverUrl,dev3criteria]", function(nv) {
-        var allParams = '?type=' + nv[0] + '&criteria=' + nv[11] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&areaStart=' + nv[4] + '&areaEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
-        $scope.dev3url = 'ws://' + nv[10] + '/openWS';
+    $scope.$watchCollection("[dev3rtype,dev3devid,dev3lat,dev3lon,dev3ss,dev3se,dev3pl,dev3ep,dev3apikey,dev3appId,dev3criteria]", function(nv) {
+        $scope.match3url = createMatchJson(nv)
     });
 
-    $scope.$watchCollection("[dev4rtype,dev4devid,dev4lat,dev4lon,dev4ss,dev4se,dev4pl,dev4ep,dev4apikey,dev4appId,serverUrl,dev4criteria]", function(nv) {
-        var allParams = '?type=' + nv[0] + '&criteria=' + nv[11] + '&apiKey=' + nv[8] + '&appId=' + nv[9] + '&latitude=' + nv[2] + '&longitude=' + nv[3] + '&areaStart=' + nv[4] + '&areaEnd=' + nv[5] +'&deviceId=' + nv[1] + '&payload=' + nv[6] + '&equalityParam1=' + nv[7];
-        $scope.dev4url = 'ws://' + nv[10] + '/openWS';
+    $scope.$watchCollection("[dev4rtype,dev4devid,dev4lat,dev4lon,dev4ss,dev4se,dev4pl,dev4ep,dev4apikey,dev4appId,dev4criteria]", function(nv) {
+        $scope.match4url = createMatchJson(nv)
     });
 
     var myWebSocket1, myWebSocket2, myWebSocket3, myWebSocket4;
@@ -76,7 +75,7 @@ myApp.controller('paramTable', ['$scope', function($scope) {
     }
 
     $scope.connect1 = function() {
-        myWebSocket1 = new WebSocket($scope.dev1url);
+        myWebSocket1 = new WebSocket($scope.openWSUrl);
         myWebSocket1.onmessage = onM.bind(null, "dev1msg");
 
         // onO.bind creates a new function with only one parameter,
@@ -86,21 +85,21 @@ myApp.controller('paramTable', ['$scope', function($scope) {
     };
 
     $scope.connect2 = function() {
-        myWebSocket2 = new WebSocket($scope.dev2url);
+        myWebSocket2 = new WebSocket($scope.openWSUrl);
         myWebSocket2.onmessage = onM.bind(null, "dev2msg");;
         myWebSocket2.onopen = onO.bind(null, "isDisabled2");
         myWebSocket2.onclose = onC.bind(null, "isDisabled2");
     };
 
     $scope.connect3 = function() {
-        myWebSocket3 = new WebSocket($scope.dev3url);
+        myWebSocket3 = new WebSocket($scope.openWSUrl);
         myWebSocket3.onmessage = onM.bind(null, "dev3msg");;
         myWebSocket3.onopen = onO.bind(null, "isDisabled3");
         myWebSocket3.onclose = onC.bind(null, "isDisabled3");
     };
 
     $scope.connect4 = function() {
-        myWebSocket4 = new WebSocket($scope.dev4url);
+        myWebSocket4 = new WebSocket($scope.openWSUrl);
         myWebSocket4.onmessage = onM.bind(null, "dev4msg");
         myWebSocket4.onopen = onO.bind(null, "isDisabled4");
         myWebSocket4.onclose = onC.bind(null, "isDisabled4");
@@ -110,11 +109,42 @@ myApp.controller('paramTable', ['$scope', function($scope) {
         var disconnectMsg = createDisconnectJson();
         myWebSocket1.send(disconnectMsg);
     };
+    $scope.disconnect2 = function() {
+        var disconnectMsg = createDisconnectJson();
+        myWebSocket2.send(disconnectMsg);
+    };
+    $scope.disconnect3 =function() {
+        var disconnectMsg = createDisconnectJson();
+        myWebSocket3.send(disconnectMsg);
+    };
+    $scope.disconnect4 = function() {
+        var disconnectMsg = createDisconnectJson();
+        myWebSocket4.send(disconnectMsg);
+    };
+
+    $scope.match1 = function() {
+        myWebSocket1.send($scope.match1url)
+    }
+
+    $scope.match2 = function() {
+        myWebSocket2.send($scope.match2url)
+    }
+
+    $scope.match3 = function() {
+        myWebSocket3.send($scope.match3url)
+    }
+
+    $scope.match4 = function() {
+        myWebSocket4.send($scope.match4url)
+    }
+
 
     function initStuff() {
 
         $scope.serverUrl = "localhost:9000"
         //$scope.serverUrl = "thawing-escarpment-8488.herokuapp.com"
+
+        $scope.openWSUrl = "ws://" + $scope.serverUrl + "/openWS"
 
         $scope.dev1rtype = "content"
         $scope.dev2rtype = "content"

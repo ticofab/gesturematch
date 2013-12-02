@@ -10,6 +10,7 @@
     <div ng-controller="paramTable">
 
     Server URL: <input type="text" size="100" maxlength="100" ng-model="serverUrl"><br><br>
+    <span class="result-api-call">{{openWSUrl}}</span><br><br>
 
         <table id="tfhover" class="tftable" border="1">
             <tr>
@@ -99,22 +100,27 @@
         </table>
 
         <br>
-        <span class="result-api-call">{{dev1url}}</span><br>
-        <span class="result-api-call">{{dev2url}}</span><br>
-        <span class="result-api-call">{{dev3url}}</span><br>
-        <span class="result-api-call">{{dev4url}}</span>
+        <span class="result-api-call">{{match1url}}</span><br><br>
+        <span class="result-api-call">{{match1url}}</span><br><br>
+        <span class="result-api-call">{{match1url}}</span><br><br>
+        <span class="result-api-call">{{match1url}}</span>
         <br><br>
 
         <button ng-click="connect1()">connect dev1</button>
+        <button ng-click="match1()">match dev1</button>
+        <button ng-click="disconnect1()">disconnect dev1</button><br>
+
         <button ng-click="connect2()">connect dev2</button>
+        <button ng-click="match2()">match dev2</button>
+        <button ng-click="disconnect2()">disconnect dev2</button><br>
+
         <button ng-click="connect3()">connect dev3</button>
-        <button ng-click="connect4()">connect dev4</button><br><br>
+        <button ng-click="match3()">match dev3</button>
+        <button ng-click="disconnect3()">disconnect dev3</button><br>
 
-        <button ng-click="disconnect1()">disconnect dev1</button>
-        <button ng-click="disconnect2()">disconnect dev2</button>
-        <button ng-click="disconnect3()">disconnect dev3</button>
+        <button ng-click="connect4()">connect dev4</button>
+        <button ng-click="match4()">match dev4</button>
         <button ng-click="disconnect4()">disconnect dev4</button><br><br>
-
 
         <input type="text" ng-model="msg1" ng-name"msg1" value="hey">
         <button ng-click="send1()" ng-disabled="isDisabled1" ng-model="isDisabled1">Send msg dev1</button>
