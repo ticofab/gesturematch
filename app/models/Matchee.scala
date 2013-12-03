@@ -8,7 +8,7 @@ import consts.json.JsonResponseLabels
 
 case class Matchee(handlingActor: ActorRef,
                    idInGroup: Int,
-                   position: ScreenPosition = ScreenPositions.PositionUndetermined)
+                   position: ScreenPosition = ScreenPositions.Undetermined)
 
 object Matchee {
   def toJson(matchee: Matchee): JsObject = {

@@ -17,24 +17,24 @@ object ScreenPositionHelper {
     nrOfScreensInConnection match {
       case 2 => {
         myMovement match {
-          case INNERRIGHT | RIGHTINNER => PositionLeft
-          case LEFTINNER | INNERLEFT => PositionRight
-          case TOPINNER | INNERTOP => PositionBottom
-          case BOTTOMINNER | INNERBOTTOM => PositionTop
-          case _ => PositionUnknown
+          case INNERRIGHT | RIGHTINNER => Left
+          case LEFTINNER | INNERLEFT => Right
+          case TOPINNER | INNERTOP => Bottom
+          case BOTTOMINNER | INNERBOTTOM => Top
+          case _ => Unknown
         }
       }
       case 4 => {
         myMovement match {
           // watch out: not including undetermined situations
-          case LEFTBOTTOM | BOTTOMLEFT => PositionTopRight
-          case RIGHTBOTTOM | BOTTOMRIGHT => PositionTopLeft
-          case TOPLEFT | LEFTTOP => PositionBottomRight
-          case TOPRIGHT | RIGHTTOP => PositionBottomLeft
-          case _ => PositionUndetermined
+          case LEFTBOTTOM | BOTTOMLEFT => TopRight
+          case RIGHTBOTTOM | BOTTOMRIGHT => TopLeft
+          case TOPLEFT | LEFTTOP => BottomRight
+          case TOPRIGHT | RIGHTTOP => BottomLeft
+          case _ => Undetermined
         }
       }
-      case _ => PositionUnknown
+      case _ => Unknown
     }
   }
 
@@ -43,15 +43,15 @@ object ScreenPositionHelper {
    */
   def getCorrespondingStartPosition(secondMovement: SwipeMovement) = {
     secondMovement match {
-      case LEFTTOP => PositionBottomLeft
-      case LEFTBOTTOM => PositionTopLeft
-      case RIGHTBOTTOM => PositionTopRight
-      case RIGHTTOP => PositionBottomRight
-      case BOTTOMLEFT => PositionBottomRight
-      case BOTTOMRIGHT => PositionBottomLeft
-      case TOPLEFT => PositionTopRight
-      case TOPRIGHT => PositionTopLeft
-      case _ => PositionUnknown
+      case LEFTTOP => BottomLeft
+      case LEFTBOTTOM => TopLeft
+      case RIGHTBOTTOM => TopRight
+      case RIGHTTOP => BottomRight
+      case BOTTOMLEFT => BottomRight
+      case BOTTOMRIGHT => BottomLeft
+      case TOPLEFT => TopRight
+      case TOPRIGHT => TopLeft
+      case _ => Unknown
     }
   }
 
@@ -62,30 +62,30 @@ object ScreenPositionHelper {
     firstMovement match {
       case INNERRIGHT => {
         firstPosition match {
-          case PositionBottomLeft => PositionTopLeft
-          case PositionTopLeft => PositionBottomLeft
-          case _ => PositionUnknown
+          case BottomLeft => TopLeft
+          case TopLeft => BottomLeft
+          case _ => Unknown
         }
       }
       case INNERBOTTOM => {
         firstPosition match {
-          case PositionTopLeft => PositionTopRight
-          case PositionTopRight => PositionTopLeft
-          case _ => PositionUnknown
+          case TopLeft => TopRight
+          case TopRight => TopLeft
+          case _ => Unknown
         }
       }
       case INNERTOP => {
         firstPosition match {
-          case PositionBottomLeft => PositionBottomRight
-          case PositionBottomRight => PositionBottomLeft
-          case _ => PositionUnknown
+          case BottomLeft => BottomRight
+          case BottomRight => BottomLeft
+          case _ => Unknown
         }
       }
       case INNERLEFT => {
         firstPosition match {
-          case PositionBottomRight => PositionTopRight
-          case PositionTopRight => PositionBottomRight
-          case _ => PositionUnknown
+          case BottomRight => TopRight
+          case TopRight => BottomRight
+          case _ => Unknown
         }
       }
     }

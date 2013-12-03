@@ -27,10 +27,10 @@ myApp.controller('paramTable', ['$scope', function($scope) {
     var myWebSocket1, myWebSocket2, myWebSocket3, myWebSocket4;
 
     // controls the disabling / enabling of the buttons
-    $scope.isDisabled1 = true;
-    $scope.isDisabled2 = true;
-    $scope.isDisabled3 = true;
-    $scope.isDisabled4 = true;
+    $scope.isDisabled1 = false;
+    $scope.isDisabled2 = false;
+    $scope.isDisabled3 = false;
+    $scope.isDisabled4 = false;
 
     // sending messages stuff
     var sendGen = function(socket, msg) {socket.send(msg);};
@@ -64,17 +64,18 @@ myApp.controller('paramTable', ['$scope', function($scope) {
     function onO(id, evt) {
         // here "id" is a string. equivalent to
         //   $scope.isDisabled1 === $scope["isDisabled1"]
-        $scope[id] = false;
+        //$scope[id] = false;
         console.log("Connection open ...");
         $scope.$apply();
     }
     function onC(id, evt) {
-        $scope[id] = true;
+        //$scope[id] = true;
         console.log("Connection closed.");
         $scope.$apply();
     }
 
     $scope.connect1 = function() {
+        $scope.isDisabled1 = true;
         myWebSocket1 = new WebSocket($scope.openWSUrl);
         myWebSocket1.onmessage = onM.bind(null, "dev1msg");
 
@@ -85,6 +86,7 @@ myApp.controller('paramTable', ['$scope', function($scope) {
     };
 
     $scope.connect2 = function() {
+        $scope.isDisabled2 = true;
         myWebSocket2 = new WebSocket($scope.openWSUrl);
         myWebSocket2.onmessage = onM.bind(null, "dev2msg");;
         myWebSocket2.onopen = onO.bind(null, "isDisabled2");
@@ -92,6 +94,7 @@ myApp.controller('paramTable', ['$scope', function($scope) {
     };
 
     $scope.connect3 = function() {
+        $scope.isDisabled3 = true;
         myWebSocket3 = new WebSocket($scope.openWSUrl);
         myWebSocket3.onmessage = onM.bind(null, "dev3msg");;
         myWebSocket3.onopen = onO.bind(null, "isDisabled3");
@@ -99,16 +102,29 @@ myApp.controller('paramTable', ['$scope', function($scope) {
     };
 
     $scope.connect4 = function() {
+        $scope.isDisabled4 = true;
         myWebSocket4 = new WebSocket($scope.openWSUrl);
         myWebSocket4.onmessage = onM.bind(null, "dev4msg");
         myWebSocket4.onopen = onO.bind(null, "isDisabled4");
         myWebSocket4.onclose = onC.bind(null, "isDisabled4");
     };
 
-    $scope.disconnect1 = function() {myWebSocket1.send(createDisconnectJson());};
-    $scope.disconnect2 = function() {myWebSocket2.send(createDisconnectJson());};
-    $scope.disconnect3 = function() {myWebSocket3.send(createDisconnectJson());};
-    $scope.disconnect4 = function() {myWebSocket4.send(createDisconnectJson());};
+    $scope.disconnect1 = function() {
+        myWebSocket1.send(createDisconnectJson());
+        $scope.isDisabled1 = false;
+    };
+    $scope.disconnect2 = function() {
+        myWebSocket2.send(createDisconnectJson());
+        $scope.isDisabled2 = false;
+    };
+    $scope.disconnect3 = function() {
+        myWebSocket3.send(createDisconnectJson());
+        $scope.isDisabled3 = false;
+    };
+    $scope.disconnect4 = function() {
+        myWebSocket4.send(createDisconnectJson());
+        $scope.isDisabled4 = false;
+    };
 
     $scope.match1 = function() {myWebSocket1.send($scope.match1json)}
     $scope.match2 = function() {myWebSocket2.send($scope.match2json)}
@@ -140,5 +156,10 @@ myApp.controller('paramTable', ['$scope', function($scope) {
         ar.push(parseInt($scope.dev3recip))
         myWebSocket3.send(createDeliverJson(ar, $scope.dev3pl));
     }
+
+    $scope.connect1();
+    $scope.connect2();
+    $scope.connect3();
+    $scope.connect4();
 
 }]);

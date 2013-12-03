@@ -7,11 +7,14 @@ object ScreenPositions extends Enumeration {
   type ScreenPosition = Value
 
   // unknown position
-  val PositionUnknown, PositionUndetermined = Value
-
-  // values for composition of 2 devices
-  val PositionLeft, PositionRight, PositionTop, PositionBottom = Value
-
-  // values for composition of 4 devices (not taking into account the device orientation)
-  val PositionTopLeft, PositionTopRight, PositionBottomLeft, PositionBottomRight = Value
+  val Unknown = Value
+  val Undetermined = Value
+  val Left  = Value
+  val Right = Value
+  val Top = Value
+  val Bottom = Value
+  val TopLeft = Value
+  val TopRight = Value
+  val BottomLeft = Value
+  val BottomRight = Value
 }
