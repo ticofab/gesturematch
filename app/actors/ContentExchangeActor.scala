@@ -44,11 +44,9 @@ class ContentExchangeActor extends Actor {
     }
 
     case Matched(info: MatcheeInfo, othersInfo: List[MatcheeInfo]) => {
+      Logger.info(s"$self, MatchedDetail message. my info: $info, others: $othersInfo")
       myInfo = Some(info)
       matcheesInfo = Some(othersInfo)
-
-      Logger.info(s"$self, MatchedDetail message. myInfo: $myInfo, others: $matcheesInfo")
-
       sendMatchedResponseToClient()
     }
 
@@ -74,11 +72,13 @@ class ContentExchangeActor extends Actor {
         case None => ??? // we shouldn't get here
       }
     }
-
   }
 
+  // *************************************
+  // Events section
+  // *************************************
   def onInput(input: String) = {
-    Logger.info(s"$self, input message: $input")
+    Logger.info(s"$self, input message from client: $input")
     // try to parse it to Json
     Try(JsonInputHelper.parseInput(input)) match {
 
@@ -86,27 +86,22 @@ class ContentExchangeActor extends Actor {
 
         // successfully parsed
         parsedMessage match {
-          case disconnect: ClientInputMessageDisconnect => onDisconnectMsg(disconnect)
-          case matchRequest: ClientInputMessageMatch => onMatchRequest(matchRequest)
-          case breakMatching: ClientInputMessageBreakMatch => onBreakConnectionMsg(breakMatching)
-          case delivery: ClientInputMessageDelivery => onDeliveryMsg(delivery)
-          case _ => sendInvalidInputResponse() // TODO: error
+          case disconnect: ClientInputMessageDisconnect => onDisconnectInput(disconnect)
+          case matchRequest: ClientInputMessageMatch => onMatchInput(matchRequest)
+          case breakMatching: ClientInputMessageBreakMatch => onBreakConnectionInput(breakMatching)
+          case delivery: ClientInputMessageDelivery => onDeliveryInput(delivery)
+          case _ => sendInvalidInputResponseToClient() // TODO: error
         }
       }
 
       case Failure(e) => {
         Logger.info(s"Couldn't parse client message: ${e.getMessage}")
-        sendInvalidInputResponse()
+        sendInvalidInputResponseToClient()
       }
     }
   }
 
-  def sendInvalidInputResponse() = {
-    // TODO: send a more helpful message back
-    sendToClient(JsonResponseHelper.getInvalidInputResponse)
-  }
-
-  def onMatchRequest(matchRequest: ClientInputMessageMatch) = {
+  def onMatchInput(matchRequest: ClientInputMessageMatch) = {
 
     val areaStartValue = Areas.getAreaFromString(matchRequest.areaStart)
     val areaEndValue = Areas.getAreaFromString(matchRequest.areaEnd)
@@ -143,7 +138,7 @@ class ContentExchangeActor extends Actor {
     }
   }
 
-  def onDisconnectMsg(disconnect: ClientInputMessageDisconnect) = {
+  def onDisconnectInput(disconnect: ClientInputMessageDisconnect) = {
     Logger.info(s"$self, client disconnected. Reason: ${disconnect.reason}")
     channel.foreach(x => {
       x.push(JsonResponseHelper.getDisconnectResponse)
@@ -155,7 +150,7 @@ class ContentExchangeActor extends Actor {
     }
   }
 
-  def onBreakConnectionMsg(break: ClientInputMessageBreakMatch) = {
+  def onBreakConnectionInput(break: ClientInputMessageBreakMatch) = {
     Logger.info(s"$self, client broke the connection. Reason: ${break.reason}")
     // send messages to the other ones in the connection and simply forget about them
     matcheesInfo match {
@@ -164,6 +159,7 @@ class ContentExchangeActor extends Actor {
           case Some(reason) => sendMessageToMatchees(MatcheeBrokeConnection(myInfo, Some(reason)))
           case None => sendMessageToMatchees(MatcheeBrokeConnection(myInfo, None))
         }
+        sendToClient(JsonResponseHelper.getMatchBrokenResponse)
         breakMyMatching()
       }
       case None => {
@@ -172,15 +168,14 @@ class ContentExchangeActor extends Actor {
     }
   }
 
-  def onDeliveryMsg(delivery: ClientInputMessageDelivery) = {
-    Logger.info(s"$self, client delivery.")
+  def onDeliveryInput(delivery: ClientInputMessageDelivery) = {
+    Logger.info(s"$self, client delivery, for ${delivery.recipients}, payload: ${delivery.payload}")
     // create a delivery message and deliver it to the right recipients!
     val matchees: List[MatcheeInfo] = matcheesInfo.getOrElse(Nil)
     if (matchees == Nil) {
-      Logger.info(s"TODO")
+      Logger.info(s"No groups seem to be established")
       sendToClient(JsonResponseHelper.getPayloadEmptyGroupdResponse)
     } else {
-
       val message = MatcheeDelivers(myInfo, delivery.payload)
       val listRecipients: List[ActorRef] = for {
         matchee <- matchees
@@ -189,27 +184,27 @@ class ContentExchangeActor extends Actor {
       } yield matchee.handlingActor
 
       if (listRecipients.isEmpty) {
+        Logger.info(s"No groups seem to be established")
         sendToClient(JsonResponseHelper.getPayloadNotDeliveredResponse)
       } else {
         listRecipients.foreach(_ ! message)
         if (listRecipients.size == matchees.size) {
+          Logger.info(s"Delivered to all recipients.")
           sendToClient(JsonResponseHelper.getPayloadDeliveredResponse)
         } else {
+          Logger.info(s"Delivered to a subset of the recipients.")
           sendToClient(JsonResponseHelper.getPayloadPartiallyDeliveredResponse)
         }
       }
     }
   }
 
-  def sendMessageToMatchees(message: MatcheeMessage) = {
-    matcheesInfo match {
-      case Some(matcheeList) => matcheeList.foreach(matchee => matchee.handlingActor ! message)
-      case None => {} // do nothing
-    }
-  }
-
-  def sendToClient(message: String) = {
-    channel.foreach(x => x.push(message))
+  // *************************************
+  // responses to client section
+  // *************************************
+  def sendInvalidInputResponseToClient() = {
+    // TODO: send a more helpful message back
+    sendToClient(JsonResponseHelper.getInvalidInputResponse)
   }
 
 
@@ -223,16 +218,30 @@ class ContentExchangeActor extends Actor {
   def sendMatcheeLeftMessageToClient(matchee: Option[MatcheeInfo], reason: Option[String]) = {
     matchee match {
       case Some(matcheeInfo) => {
-        val payloadMsg = JsonMessageHelper.createMatcheeLeavesConnectionMessage(matcheeInfo.idInGroup)
-        sendToClient(payloadMsg)
+        val message = JsonMessageHelper.createMatcheeLeavesConnectionMessage(matcheeInfo.idInGroup)
+        sendToClient(message)
       }
       case None => ??? // we shouldn't get here
     }
   }
 
+  // *************************************
+  // general functions section
+  // *************************************
   def breakMyMatching() = {
     matcheesInfo = None
-    channel.foreach(x => x.push(JsonResponseHelper.getMatchBrokenResponse))
+    myInfo = None
+  }
+
+  def sendToClient(message: String) = {
+    channel.foreach(x => x.push(message))
+  }
+
+  def sendMessageToMatchees(message: MatcheeMessage) = {
+    matcheesInfo match {
+      case Some(matcheeList) => matcheeList.foreach(matchee => matchee.handlingActor ! message)
+      case None => {} // do nothing
+    }
   }
 }
 

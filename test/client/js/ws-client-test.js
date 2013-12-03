@@ -192,8 +192,8 @@ myApp.controller('paramTable', ['$scope', function($scope) {
         $scope.dev3appId = "123-ABC"
         $scope.dev4appId = "123-ABC"
 
-        $scope.dev1recip = "0"
-        $scope.dev2recip = "1"
+        $scope.dev1recip = "1"
+        $scope.dev2recip = "0"
         $scope.dev3recip = "2"
         $scope.dev4recip = "3"
     }
