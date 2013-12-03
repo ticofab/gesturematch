@@ -41,7 +41,7 @@ class ContentExchangeActor extends Actor {
         Promise.timeout({
           Logger.info(s"$self, timeout expired. Closing connection with client at ${remoteIPAddress.getOrElse("<IP unavailable>")}.")
           closeClientConnection()
-        }, Timeouts.maxConnectionLifetime)
+          }, Timeouts.maxConnectionLifetime)
       })
 
       val wsLink = (in, out)
@@ -74,7 +74,12 @@ class ContentExchangeActor extends Actor {
           val payloadMsg = JsonMessageHelper.createMatcheeSendsPayloadMessage(matcheeInfo.idInGroup, payload)
           sendToClient(payloadMsg)
         }
-        case None => ??? // we shouldn't get here
+        case None => {
+          // we shouldn't get here! but still deliver stuff..
+          Logger.error(s"error, empty matcheeInfo!")
+          val payloadMsg = JsonMessageHelper.createMatcheeSendsPayloadMessage(-1, payload)
+          sendToClient(payloadMsg)
+        }
       }
     }
   }
@@ -146,11 +151,12 @@ class ContentExchangeActor extends Actor {
   def onDisconnectInput(disconnect: ClientInputMessageDisconnect) = {
     Logger.info(s"$self, client disconnected. Reason: ${disconnect.reason}")
     sendToClient(JsonResponseHelper.getDisconnectResponse)
-    closeClientConnection()
     disconnect.reason match {
       case Some(reason) => sendMessageToMatchees(MatcheeDisconnected(myInfo, Some(reason)))
-      case None => sendMessageToMatchees(MatcheeDisconnected(None))
+      case None => sendMessageToMatchees(MatcheeDisconnected(myInfo))
     }
+    closeClientConnection()
+    breakMyMatching()
   }
 
   def onBreakConnectionInput(break: ClientInputMessageBreakMatch) = {
@@ -203,13 +209,12 @@ class ContentExchangeActor extends Actor {
   }
 
   // *************************************
-  // responses to client section
+  // Responses to client section
   // *************************************
   def sendInvalidInputResponseToClient() = {
     // TODO: send a more helpful message back
     sendToClient(JsonResponseHelper.getInvalidInputResponse)
   }
-
 
   def sendMatchedResponseToClient() = {
     if (!myInfo.isEmpty && !matcheesInfo.isEmpty) {
@@ -224,12 +229,17 @@ class ContentExchangeActor extends Actor {
         val message = JsonMessageHelper.createMatcheeLeavesConnectionMessage(matcheeInfo.idInGroup)
         sendToClient(message)
       }
-      case None => ??? // we shouldn't get here
+      case None => {
+        // uh? we shouldn't get here
+        Logger.error(s"error, empty matcheeInfo!")
+        val message = JsonMessageHelper.createMatcheeLeavesConnectionMessage(-1)
+        sendToClient(message)
+      }
     }
   }
 
   // *************************************
-  // general functions section
+  // General functions section
   // *************************************
   def breakMyMatching() = {
     matcheesInfo = None

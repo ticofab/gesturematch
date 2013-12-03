@@ -1,10 +1,9 @@
 package models.ClientInputMessages
 
-import play.api.libs.json.{JsArray, Json, JsValue}
+import play.api.libs.json.{JsArray, JsValue}
 import consts.json.JsonInputLabels
 
 case class ClientInputMessageDelivery(recipients: List[Int], payload: String) extends ClientInputMessage
-
 
 object ClientInputMessageDelivery {
   def fromJson(jsonValue: JsValue): ClientInputMessageDelivery = {
