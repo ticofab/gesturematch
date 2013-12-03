@@ -1,9 +1,10 @@
 package helpers.json
 
 import play.api.libs.json.{JsValue, Json}
-import models.ClientInputMessages.{ClientInputMessageBreakMatch, ClientInputMessageMatch, ClientInputMessageDisconnect, ClientInputMessage}
+import models.ClientInputMessages._
 import play.api.Logger
 import consts.json.JsonInputLabels
+import scala.Some
 
 object JsonInputHelper {
   def parseInput(input: String): ClientInputMessage = {
@@ -19,7 +20,7 @@ object JsonInputHelper {
           case JsonInputLabels.INPUT_TYPE_MATCH => ClientInputMessageMatch.fromJson(jsonValue)
           case JsonInputLabels.INPUT_TYPE_BREAK_MATCH => ClientInputMessageBreakMatch.fromJson(jsonValue)
           case JsonInputLabels.INPUT_TYPE_DISCONNECT => ClientInputMessageDisconnect.fromJson(jsonValue)
-          case JsonInputLabels.INPUT_TYPE_DELIVERY => ???
+          case JsonInputLabels.INPUT_TYPE_DELIVERY => ClientInputMessageDelivery.fromJson(jsonValue)
         }
       }
       case None => ??? // TODO: send bad message or something

@@ -21,13 +21,6 @@
                 <th>Device 4</th>
             </tr>
             <tr>
-                <td class="vertical-header">Request Type</td>
-                <td><input class="table-input" ng-model="dev1rtype"></td>
-                <td><input class="table-input" ng-model="dev2rtype"></td>
-                <td><input class="table-input" ng-model="dev3rtype"></td>
-                <td><input class="table-input" ng-model="dev4rtype"></td>
-            </tr>
-            <tr>
                 <td class="vertical-header">Criteria</td>
                 <td><input class="table-input" ng-model="dev1criteria"></td>
                 <td><input class="table-input" ng-model="dev2criteria"></td>
@@ -97,6 +90,13 @@
                 <td><input class="table-input" ng-model="dev3ep"></td>
                 <td><input class="table-input" ng-model="dev4ep"></td>
             </tr>
+            <tr>
+                <td class="vertical-header">Recipients</td>
+                <td><input class="table-input" ng-model="dev1recip"></td>
+                <td><input class="table-input" ng-model="dev2recip"></td>
+                <td><input class="table-input" ng-model="dev3recip"></td>
+                <td><input class="table-input" ng-model="dev4recip"></td>
+            </tr>
         </table>
 
         <br>
@@ -109,22 +109,26 @@
         <button ng-click="connect1()">connect dev1</button>
         <button ng-click="match1()">match dev1</button>
         <button ng-click="disconnect1()">disconnect dev1</button>
-        <button ng-click="breakmatch1()">break match dev1</button><br>
+        <button ng-click="breakmatch1()">break match dev1</button>
+        <button ng-click="deliver1()">deliver dev1</button><br>
 
         <button ng-click="connect2()">connect dev2</button>
         <button ng-click="match2()">match dev2</button>
         <button ng-click="disconnect2()">disconnect dev2</button>
-        <button ng-click="breakmatch2()">break match dev2</button><br>
+        <button ng-click="breakmatch2()">break match dev2</button>
+        <button ng-click="deliver2()">deliver dev2</button><br>
 
         <button ng-click="connect3()">connect dev3</button>
         <button ng-click="match3()">match dev3</button>
         <button ng-click="disconnect3()">disconnect dev3</button>
-        <button ng-click="breakmatch3()">break match dev3</button><br>
+        <button ng-click="breakmatch3()">break match dev3</button>
+        <button ng-click="deliver3()">deliver dev3</button><br>
 
         <button ng-click="connect4()">connect dev4</button>
         <button ng-click="match4()">match dev4</button>
         <button ng-click="disconnect4()">disconnect dev4</button>
-        <button ng-click="breakmatch4()">break match dev4</button><br><br>
+        <button ng-click="breakmatch4()">break match dev4</button>
+        <button ng-click="deliver4()">deliver dev4</button><br><br>
 
         <input type="text" ng-model="msg1" ng-name"msg1" value="hey">
         <button ng-click="send1()" ng-disabled="isDisabled1" ng-model="isDisabled1">Send msg dev1</button>

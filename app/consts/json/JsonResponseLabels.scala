@@ -21,6 +21,9 @@ object JsonResponseLabels {
   val OUTCOME_MATCH_BROKEN = "matchBroken"
 
   // -- outcomes to delivery request
+  val OUTCOME_PAYLOAD_EMPTY_GROUP = "notPartOfAnyGroup"
+  val OUTCOME_PAYLOAD_PARTIALLY_DELIVERED = "partiallyDelivered"
+  val OUTCOME_PAYLOAD_NOT_DELIVERED = "notDelivered"
   val OUTCOME_PAYLOAD_DELIVERED = "delivered"
 
   // matched messages labels

@@ -36,6 +36,10 @@ object JsonResponseHelper {
   def getDisconnectResponse = getSimpleOutcomeResponse(JsonResponseLabels.OUTCOME_DISCONNECTED)
   def getInvalidInputResponse = getSimpleOutcomeResponse(JsonResponseLabels.OUTCOME_INPUT_INVALID)
   def getNothingToBreakResponse = getSimpleOutcomeResponse(JsonResponseLabels.OUTCOME_NO_MATCH_TO_BREAK)
+  def getPayloadPartiallyDeliveredResponse = getSimpleOutcomeResponse(JsonResponseLabels.OUTCOME_PAYLOAD_PARTIALLY_DELIVERED)
+  def getPayloadNotDeliveredResponse = getSimpleOutcomeResponse(JsonResponseLabels.OUTCOME_PAYLOAD_NOT_DELIVERED)
+  def getPayloadDeliveredResponse = getSimpleOutcomeResponse(JsonResponseLabels.OUTCOME_PAYLOAD_DELIVERED)
+  def getPayloadEmptyGroupdResponse = getSimpleOutcomeResponse(JsonResponseLabels.OUTCOME_PAYLOAD_EMPTY_GROUP)
 
   private def getSimpleOutcomeResponse(outcomeResponse: String) = {
     Json.stringify(

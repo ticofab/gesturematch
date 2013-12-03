@@ -120,6 +120,16 @@ myApp.controller('paramTable', ['$scope', function($scope) {
     $scope.breakmatch3 = function() {myWebSocket3.send(createBreakMatchJson());}
     $scope.breakmatch4 = function() {myWebSocket4.send(createBreakMatchJson());}
 
+    $scope.deliver1 = function() {
+        var ar = [];
+        ar.push(parseInt($scope.dev1recip))
+        ar.push(3)
+        myWebSocket1.send(createDeliverJson(ar, $scope.dev1pl));
+    }
+    $scope.deliver2 = function() {myWebSocket2.send(createDeliverJson($scope.dev2deliver));}
+    $scope.deliver3 = function() {myWebSocket3.send(createDeliverJson($scope.dev3deliver));}
+    $scope.deliver4 = function() {myWebSocket4.send(createDeliverJson($scope.dev4deliver));}
+
     function initStuff() {
 
         $scope.serverUrl = "localhost:9000"
@@ -163,7 +173,7 @@ myApp.controller('paramTable', ['$scope', function($scope) {
         $scope.dev4ss = "left"
 
         $scope.dev1se = "right"
-        $scope.dev2se = "right"
+        $scope.dev2se = "inner"
         $scope.dev3se = "right"
         $scope.dev4se = "inner"
 
@@ -181,6 +191,11 @@ myApp.controller('paramTable', ['$scope', function($scope) {
         $scope.dev2appId = "123-ABC"
         $scope.dev3appId = "123-ABC"
         $scope.dev4appId = "123-ABC"
+
+        $scope.dev1recip = "0"
+        $scope.dev2recip = "1"
+        $scope.dev3recip = "2"
+        $scope.dev4recip = "3"
     }
 
 }]);

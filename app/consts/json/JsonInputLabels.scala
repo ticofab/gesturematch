@@ -11,4 +11,7 @@ object JsonInputLabels {
 
   // input reason
   val INPUT_REASON = "reason"
+  val INPUT_PAYLOAD = "payload"
+  val INPUT_RECIPIENTS = "recipients"
+  val INPUT_RECIPIENT = "recipient"
 }

@@ -5,7 +5,7 @@ import scala.concurrent.duration.DurationInt
 import play.api.libs.iteratee.{Iteratee, Enumerator}
 import akka.actor.ActorRef
 import akka.pattern.ask
-import actors.ContentExchangeActorWS
+import actors.ContentExchangeActor
 import play.api.libs.concurrent.Akka
 import play.api.Play.current
 import models.ClientConnected
@@ -22,7 +22,7 @@ object ApplicationWS extends MyController {
   def openWS(): WebSocket[String] = WebSocket.async {
     request => {
       Logger.info(s"openWS endpoint connection: $request")
-      val handlingActor: ActorRef = Akka.system.actorOf(ContentExchangeActorWS.props)
+      val handlingActor: ActorRef = Akka.system.actorOf(ContentExchangeActor.props)
       val wsLinkFuture = (handlingActor ? ClientConnected())(5.seconds)
       wsLinkFuture.mapTo[(Iteratee[String, _], Enumerator[String])]
     }

@@ -6,6 +6,17 @@ function createBreakMatchJson() {
     return JSON.stringify({"type":"breakMatch"});
 }
 
+function createDeliverJson(recipients, payload) {
+    var deliver = {"type":"delivery",
+                    "payload": payload,
+                    "recipients": []}
+    for (var i in recipients) {
+        var recip = recipients[i]
+        deliver.recipients.push({"recipient":recip})
+    }
+    return JSON.stringify(deliver)
+}
+
 // nv are the parametes in the order in which they're observed...
 function createMatchJson(nv) {
     var matchRequest = {"type":"match",

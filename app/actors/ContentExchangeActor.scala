@@ -1,10 +1,10 @@
 package actors
 
-import akka.actor.{Actor, Props}
+import akka.actor.{ActorRef, Actor, Props}
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-import helpers.{RequestAnalyticsHelper}
+import helpers.RequestAnalyticsHelper
 import models._
 import scala.util.Try
 import models.ClientInputMessages._
@@ -19,7 +19,7 @@ import scala.util.Success
 import helpers.json.{JsonMessageHelper, JsonResponseHelper, JsonInputHelper}
 import helpers.movements.SwipeMovementHelper
 
-class ContentExchangeActorWS extends Actor {
+class ContentExchangeActor extends Actor {
   var channel: Option[Concurrent.Channel[String]] = None
   var matcheesInfo: Option[List[MatcheeInfo]] = None
   var myInfo: Option[MatcheeInfo] = None
@@ -55,13 +55,13 @@ class ContentExchangeActorWS extends Actor {
     case MatcheeBrokeConnection(matchee, reason) => {
       Logger.info(s"$self, a matchee broke the matching.")
       sendMatcheeLeftMessageToClient(matchee, reason)
-      breakMyMatching
+      breakMyMatching()
     }
 
     case MatcheeDisconnected(matchee, reason) => {
       Logger.info(s"$self, a matchee disconnected. Breaking connection.")
       sendMatcheeLeftMessageToClient(matchee, reason)
-      breakMyMatching
+      breakMyMatching()
     }
 
     case MatcheeDelivers(matchee, payload) => {
@@ -69,7 +69,7 @@ class ContentExchangeActorWS extends Actor {
       matchee match {
         case Some(matcheeInfo) => {
           val payloadMsg = JsonMessageHelper.createMatcheeSendsPayloadMessage(matcheeInfo.idInGroup, payload)
-          channel.foreach(x => x.push(payloadMsg))
+          sendToClient(payloadMsg)
         }
         case None => ??? // we shouldn't get here
       }
@@ -89,16 +89,21 @@ class ContentExchangeActorWS extends Actor {
           case disconnect: ClientInputMessageDisconnect => onDisconnectMsg(disconnect)
           case matchRequest: ClientInputMessageMatch => onMatchRequest(matchRequest)
           case breakMatching: ClientInputMessageBreakMatch => onBreakConnectionMsg(breakMatching)
-          case _ => {} // TODO: error
+          case delivery: ClientInputMessageDelivery => onDeliveryMsg(delivery)
+          case _ => sendInvalidInputResponse() // TODO: error
         }
       }
 
       case Failure(e) => {
         Logger.info(s"Couldn't parse client message: ${e.getMessage}")
-        // TODO: send a more helpful message back
-        channel.foreach(x => x.push(JsonResponseHelper.getInvalidInputResponse))
+        sendInvalidInputResponse()
       }
     }
+  }
+
+  def sendInvalidInputResponse() = {
+    // TODO: send a more helpful message back
+    sendToClient(JsonResponseHelper.getInvalidInputResponse)
   }
 
   def onMatchRequest(matchRequest: ClientInputMessageMatch) = {
@@ -114,7 +119,7 @@ class ContentExchangeActorWS extends Actor {
       case Failure(e) => {
         // request issue
         Logger.info(s"    Request invalid, reason: ${e.getMessage}")
-        channel.foreach(x => x.push(JsonResponseHelper.getInvalidMatchRequestResponse))
+        sendToClient(JsonResponseHelper.getInvalidMatchRequestResponse)
       }
 
       case Success(isValid) => {
@@ -138,13 +143,6 @@ class ContentExchangeActorWS extends Actor {
     }
   }
 
-  def sendMessageToMatchees(message: MatcheeMessage) = {
-    matcheesInfo match {
-      case Some(matcheeList) => matcheeList.foreach(matchee => matchee.handlingActor ! message)
-      case None => {} // do nothing
-    }
-  }
-
   def onDisconnectMsg(disconnect: ClientInputMessageDisconnect) = {
     Logger.info(s"$self, client disconnected. Reason: ${disconnect.reason}")
     channel.foreach(x => {
@@ -158,6 +156,7 @@ class ContentExchangeActorWS extends Actor {
   }
 
   def onBreakConnectionMsg(break: ClientInputMessageBreakMatch) = {
+    Logger.info(s"$self, client broke the connection. Reason: ${break.reason}")
     // send messages to the other ones in the connection and simply forget about them
     matcheesInfo match {
       case Some(info) => {
@@ -165,20 +164,59 @@ class ContentExchangeActorWS extends Actor {
           case Some(reason) => sendMessageToMatchees(MatcheeBrokeConnection(myInfo, Some(reason)))
           case None => sendMessageToMatchees(MatcheeBrokeConnection(myInfo, None))
         }
-        breakMyMatching
+        breakMyMatching()
       }
       case None => {
-        channel.foreach(x => x.push(JsonResponseHelper.getNothingToBreakResponse))
+        sendToClient(JsonResponseHelper.getNothingToBreakResponse)
       }
     }
   }
 
+  def onDeliveryMsg(delivery: ClientInputMessageDelivery) = {
+    Logger.info(s"$self, client delivery.")
+    // create a delivery message and deliver it to the right recipients!
+    val matchees: List[MatcheeInfo] = matcheesInfo.getOrElse(Nil)
+    if (matchees == Nil) {
+      Logger.info(s"TODO")
+      sendToClient(JsonResponseHelper.getPayloadEmptyGroupdResponse)
+    } else {
+
+      val message = MatcheeDelivers(myInfo, delivery.payload)
+      val listRecipients: List[ActorRef] = for {
+        matchee <- matchees
+        recipient <- delivery.recipients
+        if matchee.idInGroup == recipient && recipient != -1
+      } yield matchee.handlingActor
+
+      if (listRecipients.isEmpty) {
+        sendToClient(JsonResponseHelper.getPayloadNotDeliveredResponse)
+      } else {
+        listRecipients.foreach(_ ! message)
+        if (listRecipients.size == matchees.size) {
+          sendToClient(JsonResponseHelper.getPayloadDeliveredResponse)
+        } else {
+          sendToClient(JsonResponseHelper.getPayloadPartiallyDeliveredResponse)
+        }
+      }
+    }
+  }
+
+  def sendMessageToMatchees(message: MatcheeMessage) = {
+    matcheesInfo match {
+      case Some(matcheeList) => matcheeList.foreach(matchee => matchee.handlingActor ! message)
+      case None => {} // do nothing
+    }
+  }
+
+  def sendToClient(message: String) = {
+    channel.foreach(x => x.push(message))
+  }
+
+
   def sendMatchedResponseToClient() = {
     if (!myInfo.isEmpty && !matcheesInfo.isEmpty) {
       val jsonToSend = JsonResponseHelper.createMatchedResponse(myInfo.get, matcheesInfo.get)
-      channel.foreach(x => {
-        x.push(jsonToSend)
-      })
+      sendToClient(jsonToSend)
     }
   }
 
@@ -186,18 +224,18 @@ class ContentExchangeActorWS extends Actor {
     matchee match {
       case Some(matcheeInfo) => {
         val payloadMsg = JsonMessageHelper.createMatcheeLeavesConnectionMessage(matcheeInfo.idInGroup)
-        channel.foreach(x => x.push(payloadMsg))
+        sendToClient(payloadMsg)
       }
       case None => ??? // we shouldn't get here
     }
   }
 
-  def breakMyMatching = {
+  def breakMyMatching() = {
     matcheesInfo = None
     channel.foreach(x => x.push(JsonResponseHelper.getMatchBrokenResponse))
   }
 }
 
-object ContentExchangeActorWS {
-  def props: Props = Props(classOf[ContentExchangeActorWS])
+object ContentExchangeActor {
+  def props: Props = Props(classOf[ContentExchangeActor])
 }
