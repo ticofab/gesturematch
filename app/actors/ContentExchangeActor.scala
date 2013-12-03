@@ -20,13 +20,15 @@ import helpers.movements.SwipeMovementHelper
 import controllers.ApplicationWS
 
 class ContentExchangeActor extends Actor {
+  var remoteIPAddress: Option[String] = None
   var channel: Option[Concurrent.Channel[String]] = None
   var matcheesInfo: Option[List[MatcheeInfo]] = None
   var myInfo: Option[MatcheeInfo] = None
 
   def receive: Actor.Receive = {
-    case ClientConnected() => {
-      Logger.info(s"ClientConnected message")
+    case ClientConnected(remoteAddress) => {
+      Logger.info(s"ClientConnected: $remoteAddress managed by $self")
+      remoteIPAddress = Some(remoteAddress)
 
       val in = Iteratee.foreach[String] {
         input => onInput(input)
@@ -37,7 +39,7 @@ class ContentExchangeActor extends Actor {
 
         // start a timeout to close the connection after a while
         Promise.timeout({
-          Logger.info(s"$self, timeout expired. Closing connection.")
+          Logger.info(s"$self, timeout expired. Closing connection with client at ${remoteIPAddress.getOrElse("<IP unavailable>")}.")
           closeClientConnection()
         }, Timeouts.maxConnectionLifetime)
       })
