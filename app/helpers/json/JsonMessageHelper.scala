@@ -9,17 +9,17 @@ object JsonMessageHelper {
     Json.stringify(
       Json.obj(
         JsonMessageLabels.MESSAGE_TYPE -> JsonMessageLabels.MESSAGE_TYPE_DELIVERY,
-        JsonMessageLabels.SENDER_ID -> senderId,
+        JsonMessageLabels.MATCHEE_ID -> senderId,
         JsonMessageLabels.PAYLOAD -> payload
       )
     )
   }
   
-  def createMatcheeLeavesConnectionMessage(senderId: Int) = {
+  def createMatcheeLeavesMessage(senderId: Int) = {
     Json.stringify(
       Json.obj(
-        JsonMessageLabels.MESSAGE_TYPE -> JsonMessageLabels.MESSAGE_TYPE_MATCHEE_LEFT_CONNECTION,
-        JsonMessageLabels.SENDER_ID -> senderId
+        JsonMessageLabels.MESSAGE_TYPE -> JsonMessageLabels.MESSAGE_TYPE_MATCHEE_LEFT_GROUP,
+        JsonMessageLabels.MATCHEE_ID -> senderId
       )
     )
   }

@@ -17,8 +17,8 @@ object JsonResponseLabels {
   val OUTCOME_DISCONNECTED = "disconnected"
 
   // -- outcomes to break match request
-  val OUTCOME_NO_MATCH_TO_BREAK = "nothingToBreak"
-  val OUTCOME_MATCH_BROKEN = "matchBroken"
+  val OUTCOME_NO_GROUP_TO_LEAVE = "noGroupToLeave"
+  val OUTCOME_GROUP_LEFT = "groupLeft"
 
   // -- outcomes to delivery request
   val OUTCOME_PAYLOAD_EMPTY_GROUP = "notPartOfAnyGroup"
@@ -28,10 +28,10 @@ object JsonResponseLabels {
 
   // matched messages labels
   val GROUP_SIZE = "groupSize"
-  val MY_CONNECTION_INFO = "myConnectionInfo"
-  val OTHERS_CONNECTION_INFO = "othersConnectionInfo"
+  val ME_IN_GROUP = "meInGroup"
+  val OTHERS_IN_GROUP = "othersInGroup"
 
-  // info object
+  // matchee object
   val ID_IN_GROUP = "idInGroup"
   val POSITION_IN_GROUP = "position"
 }

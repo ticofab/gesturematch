@@ -3,7 +3,7 @@ package actors
 import akka.actor.{Actor, Props}
 import helpers.{RequestAnalyticsHelper, RequestStorageHelper}
 import play.api.Logger
-import models.{NewRequest, Matched, MatcheeInfo, RequestToMatch}
+import models.{NewRequest, Matched, Matchee, RequestToMatch}
 import consts.Criteria
 import helpers.movements.SwipeMovementHelper
 
@@ -48,7 +48,7 @@ class TouchMatchingActor extends Actor {
           Logger.info(s"$myName, group found, size: ${group.size}")
           RequestStorageHelper.removeRequests(Criteria.PRESENCE, group)
 
-          val matcheesInfo: List[MatcheeInfo] = group.zipWithIndex.map(x => MatcheeInfo(x._1.handlingActor, x._2))
+          val matcheesInfo: List[Matchee] = group.zipWithIndex.map(x => Matchee(x._1.handlingActor, x._2))
           group.foreach(r => {
             // this could maybe be done by each actor, but this way it's cleaner
             val (myInfo, othersInfo) = matcheesInfo.partition(m => m.handlingActor == r.handlingActor)

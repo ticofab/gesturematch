@@ -22,8 +22,8 @@ class PositionMatcherActor extends Actor {
     Logger.info(s"1st mov & pos:   ${r1.movement}    ${pos1.toString}")
     Logger.info(s"2nd mov & pos:   ${r2.movement}    ${pos2.toString}")
 
-    val matchee1Info = MatcheeInfo(r1.handlingActor, 0, pos1)
-    val matchee2Info = MatcheeInfo(r2.handlingActor, 1, pos2)
+    val matchee1Info = Matchee(r1.handlingActor, 0, pos1)
+    val matchee2Info = Matchee(r2.handlingActor, 1, pos2)
 
     r1.handlingActor ! Matched(matchee1Info, List(matchee2Info))
     r2.handlingActor ! Matched(matchee2Info, List(matchee1Info))
@@ -60,10 +60,10 @@ class PositionMatcherActor extends Actor {
     Logger.info(s"3rd mov & pos:   ${r3.movement}    ${pos3.toString}")
     Logger.info(s"4th pos:         ${pos4.toString}\n")
 
-    val match1Info = MatcheeInfo(r1.handlingActor, 0, pos1)
-    val match2Info = MatcheeInfo(r2.handlingActor, 1, pos2)
-    val match3Info = MatcheeInfo(r3.handlingActor, 2, pos3)
-    val match4Info = MatcheeInfo(r4.handlingActor, 3, pos4)
+    val match1Info = Matchee(r1.handlingActor, 0, pos1)
+    val match2Info = Matchee(r2.handlingActor, 1, pos2)
+    val match3Info = Matchee(r3.handlingActor, 2, pos3)
+    val match4Info = Matchee(r4.handlingActor, 3, pos4)
 
     r1.handlingActor ! Matched(match1Info, List(match2Info, match3Info, match4Info))
     r2.handlingActor ! Matched(match2Info, List(match1Info, match3Info, match4Info))

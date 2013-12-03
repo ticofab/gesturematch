@@ -22,8 +22,8 @@ import controllers.ApplicationWS
 class ContentExchangeActor extends Actor {
   var remoteIPAddress: Option[String] = None
   var channel: Option[Concurrent.Channel[String]] = None
-  var matcheesInfo: Option[List[MatcheeInfo]] = None
-  var myInfo: Option[MatcheeInfo] = None
+  var matchees: Option[List[Matchee]] = None
+  var myInfo: Option[Matchee] = None
 
   def receive: Actor.Receive = {
     case ClientConnected(remoteAddress) => {
@@ -41,46 +41,30 @@ class ContentExchangeActor extends Actor {
         Promise.timeout({
           Logger.info(s"$self, timeout expired. Closing connection with client at ${remoteIPAddress.getOrElse("<IP unavailable>")}.")
           closeClientConnection()
-          }, Timeouts.maxConnectionLifetime)
+        }, Timeouts.maxConnectionLifetime)
       })
 
       val wsLink = (in, out)
       sender ! wsLink
     }
 
-    case Matched(info: MatcheeInfo, othersInfo: List[MatcheeInfo]) => {
-      Logger.info(s"$self, MatchedDetail message. my info: $info, others: $othersInfo")
+    case Matched(info: Matchee, others: List[Matchee]) => {
+      Logger.info(s"$self, MatchedDetail message. my matchee: $info, others: $others")
       myInfo = Some(info)
-      matcheesInfo = Some(othersInfo)
+      matchees = Some(others)
       sendMatchedResponseToClient()
     }
 
-    case MatcheeBrokeConnection(matchee, reason) => {
-      Logger.info(s"$self, a matchee broke the matching.")
+    case MatcheeLeftGroup(matchee, reason) => {
+      Logger.info(s"$self, a matchee left the group.")
       sendMatcheeLeftMessageToClient(matchee, reason)
-      breakMyMatching()
-    }
-
-    case MatcheeDisconnected(matchee, reason) => {
-      Logger.info(s"$self, a matchee disconnected. Breaking connection.")
-      sendMatcheeLeftMessageToClient(matchee, reason)
-      breakMyMatching()
+      leaveGroup()
     }
 
     case MatcheeDelivers(matchee, payload) => {
       Logger.info(s"$self, a matchee delivered some payload. Forwarding it to my client.")
-      matchee match {
-        case Some(matcheeInfo) => {
-          val payloadMsg = JsonMessageHelper.createMatcheeSendsPayloadMessage(matcheeInfo.idInGroup, payload)
-          sendToClient(payloadMsg)
-        }
-        case None => {
-          // we shouldn't get here! but still deliver stuff..
-          Logger.error(s"error, empty matcheeInfo!")
-          val payloadMsg = JsonMessageHelper.createMatcheeSendsPayloadMessage(-1, payload)
-          sendToClient(payloadMsg)
-        }
-      }
+      val payloadMsg = JsonMessageHelper.createMatcheeSendsPayloadMessage(matchee.idInGroup, payload)
+      sendToClient(payloadMsg)
     }
   }
 
@@ -98,7 +82,7 @@ class ContentExchangeActor extends Actor {
         parsedMessage match {
           case disconnect: ClientInputMessageDisconnect => onDisconnectInput(disconnect)
           case matchRequest: ClientInputMessageMatch => onMatchInput(matchRequest)
-          case breakMatching: ClientInputMessageBreakMatch => onBreakConnectionInput(breakMatching)
+          case leaveGroup: ClientInputMessageLeaveGroup => onLeaveGroupInput(leaveGroup)
           case delivery: ClientInputMessageDelivery => onDeliveryInput(delivery)
           case _ => sendInvalidInputResponseToClient() // TODO: error
         }
@@ -152,24 +136,26 @@ class ContentExchangeActor extends Actor {
     Logger.info(s"$self, client disconnected. Reason: ${disconnect.reason}")
     sendToClient(JsonResponseHelper.getDisconnectResponse)
     disconnect.reason match {
-      case Some(reason) => sendMessageToMatchees(MatcheeDisconnected(myInfo, Some(reason)))
-      case None => sendMessageToMatchees(MatcheeDisconnected(myInfo))
+      // TODO: prevent that we even get here if myInfo is None
+      case Some(reason) => sendMessageToMatchees(MatcheeLeftGroup(myInfo.get, Some(reason)))
+      case None => sendMessageToMatchees(MatcheeLeftGroup(myInfo.get))
     }
     closeClientConnection()
-    breakMyMatching()
+    leaveGroup()
   }
 
-  def onBreakConnectionInput(break: ClientInputMessageBreakMatch) = {
-    Logger.info(s"$self, client broke the connection. Reason: ${break.reason}")
+  def onLeaveGroupInput(leaveGroupMessage: ClientInputMessageLeaveGroup) = {
+    Logger.info(s"$self, client left the group. Reason: ${leaveGroupMessage.reason}")
     // send messages to the other ones in the connection and simply forget about them
-    matcheesInfo match {
-      case Some(info) => {
-        break.reason match {
-          case Some(reason) => sendMessageToMatchees(MatcheeBrokeConnection(myInfo, Some(reason)))
-          case None => sendMessageToMatchees(MatcheeBrokeConnection(myInfo, None))
+    matchees match {
+      case Some(matcheesList) => {
+        leaveGroupMessage.reason match {
+          // TODO: prevent that we even get here if myInfo is None
+          case Some(reason) => sendMessageToMatchees(MatcheeLeftGroup(myInfo.get, Some(reason)))
+          case None => sendMessageToMatchees(MatcheeLeftGroup(myInfo.get, None))
         }
         sendToClient(JsonResponseHelper.getMatchBrokenResponse)
-        breakMyMatching()
+        leaveGroup()
       }
       case None => {
         sendToClient(JsonResponseHelper.getNothingToBreakResponse)
@@ -178,16 +164,17 @@ class ContentExchangeActor extends Actor {
   }
 
   def onDeliveryInput(delivery: ClientInputMessageDelivery) = {
+    // TODO: prevent that we even get here if myInfo == None!
     Logger.info(s"$self, client delivery, for ${delivery.recipients}, payload: ${delivery.payload}")
     // create a delivery message and deliver it to the right recipients!
-    val matchees: List[MatcheeInfo] = matcheesInfo.getOrElse(Nil)
-    if (matchees == Nil) {
+    val matcheesList: List[Matchee] = matchees.getOrElse(Nil)
+    if (matcheesList == Nil) {
       Logger.info(s"No groups seem to be established")
       sendToClient(JsonResponseHelper.getPayloadEmptyGroupdResponse)
     } else {
-      val message = MatcheeDelivers(myInfo, delivery.payload)
+      val message = MatcheeDelivers(myInfo.get, delivery.payload)
       val listRecipients: List[ActorRef] = for {
-        matchee <- matchees
+        matchee <- matcheesList
         recipient <- delivery.recipients
         if matchee.idInGroup == recipient && recipient != -1
       } yield matchee.handlingActor
@@ -197,7 +184,7 @@ class ContentExchangeActor extends Actor {
         sendToClient(JsonResponseHelper.getPayloadNotDeliveredResponse)
       } else {
         listRecipients.foreach(_ ! message)
-        if (listRecipients.size == matchees.size) {
+        if (listRecipients.size == matcheesList.size) {
           Logger.info(s"Delivered to all recipients.")
           sendToClient(JsonResponseHelper.getPayloadDeliveredResponse)
         } else {
@@ -217,32 +204,22 @@ class ContentExchangeActor extends Actor {
   }
 
   def sendMatchedResponseToClient() = {
-    if (!myInfo.isEmpty && !matcheesInfo.isEmpty) {
-      val jsonToSend = JsonResponseHelper.createMatchedResponse(myInfo.get, matcheesInfo.get)
+    if (!myInfo.isEmpty && !matchees.isEmpty) {
+      val jsonToSend = JsonResponseHelper.createMatchedResponse(myInfo.get, matchees.get)
       sendToClient(jsonToSend)
     }
   }
 
-  def sendMatcheeLeftMessageToClient(matchee: Option[MatcheeInfo], reason: Option[String]) = {
-    matchee match {
-      case Some(matcheeInfo) => {
-        val message = JsonMessageHelper.createMatcheeLeavesConnectionMessage(matcheeInfo.idInGroup)
-        sendToClient(message)
-      }
-      case None => {
-        // uh? we shouldn't get here
-        Logger.error(s"error, empty matcheeInfo!")
-        val message = JsonMessageHelper.createMatcheeLeavesConnectionMessage(-1)
-        sendToClient(message)
-      }
-    }
+  def sendMatcheeLeftMessageToClient(matchee: Matchee, reason: Option[String]) = {
+    val message = JsonMessageHelper.createMatcheeLeavesMessage(matchee.idInGroup)
+    sendToClient(message)
   }
 
   // *************************************
   // General functions section
   // *************************************
-  def breakMyMatching() = {
-    matcheesInfo = None
+  def leaveGroup() = {
+    matchees = None
     myInfo = None
   }
 
@@ -253,7 +230,7 @@ class ContentExchangeActor extends Actor {
   def closeClientConnection() = channel.foreach(x => x.eofAndEnd())
 
   def sendMessageToMatchees(message: MatcheeMessage) = {
-    matcheesInfo match {
+    matchees match {
       case Some(matcheeList) => matcheeList.foreach(matchee => matchee.handlingActor ! message)
       case None => {} // do nothing
     }

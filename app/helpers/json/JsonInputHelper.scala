@@ -18,7 +18,7 @@ object JsonInputHelper {
 
         header match {
           case JsonInputLabels.INPUT_TYPE_MATCH => ClientInputMessageMatch.fromJson(jsonValue)
-          case JsonInputLabels.INPUT_TYPE_BREAK_MATCH => ClientInputMessageBreakMatch.fromJson(jsonValue)
+          case JsonInputLabels.INPUT_TYPE_LEAVE_GROUP => ClientInputMessageLeaveGroup.fromJson(jsonValue)
           case JsonInputLabels.INPUT_TYPE_DISCONNECT => ClientInputMessageDisconnect.fromJson(jsonValue)
           case JsonInputLabels.INPUT_TYPE_DELIVERY => ClientInputMessageDelivery.fromJson(jsonValue)
         }
