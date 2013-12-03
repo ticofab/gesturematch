@@ -8,16 +8,16 @@ import helpers.RequestAnalyticsHelper
 import models._
 import scala.util.Try
 import models.ClientInputMessages._
-import controllers.MyController
-import consts.Areas
-import consts.Criteria
+import consts.{Timeouts, Areas, Criteria}
 import play.api.libs.iteratee.{Concurrent, Enumerator, Iteratee}
 import models.NewRequest
 import scala.util.Failure
 import scala.Some
 import scala.util.Success
+import play.api.libs.concurrent.Promise
 import helpers.json.{JsonMessageHelper, JsonResponseHelper, JsonInputHelper}
 import helpers.movements.SwipeMovementHelper
+import controllers.ApplicationWS
 
 class ContentExchangeActor extends Actor {
   var channel: Option[Concurrent.Channel[String]] = None
@@ -35,8 +35,11 @@ class ContentExchangeActor extends Actor {
       val out: Enumerator[String] = Concurrent.unicast(c => {
         channel = Some(c)
 
-        // TODO: start a timeout to close the connection after a while
-        //Promise.timeout(channel.foreach(x => x.eofAndEnd()), Timeouts.maxOldestRequestInterval)
+        // start a timeout to close the connection after a while
+        Promise.timeout({
+          Logger.info(s"$self, timeout expired. Closing connection.")
+          closeClientConnection()
+        }, Timeouts.maxConnectionLifetime)
       })
 
       val wsLink = (in, out)
@@ -131,8 +134,8 @@ class ContentExchangeActor extends Actor {
           // we only get here if the criteria is valid
 
           // TODO: where to put these matching actors?
-          case Criteria.POSITION => MyController.positionMatchingActor ! NewRequest(requestData)
-          case Criteria.PRESENCE => MyController.touchMatchingActor ! NewRequest(requestData)
+          case Criteria.POSITION => ApplicationWS.positionMatchingActor ! NewRequest(requestData)
+          case Criteria.PRESENCE => ApplicationWS.touchMatchingActor ! NewRequest(requestData)
         }
       }
     }
@@ -140,10 +143,8 @@ class ContentExchangeActor extends Actor {
 
   def onDisconnectInput(disconnect: ClientInputMessageDisconnect) = {
     Logger.info(s"$self, client disconnected. Reason: ${disconnect.reason}")
-    channel.foreach(x => {
-      x.push(JsonResponseHelper.getDisconnectResponse)
-      x.eofAndEnd()
-    })
+    sendToClient(JsonResponseHelper.getDisconnectResponse)
+    closeClientConnection()
     disconnect.reason match {
       case Some(reason) => sendMessageToMatchees(MatcheeDisconnected(myInfo, Some(reason)))
       case None => sendMessageToMatchees(MatcheeDisconnected(None))
@@ -236,6 +237,8 @@ class ContentExchangeActor extends Actor {
   def sendToClient(message: String) = {
     channel.foreach(x => x.push(message))
   }
+
+  def closeClientConnection() = channel.foreach(x => x.eofAndEnd())
 
   def sendMessageToMatchees(message: MatcheeMessage) = {
     matcheesInfo match {

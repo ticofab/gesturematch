@@ -1,8 +1,8 @@
 package controllers
 
-import play.api.mvc.Action
+import play.api.mvc.{Controller, Action}
 
-object ApplicationHTTP extends MyController {
+object ApplicationHTTP extends Controller {
 
   // simple alive response
   def alive() = Action {

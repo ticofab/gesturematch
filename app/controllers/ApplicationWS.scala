@@ -5,13 +5,16 @@ import scala.concurrent.duration.DurationInt
 import play.api.libs.iteratee.{Iteratee, Enumerator}
 import akka.actor.ActorRef
 import akka.pattern.ask
-import actors.ContentExchangeActor
+import actors.{TouchMatchingActor, PositionMatcherActor, ContentExchangeActor}
 import play.api.libs.concurrent.Akka
 import play.api.Play.current
 import models.ClientConnected
 import play.api.Logger
 
-object ApplicationWS extends MyController {
+object ApplicationWS extends Controller {
+  Logger.info("\n******* Server starting. Creating ActorSystem. ********")
+  val positionMatchingActor = Akka.system.actorOf(PositionMatcherActor.props)
+  val touchMatchingActor = Akka.system.actorOf(TouchMatchingActor.props)
 
   /*
    Endpoint to open the WebSocket connection.
