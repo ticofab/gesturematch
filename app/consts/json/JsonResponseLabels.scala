@@ -28,7 +28,7 @@ object JsonResponseLabels {
 
   // matched messages labels
   val GROUP_SIZE = "groupSize"
-  val ME_IN_GROUP = "meInGroup"
+  val ME_IN_GROUP = "myselfInGroup"
   val OTHERS_IN_GROUP = "othersInGroup"
 
   // matchee object
