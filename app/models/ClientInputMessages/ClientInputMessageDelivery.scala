@@ -7,9 +7,7 @@ case class ClientInputMessageDelivery(recipients: List[Int], payload: String) ex
 
 object ClientInputMessageDelivery {
   def fromJson(jsonValue: JsValue): ClientInputMessageDelivery = {
-    val recipientsJsonArray = (jsonValue \ JsonInputLabels.INPUT_RECIPIENTS).as[JsArray]
-    val recipientsJsValues = (recipientsJsonArray \\ JsonInputLabels.INPUT_RECIPIENT).toList
-    val recipients = recipientsJsValues.map(x => x.as[Int])
+    val recipients = (jsonValue \ JsonInputLabels.INPUT_RECIPIENTS).as[List[Int]]
     val payload: String = (jsonValue \ JsonInputLabels.INPUT_PAYLOAD).as[String]
     ClientInputMessageDelivery(recipients, payload)
   }
