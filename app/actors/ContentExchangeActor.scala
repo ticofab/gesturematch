@@ -170,7 +170,7 @@ class ContentExchangeActor extends Actor {
     val matcheesList: List[Matchee] = matchees.getOrElse(Nil)
     if (matcheesList == Nil) {
       Logger.info(s"No groups seem to be established")
-      sendToClient(JsonResponseHelper.getPayloadEmptyGroupdResponse)
+      sendToClient(JsonResponseHelper.getPayloadEmptyGroupResponse)
     } else {
       val message = MatcheeDelivers(myInfo.get, delivery.payload)
       val listRecipients: List[ActorRef] = for {
@@ -179,18 +179,13 @@ class ContentExchangeActor extends Actor {
         if matchee.idInGroup == recipient && recipient != -1
       } yield matchee.handlingActor
 
-      if (listRecipients.isEmpty) {
-        Logger.info(s"No groups seem to be established")
-        sendToClient(JsonResponseHelper.getPayloadNotDeliveredResponse)
+      listRecipients.foreach(_ ! message)
+      if (listRecipients.size == delivery.recipients.size) {
+        Logger.info(s"Delivered to all requested recipients.")
+        sendToClient(JsonResponseHelper.getPayloadDeliveredResponse)
       } else {
-        listRecipients.foreach(_ ! message)
-        if (listRecipients.size == delivery.recipients.size) {
-          Logger.info(s"Delivered to all requested recipients.")
-          sendToClient(JsonResponseHelper.getPayloadDeliveredResponse)
-        } else {
-          Logger.info(s"Delivered to a subset of the recipients.")
-          sendToClient(JsonResponseHelper.getPayloadPartiallyDeliveredResponse)
-        }
+        Logger.info(s"Delivered to a subset of the recipients.")
+        sendToClient(JsonResponseHelper.getPayloadPartiallyDeliveredResponse)
       }
     }
   }

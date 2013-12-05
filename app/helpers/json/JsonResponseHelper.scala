@@ -55,7 +55,7 @@ object JsonResponseHelper {
 
   def getPayloadDeliveredResponse = getOutcomeResponse(JsonInputLabels.INPUT_TYPE_DELIVERY, JsonGeneralLabels.OK)
 
-  def getPayloadEmptyGroupdResponse = getOutcomeResponse(JsonInputLabels.INPUT_TYPE_DELIVERY, JsonGeneralLabels.FAIL,
+  def getPayloadEmptyGroupResponse = getOutcomeResponse(JsonInputLabels.INPUT_TYPE_DELIVERY, JsonGeneralLabels.FAIL,
     Some(JsonResponseLabels.REASON_NOT_PART_OF_ANY_GROUP))
 
   private def getOutcomeResponse(`type`: String, outcome: String, reason: Option[String] = None) = {
