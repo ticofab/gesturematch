@@ -12,7 +12,7 @@ function createDeliverJson(recipients, payload) {
                     "recipients": []}
     for (var i in recipients) {
         var recip = recipients[i]
-        deliver.recipients.push({"recipient":recip})
+        deliver.recipients.push(recip)
     }
     return JSON.stringify(deliver)
 }

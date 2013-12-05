@@ -184,8 +184,8 @@ class ContentExchangeActor extends Actor {
         sendToClient(JsonResponseHelper.getPayloadNotDeliveredResponse)
       } else {
         listRecipients.foreach(_ ! message)
-        if (listRecipients.size == matcheesList.size) {
-          Logger.info(s"Delivered to all recipients.")
+        if (listRecipients.size == delivery.recipients.size) {
+          Logger.info(s"Delivered to all requested recipients.")
           sendToClient(JsonResponseHelper.getPayloadDeliveredResponse)
         } else {
           Logger.info(s"Delivered to a subset of the recipients.")
