@@ -158,7 +158,7 @@ class ContentExchangeActor extends Actor {
         leaveGroup()
       }
       case None => {
-        sendToClient(JsonResponseHelper.getNothingToBreakResponse)
+        sendToClient(JsonResponseHelper.getNoGroupToLeaveResponse)
       }
     }
   }

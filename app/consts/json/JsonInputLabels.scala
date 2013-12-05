@@ -1,9 +1,10 @@
 package consts.json
 
 object JsonInputLabels {
+  // input type key
+  val TYPE_INPUT = "input"
 
-  // input types
-  val INPUT_TYPE = "type"
+  // input type keys
   val INPUT_TYPE_MATCH = "match"
   val INPUT_TYPE_LEAVE_GROUP = "leaveGroup"
   val INPUT_TYPE_DISCONNECT = "disconnect"
@@ -20,8 +21,6 @@ object JsonInputLabels {
   val MATCH_INPUT_DEVICEID = "deviceId"
   val MATCH_INPUT_EQUALITYPARAM = "equalityParam"
 
-  // input reason
-  val INPUT_REASON = "reason"
-  val INPUT_PAYLOAD = "payload"
+  // input delivery keys
   val INPUT_RECIPIENTS = "recipients"
 }

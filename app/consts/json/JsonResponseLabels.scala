@@ -1,30 +1,23 @@
 package consts.json
 
 object JsonResponseLabels {
-  // possible outcomes
-  val OUTCOME = "outcome"
+  // response kinds key
+  val KIND_RESPONSE = "response"
+  val KIND_INVALID_INPUT = "invalidInput"
 
-  // -- outcomes to match request
-  val OUTCOME_INVALID_REQUEST = "invalidRequest"
-  val OUTCOME_REASON = "reason"
-  val OUTCOME_MATCHED = "matched"
-  val OUTCOME_UNCERTAIN = "uncertain"
-  val OUTCOME_TIMEOUT = "timeout"
-  val OUTCOME_UNKNOWN_ERROR = "error"
-  val OUTCOME_INPUT_INVALID = "invalid_input"
-
-  // -- outcomes to disconnect request
-  val OUTCOME_DISCONNECTED = "disconnected"
+  // -- reasons to match request
+  val REASON_INVALID_REQUEST = "invalidRequest"
+  val REASON_UNCERTAIN = "uncertain"
+  val REASON_TIMEOUT = "timeout"
+  val REASON_UNKNOWN_ERROR = "error"
 
   // -- outcomes to break match request
-  val OUTCOME_NO_GROUP_TO_LEAVE = "noGroupToLeave"
-  val OUTCOME_GROUP_LEFT = "groupLeft"
+  val REASON_NOT_PART_OF_ANY_GROUP = "notPartOfAnyGroup"
 
   // -- outcomes to delivery request
-  val OUTCOME_PAYLOAD_EMPTY_GROUP = "notPartOfAnyGroup"
-  val OUTCOME_PAYLOAD_PARTIALLY_DELIVERED = "partiallyDelivered"
-  val OUTCOME_PAYLOAD_NOT_DELIVERED = "notDelivered"
-  val OUTCOME_PAYLOAD_DELIVERED = "delivered"
+  val REASON_PAYLOAD_PARTIALLY_DELIVERED = "partiallyDelivered"
+  val REASON_PAYLOAD_NOT_DELIVERED = "notDelivered"
+  val REASON_PAYLOAD_DELIVERED = "delivered"
 
   // matched messages labels
   val GROUP_SIZE = "groupSize"

@@ -3,14 +3,14 @@ package helpers.json
 import play.api.libs.json.{JsValue, Json}
 import models.ClientInputMessages._
 import play.api.Logger
-import consts.json.JsonInputLabels
+import consts.json.{JsonGeneralLabels, JsonInputLabels}
 import scala.Some
 
 object JsonInputHelper {
   def parseInput(input: String): ClientInputMessage = {
     val jsonValue: JsValue = Json.parse(input)
 
-    val inputType = (jsonValue \ JsonInputLabels.INPUT_TYPE).asOpt[String]
+    val inputType = (jsonValue \ JsonGeneralLabels.TYPE).asOpt[String]
 
     inputType match {
       case Some(header) => {
