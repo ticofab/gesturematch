@@ -6,8 +6,9 @@ import play.api.Logger
 import models.{NewRequest, Matched, Matchee, RequestToMatch}
 import consts.Criteria
 import helpers.movements.SwipeMovementHelper
+import traits.StringGenerator
 
-class TouchMatchingActor extends Actor {
+class TouchMatchingActor extends Actor with StringGenerator {
 
   lazy val myName = this.getClass.getSimpleName
 
@@ -48,11 +49,14 @@ class TouchMatchingActor extends Actor {
           Logger.info(s"$myName, group found, size: ${group.size}")
           RequestStorageHelper.removeRequests(Criteria.PRESENCE, group)
 
+          // get unique group id
+          val groupId = getGroupUniqueString
+
           val matcheesInfo: List[Matchee] = group.zipWithIndex.map(x => Matchee(x._1.handlingActor, x._2))
           group.foreach(r => {
             // this could maybe be done by each actor, but this way it's cleaner
             val (myInfo, othersInfo) = matcheesInfo.partition(m => m.handlingActor == r.handlingActor)
-            r.handlingActor ! Matched(myInfo.head, othersInfo)
+            r.handlingActor ! Matched(myInfo.head, othersInfo, groupId)
           })
         }
       }

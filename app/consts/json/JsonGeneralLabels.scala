@@ -7,6 +7,7 @@ object JsonGeneralLabels {
   val OUTCOME = "outcome"
   val REASON = "reason"
   val PAYLOAD = "payload"
+  val GROUP_ID = "groupId"
 
   // top values
   val OK = "ok"

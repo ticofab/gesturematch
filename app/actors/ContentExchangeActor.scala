@@ -24,6 +24,7 @@ class ContentExchangeActor extends Actor {
   var channel: Option[Concurrent.Channel[String]] = None
   var matchees: Option[List[Matchee]] = None
   var myInfo: Option[Matchee] = None
+  var groupId: Option[String] = None
 
   def receive: Actor.Receive = {
     case ClientConnected(remoteAddress) => {
@@ -48,10 +49,11 @@ class ContentExchangeActor extends Actor {
       sender ! wsLink
     }
 
-    case Matched(info: Matchee, others: List[Matchee]) => {
+    case Matched(info: Matchee, others: List[Matchee], groupUniqueId: String) => {
       Logger.info(s"$self, MatchedDetail message. my matchee: $info, others: $others")
       myInfo = Some(info)
       matchees = Some(others)
+      groupId = Some(groupUniqueId)
       sendMatchedResponseToClient()
     }
 
@@ -89,8 +91,10 @@ class ContentExchangeActor extends Actor {
       }
 
       case Failure(e) => {
+        // TODO: more descriptive error
+        lazy val invalidJson = "Error parsing the JSON input."
         Logger.info(s"Couldn't parse client message: ${e.getMessage}")
-        sendInvalidInputResponseToClient()
+        sendInvalidInputResponseToClient(Some(invalidJson))
       }
     }
   }
@@ -133,74 +137,92 @@ class ContentExchangeActor extends Actor {
   }
 
   def onDisconnectInput(disconnect: ClientInputMessageDisconnect) = {
-    Logger.info(s"$self, client disconnected. Reason: ${disconnect.reason}")
-    sendToClient(JsonResponseHelper.getDisconnectResponse)
-    disconnect.reason match {
-      // TODO: prevent that we even get here if myInfo is None
-      case Some(reason) => sendMessageToMatchees(MatcheeLeftGroup(myInfo.get, Some(reason)))
-      case None => sendMessageToMatchees(MatcheeLeftGroup(myInfo.get))
+    // if not valid, this input wiil be simply discarded
+    if (isValidInput(disconnect.groupId)) {
+      Logger.info(s"$self, client disconnected. Reason: ${disconnect.reason}")
+      sendToClient(JsonResponseHelper.getDisconnectResponse(groupId.get))
+      disconnect.reason match {
+        // TODO: prevent that we even get here if myInfo is None
+        case Some(reason) => sendMessageToMatchees(MatcheeLeftGroup(myInfo.get, Some(reason)))
+        case None => sendMessageToMatchees(MatcheeLeftGroup(myInfo.get))
+      }
+      closeClientConnection()
+      leaveGroup()
     }
-    closeClientConnection()
-    leaveGroup()
   }
 
   def onLeaveGroupInput(leaveGroupMessage: ClientInputMessageLeaveGroup) = {
-    Logger.info(s"$self, client left the group. Reason: ${leaveGroupMessage.reason}")
-    // send messages to the other ones in the connection and simply forget about them
-    matchees match {
-      case Some(matcheesList) => {
-        leaveGroupMessage.reason match {
-          // TODO: prevent that we even get here if myInfo is None
-          case Some(reason) => sendMessageToMatchees(MatcheeLeftGroup(myInfo.get, Some(reason)))
-          case None => sendMessageToMatchees(MatcheeLeftGroup(myInfo.get, None))
+    // if not valid, this input wiil be simply discarded
+    if (isValidInput(leaveGroupMessage.groupId)) {
+      Logger.info(s"$self, client left the group. Reason: ${leaveGroupMessage.reason}")
+      // send messages to the other ones in the connection and simply forget about them
+      matchees match {
+        case Some(matcheesList) => {
+          leaveGroupMessage.reason match {
+            // TODO: prevent that we even get here if myInfo is None
+            case Some(reason) => sendMessageToMatchees(MatcheeLeftGroup(myInfo.get, Some(reason)))
+            case None => sendMessageToMatchees(MatcheeLeftGroup(myInfo.get, None))
+          }
+          sendToClient(JsonResponseHelper.getMatchBrokenResponse(groupId.get))
+          leaveGroup()
         }
-        sendToClient(JsonResponseHelper.getMatchBrokenResponse)
-        leaveGroup()
-      }
-      case None => {
-        sendToClient(JsonResponseHelper.getNoGroupToLeaveResponse)
+        case None => {
+          sendToClient(JsonResponseHelper.getNoGroupToLeaveResponse(groupId.get))
+        }
       }
     }
   }
 
   def onDeliveryInput(delivery: ClientInputMessageDelivery) = {
-    // TODO: prevent that we even get here if myInfo == None!
-    Logger.info(s"$self, client delivery, for ${delivery.recipients}, payload: ${delivery.payload}")
-    // create a delivery message and deliver it to the right recipients!
-    val matcheesList: List[Matchee] = matchees.getOrElse(Nil)
-    if (matcheesList == Nil) {
-      Logger.info(s"No groups seem to be established")
-      sendToClient(JsonResponseHelper.getPayloadEmptyGroupResponse)
-    } else {
-      val message = MatcheeDelivers(myInfo.get, delivery.payload)
-      val listRecipients: List[ActorRef] = for {
-        matchee <- matcheesList
-        recipient <- delivery.recipients
-        if matchee.idInGroup == recipient && recipient != -1
-      } yield matchee.handlingActor
-
-      listRecipients.foreach(_ ! message)
-      if (listRecipients.size == delivery.recipients.size) {
-        Logger.info(s"Delivered to all requested recipients.")
-        sendToClient(JsonResponseHelper.getPayloadDeliveredResponse)
+    // if not valid, this input wiil be simply discarded
+    if (isValidInput(delivery.groupId)) {
+      // TODO: prevent that we even get here if myInfo == None or groupId == None!
+      Logger.info(s"$self, client delivery, for ${delivery.recipients}, payload: ${delivery.payload}")
+      // create a delivery message and deliver it to the right recipients!
+      val matcheesList: List[Matchee] = matchees.getOrElse(Nil)
+      if (matcheesList == Nil) {
+        Logger.info(s"No groups seem to be established")
+        sendToClient(JsonResponseHelper.getPayloadEmptyGroupResponse(groupId.get))
       } else {
-        Logger.info(s"Delivered to a subset of the recipients.")
-        sendToClient(JsonResponseHelper.getPayloadPartiallyDeliveredResponse)
+        val message = MatcheeDelivers(myInfo.get, delivery.payload)
+        val listRecipients: List[ActorRef] = for {
+          matchee <- matcheesList
+          recipient <- delivery.recipients
+          if matchee.idInGroup == recipient && recipient != -1
+        } yield matchee.handlingActor
+
+        listRecipients.foreach(_ ! message)
+        if (listRecipients.size == delivery.recipients.size) {
+          Logger.info(s"Delivered to all requested recipients.")
+          sendToClient(JsonResponseHelper.getPayloadDeliveredResponse(groupId.get))
+        } else {
+          Logger.info(s"Delivered to a subset of the recipients.")
+          sendToClient(JsonResponseHelper.getPayloadPartiallyDeliveredResponse(groupId.get))
+        }
       }
+    }
+  }
+
+  def isValidInput(inputGroupId: String) = {
+    // TODO: watch out for the get!
+    if (inputGroupId == groupId.get) true
+    else {
+      sendToClient(JsonResponseHelper.getWrongGroupIdResponse(inputGroupId))
+      false
     }
   }
 
   // *************************************
   // Responses to client section
   // *************************************
-  def sendInvalidInputResponseToClient() = {
+  def sendInvalidInputResponseToClient(reason: Option[String] = None) = {
     // TODO: send a more helpful message back
-    sendToClient(JsonResponseHelper.getInvalidInputResponse)
+    sendToClient(JsonResponseHelper.getInvalidInputResponse(reason))
   }
 
   def sendMatchedResponseToClient() = {
     if (!myInfo.isEmpty && !matchees.isEmpty) {
-      val jsonToSend = JsonResponseHelper.createMatchedResponse(myInfo.get, matchees.get)
+      val jsonToSend = JsonResponseHelper.createMatchedResponse(myInfo.get, matchees.get, groupId.get)
       sendToClient(jsonToSend)
     }
   }
@@ -216,6 +238,7 @@ class ContentExchangeActor extends Actor {
   def leaveGroup() = {
     matchees = None
     myInfo = None
+    groupId = None
   }
 
   def sendToClient(message: String) = {

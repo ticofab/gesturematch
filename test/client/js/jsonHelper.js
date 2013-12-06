@@ -8,6 +8,7 @@ function createBreakMatchJson() {
 
 function createDeliverJson(recipients, payload) {
     var deliver = {"type":"delivery",
+                    "groupId":"WRONGGROUP",
                     "payload": payload,
                     "recipients": []}
     for (var i in recipients) {

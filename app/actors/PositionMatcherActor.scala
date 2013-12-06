@@ -7,10 +7,11 @@ import consts.Areas._
 import play.api.Logger
 import consts.Criteria
 import helpers.movements.SwipeMovementHelper
+import traits.StringGenerator
 
-class PositionMatcherActor extends Actor {
+class PositionMatcherActor extends Actor with StringGenerator {
 
-  private def deliverTo2Group(group: List[RequestToMatch]): Unit = {
+  private def deliverTo2Group(group: List[RequestToMatch], groupId: String): Unit = {
     // the new request
     val r1 = group.head
     val pos1 = ScreenPositionHelper.getPosition(r1.movement, 2)
@@ -22,14 +23,14 @@ class PositionMatcherActor extends Actor {
     Logger.info(s"1st mov & pos:   ${r1.movement}    ${pos1.toString}")
     Logger.info(s"2nd mov & pos:   ${r2.movement}    ${pos2.toString}")
 
-    val matchee1Info = Matchee(r1.handlingActor, 0, pos1)
-    val matchee2Info = Matchee(r2.handlingActor, 1, pos2)
+    val matchee1 = Matchee(r1.handlingActor, 0, pos1)
+    val matchee2 = Matchee(r2.handlingActor, 1, pos2)
 
-    r1.handlingActor ! Matched(matchee1Info, List(matchee2Info))
-    r2.handlingActor ! Matched(matchee2Info, List(matchee1Info))
+    r1.handlingActor ! Matched(matchee1, List(matchee2), groupId)
+    r2.handlingActor ! Matched(matchee2, List(matchee1), groupId)
   }
 
-  private def deliverTo4Group(group: List[RequestToMatch]): Unit = {
+  private def deliverTo4Group(group: List[RequestToMatch], groupId: String): Unit = {
     // here I need to understand what's the orientation. the issue could be with movement that end or start in the middle,
     // as at that point I wouldn't be able to see where they are placed.
 
@@ -60,15 +61,15 @@ class PositionMatcherActor extends Actor {
     Logger.info(s"3rd mov & pos:   ${r3.movement}    ${pos3.toString}")
     Logger.info(s"4th pos:         ${pos4.toString}\n")
 
-    val match1Info = Matchee(r1.handlingActor, 0, pos1)
-    val match2Info = Matchee(r2.handlingActor, 1, pos2)
-    val match3Info = Matchee(r3.handlingActor, 2, pos3)
-    val match4Info = Matchee(r4.handlingActor, 3, pos4)
+    val matchee1 = Matchee(r1.handlingActor, 0, pos1)
+    val matchee2 = Matchee(r2.handlingActor, 1, pos2)
+    val matchee3 = Matchee(r3.handlingActor, 2, pos3)
+    val matchee4 = Matchee(r4.handlingActor, 3, pos4)
 
-    r1.handlingActor ! Matched(match1Info, List(match2Info, match3Info, match4Info))
-    r2.handlingActor ! Matched(match2Info, List(match1Info, match3Info, match4Info))
-    r3.handlingActor ! Matched(match3Info, List(match1Info, match2Info, match4Info))
-    r4.handlingActor ! Matched(match4Info, List(match1Info, match2Info, match4Info))
+    r1.handlingActor ! Matched(matchee1, List(matchee2, matchee3, matchee4), groupId)
+    r2.handlingActor ! Matched(matchee2, List(matchee1, matchee3, matchee4), groupId)
+    r3.handlingActor ! Matched(matchee3, List(matchee1, matchee2, matchee4), groupId)
+    r4.handlingActor ! Matched(matchee4, List(matchee1, matchee2, matchee4), groupId)
   }
 
   private def getMatchingGroup(request: RequestToMatch, existingRequests: List[RequestToMatch]): List[MatchingGroup] = {
@@ -126,10 +127,13 @@ class PositionMatcherActor extends Actor {
           // remove the group from the storage
           RequestStorageHelper.removeRequests(Criteria.POSITION, group.requests)
 
+          // generate a unique groupId
+          val groupId = getGroupUniqueString
+
           // Send a matching notification to the actors managing the corresponding devices
           group.devicesInGroup match {
-            case 4 => deliverTo4Group(group.requests)
-            case 2 => deliverTo2Group(group.requests)
+            case 4 => deliverTo4Group(group.requests, groupId)
+            case 2 => deliverTo2Group(group.requests, groupId)
           }
         }
 
