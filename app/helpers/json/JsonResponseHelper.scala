@@ -42,7 +42,7 @@ object JsonResponseHelper {
   def getTimeoutResponse = getOutcomeResponse(JsonInputLabels.INPUT_TYPE_MATCH, JsonGeneralLabels.FAIL,
     Some(JsonResponseLabels.REASON_TIMEOUT))
 
-  def getMatchBrokenResponse(groupId: String) = getGroupOutcomeResponse(groupId,
+  def getGroupLeftResponse(groupId: String) = getGroupOutcomeResponse(groupId,
     JsonInputLabels.INPUT_TYPE_LEAVE_GROUP, JsonGeneralLabels.OK)
 
   def getDisconnectResponse(groupId: String) = getGroupOutcomeResponse(groupId,

@@ -16,7 +16,7 @@ function initStuff(scope) {
     scope.dev4criteria = "presence"
 
     scope.dev1apikey = "contact-api-key"
-    scope.dev2apikey = "contact-api-key"
+    scope.dev2apikey = "swipeshare-api-key"
     scope.dev3apikey = "contact-api-key"
     scope.dev4apikey = "contact-api-key"
 
@@ -51,7 +51,7 @@ function initStuff(scope) {
     scope.dev4pl = "[{\"type\":\"NAME\",\"content\":{\"value\":\"Fabio4\"}}]"
 
     scope.dev1ep = "uguale"
-    scope.dev2ep = "uguale"
+    scope.dev2ep = "blue"
     scope.dev3ep = "uguale"
     scope.dev4ep = "uguale"
 

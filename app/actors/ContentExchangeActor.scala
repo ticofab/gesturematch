@@ -163,7 +163,7 @@ class ContentExchangeActor extends Actor {
             case Some(reason) => sendMessageToMatchees(MatcheeLeftGroup(myInfo.get, Some(reason)))
             case None => sendMessageToMatchees(MatcheeLeftGroup(myInfo.get, None))
           }
-          sendToClient(JsonResponseHelper.getMatchBrokenResponse(groupId.get))
+          sendToClient(JsonResponseHelper.getGroupLeftResponse(groupId.get))
           leaveGroup()
         }
         case None => {
