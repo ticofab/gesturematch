@@ -11,7 +11,7 @@ function initStuff(scope) {
     scope.dev4rtype = "content"
 
     scope.dev1criteria = "presence"
-    scope.dev2criteria = "presence"
+    scope.dev2criteria = "position"
     scope.dev3criteria = "presence"
     scope.dev4criteria = "presence"
 
@@ -42,7 +42,7 @@ function initStuff(scope) {
 
     scope.dev1se = "right"
     scope.dev2se = "inner"
-    scope.dev3se = "right"
+    scope.dev3se = "inner"
     scope.dev4se = "inner"
 
     scope.dev1pl = "[{\"type\":\"NAME\",\"content\":{\"value\":\"Fabio1\"}}]"

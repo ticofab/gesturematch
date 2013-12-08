@@ -3,7 +3,7 @@ function createDisconnectJson() {
 }
 
 function createBreakMatchJson() {
-    return JSON.stringify({"type":"leaveGroup"});
+    return JSON.stringify({"type":"leaveGroup", "groupId":"xxEXAMPLEGROUPxx"});
 }
 
 function createDeliverJson(recipients, payload) {

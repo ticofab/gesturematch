@@ -22,7 +22,7 @@ object JsonResponseHelper {
         JsonGeneralLabels.OUTCOME -> JsonGeneralLabels.OK,
         JsonGeneralLabels.GROUP_ID -> JsString(groupId),
         JsonResponseLabels.GROUP_SIZE -> JsNumber(otherInfos.size + 1),
-        JsonResponseLabels.ME_IN_GROUP -> Matchee.toJson(myInfo),
+        JsonResponseLabels.MYSELF_IN_GROUP -> Matchee.toJson(myInfo),
         JsonResponseLabels.OTHERS_IN_GROUP -> jsonArray
       )
     )
@@ -45,10 +45,13 @@ object JsonResponseHelper {
   def getGroupLeftResponse(groupId: String) = getGroupOutcomeResponse(groupId,
     JsonInputLabels.INPUT_TYPE_LEAVE_GROUP, JsonGeneralLabels.OK)
 
-  def getDisconnectResponse(groupId: String) = getGroupOutcomeResponse(groupId,
-    JsonInputLabels.INPUT_TYPE_DISCONNECT, JsonGeneralLabels.OK)
+  def getDisconnectResponse = getOutcomeResponse(JsonInputLabels.INPUT_TYPE_DISCONNECT, JsonGeneralLabels.OK)
 
-  def getNoGroupToLeaveResponse(groupId: String) = getGroupOutcomeResponse(groupId,
+  def getNotPartOfGroupResponse(groupId: String) = getGroupOutcomeResponse(groupId,
+    JsonInputLabels.INPUT_TYPE_LEAVE_GROUP, JsonGeneralLabels.FAIL,
+    Some(JsonResponseLabels.REASON_NOT_PART_OF_THIS_GROUP))
+
+  def getNoGroupToLeaveResponse = getOutcomeResponse(
     JsonInputLabels.INPUT_TYPE_LEAVE_GROUP, JsonGeneralLabels.FAIL,
     Some(JsonResponseLabels.REASON_NOT_PART_OF_ANY_GROUP))
 
@@ -56,15 +59,14 @@ object JsonResponseHelper {
     JsonInputLabels.INPUT_TYPE_DELIVERY, JsonGeneralLabels.PARTIAL,
     Some(JsonResponseLabels.REASON_PAYLOAD_PARTIALLY_DELIVERED))
 
-  def getPayloadNotDeliveredResponse(groupId: String) = getGroupOutcomeResponse(groupId,
-    JsonInputLabels.INPUT_TYPE_DELIVERY, JsonGeneralLabels.FAIL)
+  def getPayloadNotDeliveredResponse(groupId: String, reason: Option[String] = None) = getGroupOutcomeResponse(groupId,
+    JsonInputLabels.INPUT_TYPE_DELIVERY, JsonGeneralLabels.FAIL, reason)
 
   def getPayloadDeliveredResponse(groupId: String) = getGroupOutcomeResponse(groupId,
     JsonInputLabels.INPUT_TYPE_DELIVERY, JsonGeneralLabels.OK)
 
-  def getPayloadEmptyGroupResponse(groupId: String) = getGroupOutcomeResponse(groupId,
-    JsonInputLabels.INPUT_TYPE_DELIVERY, JsonGeneralLabels.FAIL,
-    Some(JsonResponseLabels.REASON_NOT_PART_OF_ANY_GROUP))
+  def getPayloadEmptyGroupResponse(groupId: String) = getOutcomeResponse(JsonInputLabels.INPUT_TYPE_DELIVERY,
+    JsonGeneralLabels.FAIL, Some(JsonResponseLabels.REASON_NOT_PART_OF_ANY_GROUP))
 
   lazy val notPartOfGroup = "You are not part of group "
 

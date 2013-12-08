@@ -8,7 +8,7 @@ import consts.Criteria
 import helpers.movements.SwipeMovementHelper
 import traits.StringGenerator
 
-class TouchMatchingActor extends Actor with StringGenerator {
+class PresenceMatchingActor extends Actor with StringGenerator {
 
   lazy val myName = this.getClass.getSimpleName
 
@@ -64,6 +64,6 @@ class TouchMatchingActor extends Actor with StringGenerator {
   }
 }
 
-object TouchMatchingActor {
-  val props = Props(classOf[TouchMatchingActor])
+object PresenceMatchingActor {
+  val props = Props(classOf[PresenceMatchingActor])
 }

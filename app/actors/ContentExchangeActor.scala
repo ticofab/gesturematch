@@ -1,6 +1,7 @@
 package actors
 
 import akka.actor.{ActorRef, Actor, Props}
+import akka.pattern.ask
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
@@ -18,6 +19,8 @@ import play.api.libs.concurrent.Promise
 import helpers.json.{JsonMessageHelper, JsonResponseHelper, JsonInputHelper}
 import helpers.movements.SwipeMovementHelper
 import controllers.ApplicationWS
+import consts.json.{JsonResponseLabels, JsonGeneralLabels}
+import java.util.concurrent.TimeoutException
 
 class ContentExchangeActor extends Actor {
   var remoteIPAddress: Option[String] = None
@@ -74,7 +77,12 @@ class ContentExchangeActor extends Actor {
   // Events section
   // *************************************
   def onInput(input: String) = {
-    Logger.info(s"$self, input message from client. Input length: ${input.length}")
+
+    if (input.contains(JsonGeneralLabels.PAYLOAD)) {
+      Logger.info(s"$self, input message from client. Length: ${input.length}, Input: ${input.substring(0, 100)}")
+    } else {
+      Logger.info(s"$self, input message from client. Length: ${input.length}, Input: $input")
+    }
     // try to parse it to Json
     Try(JsonInputHelper.parseInput(input)) match {
 
@@ -125,36 +133,42 @@ class ContentExchangeActor extends Actor {
           matchRequest.latitude, matchRequest.longitude, timestamp, areaStartValue, areaEndValue, movement,
           matchRequest.equalityParam, self)
 
+        def futureMatched(matcher: ActorRef) = {
+          val matchedFuture = (matcher ? NewRequest(requestData))(Timeouts.maxOldestRequestInterval)
+          matchedFuture recover {
+            // basically this timeout will always trigger. But maybe we've been matched in the meantime
+            case t: TimeoutException => if (groupId.isEmpty) sendToClient(JsonResponseHelper.getTimeoutResponse)
+          }
+        }
+
         criteriaValue match {
           // we only get here if the criteria is valid
-
-          // TODO: where to put these matching actors?
-          case Criteria.POSITION => ApplicationWS.positionMatchingActor ! NewRequest(requestData)
-          case Criteria.PRESENCE => ApplicationWS.touchMatchingActor ! NewRequest(requestData)
+          case Criteria.POSITION => futureMatched(ApplicationWS.positionMatchingActor)
+          case Criteria.PRESENCE => futureMatched(ApplicationWS.touchMatchingActor)
         }
       }
     }
   }
 
   def onDisconnectInput(disconnect: ClientInputMessageDisconnect) = {
-    // if not valid, this input wiil be simply discarded
-    if (isValidInput(disconnect.groupId)) {
-      Logger.info(s"$self, client disconnected. Reason: ${disconnect.reason}")
-      sendToClient(JsonResponseHelper.getDisconnectResponse(groupId.get))
+    // a disconnect message doesn't have a groupId
+    Logger.info(s"$self, client disconnected. Reason: ${disconnect.reason}")
+    sendToClient(JsonResponseHelper.getDisconnectResponse)
+    if (!matchees.isEmpty) {
       disconnect.reason match {
         // TODO: prevent that we even get here if myInfo is None
         case Some(reason) => sendMessageToMatchees(MatcheeLeftGroup(myInfo.get, Some(reason)))
         case None => sendMessageToMatchees(MatcheeLeftGroup(myInfo.get))
       }
-      closeClientConnection()
-      leaveGroup()
     }
+    closeClientConnection()
+    leaveGroup()
   }
 
   def onLeaveGroupInput(leaveGroupMessage: ClientInputMessageLeaveGroup) = {
     // if not valid, this input wiil be simply discarded
     if (isValidInput(leaveGroupMessage.groupId)) {
-      Logger.info(s"$self, client left the group. Reason: ${leaveGroupMessage.reason}")
+      Logger.info(s"$self, client asks to leave group ${leaveGroupMessage.groupId}, Reason: ${leaveGroupMessage.reason}")
       // send messages to the other ones in the connection and simply forget about them
       matchees match {
         case Some(matcheesList) => {
@@ -167,9 +181,13 @@ class ContentExchangeActor extends Actor {
           leaveGroup()
         }
         case None => {
-          sendToClient(JsonResponseHelper.getNoGroupToLeaveResponse(groupId.get))
+          // we shouldn't get here but just in case
+          sendToClient(JsonResponseHelper.getNotPartOfGroupResponse(groupId.get))
         }
       }
+    } else {
+      Logger.info(s"$self, client is not part of group ${leaveGroupMessage.groupId}")
+      sendToClient(JsonResponseHelper.getNoGroupToLeaveResponse)
     }
   }
 
@@ -180,7 +198,7 @@ class ContentExchangeActor extends Actor {
       Logger.info(s"$self, client delivery, for ${delivery.recipients}, payload length: ${delivery.payload.length}")
       // create a delivery message and deliver it to the right recipients!
       val matcheesList: List[Matchee] = matchees.getOrElse(Nil)
-      if (matcheesList == Nil) {
+      if (groupId.isEmpty) {
         Logger.info(s"No groups seem to be established")
         sendToClient(JsonResponseHelper.getPayloadEmptyGroupResponse(groupId.get))
       } else {
@@ -193,19 +211,23 @@ class ContentExchangeActor extends Actor {
 
         listRecipients.foreach(_ ! message)
         if (listRecipients.size == delivery.recipients.size) {
-          Logger.info(s"Delivered to all requested recipients.")
+          Logger.info(s"$self, Delivered to all requested recipients.")
           sendToClient(JsonResponseHelper.getPayloadDeliveredResponse(groupId.get))
         } else {
-          Logger.info(s"Delivered to a subset of the recipients.")
+          Logger.info(s"$self, Delivered to a subset of the recipients.")
           sendToClient(JsonResponseHelper.getPayloadPartiallyDeliveredResponse(groupId.get))
         }
       }
+    } else {
+      Logger.info(s"$self, client is not part of group ${delivery.groupId}")
+      sendToClient(JsonResponseHelper.getPayloadNotDeliveredResponse(delivery.groupId,
+        Some(JsonResponseLabels.REASON_NOT_PART_OF_THIS_GROUP)))
     }
   }
 
   def isValidInput(inputGroupId: String) = {
     // TODO: watch out for the get!
-    if (inputGroupId == groupId.get) true
+    if (inputGroupId == groupId.getOrElse("")) true
     else {
       sendToClient(JsonResponseHelper.getWrongGroupIdResponse(inputGroupId))
       false
