@@ -68,7 +68,7 @@ class ContentExchangeActor extends Actor {
 
     case MatcheeDelivers(matchee, payload) => {
       Logger.info(s"$self, a matchee delivered some payload (length: ${payload.length}). Forwarding it to my client.")
-      val payloadMsg = JsonMessageHelper.createMatcheeSendsPayloadMessage(matchee.idInGroup, payload)
+      val payloadMsg = JsonMessageHelper.createMatcheeSendsPayloadMessage(groupId.get, matchee.idInGroup, payload)
       sendToClient(payloadMsg)
     }
   }
@@ -250,7 +250,7 @@ class ContentExchangeActor extends Actor {
   }
 
   def sendMatcheeLeftMessageToClient(matchee: Matchee, reason: Option[String]) = {
-    val message = JsonMessageHelper.createMatcheeLeavesMessage(matchee.idInGroup)
+    val message = JsonMessageHelper.createMatcheeLeftGroupMessage(groupId.get, matchee.idInGroup)
     sendToClient(message)
   }
 

@@ -5,23 +5,25 @@ import consts.json.{JsonGeneralLabels, JsonMessageLabels}
 
 object JsonMessageHelper {
 
-  def createMatcheeSendsPayloadMessage(senderId: Int, payload: String) = {
+  def createMatcheeSendsPayloadMessage(groupId: String, senderId: Int, payload: String) = {
     Json.stringify(
       Json.obj(
         JsonGeneralLabels.KIND -> JsonMessageLabels.KIND_MESSAGE,
         JsonGeneralLabels.TYPE -> JsonMessageLabels.MESSAGE_TYPE_DELIVERY,
+        JsonGeneralLabels.GROUP_ID -> groupId,
         JsonMessageLabels.MESSAGE_MATCHEE_ID -> senderId,
         JsonGeneralLabels.PAYLOAD -> payload
       )
     )
   }
 
-  def createMatcheeLeavesMessage(senderId: Int) = {
+  def createMatcheeLeftGroupMessage(groupId: String, leaverId: Int) = {
     Json.stringify(
       Json.obj(
         JsonGeneralLabels.KIND -> JsonMessageLabels.KIND_MESSAGE,
         JsonGeneralLabels.TYPE -> JsonMessageLabels.MESSAGE_TYPE_MATCHEE_LEFT_GROUP,
-        JsonMessageLabels.MESSAGE_MATCHEE_ID -> senderId
+        JsonGeneralLabels.GROUP_ID -> groupId,
+        JsonMessageLabels.MESSAGE_MATCHEE_ID -> leaverId
       )
     )
   }
