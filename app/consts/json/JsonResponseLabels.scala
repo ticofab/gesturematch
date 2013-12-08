@@ -11,10 +11,10 @@ object JsonResponseLabels {
   val REASON_TIMEOUT = "timeout"
   val REASON_UNKNOWN_ERROR = "error"
 
-  // -- outcomes to break match request
+  // -- reasons to leave group request
   val REASON_NOT_PART_OF_ANY_GROUP = "notPartOfAnyGroup"
 
-  // -- outcomes to delivery request
+  // -- reasons to delivery request
   val REASON_PAYLOAD_PARTIALLY_DELIVERED = "partiallyDelivered"
   val REASON_PAYLOAD_NOT_DELIVERED = "notDelivered"
   val REASON_PAYLOAD_DELIVERED = "delivered"

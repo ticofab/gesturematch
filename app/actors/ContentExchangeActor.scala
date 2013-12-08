@@ -64,7 +64,7 @@ class ContentExchangeActor extends Actor {
     }
 
     case MatcheeDelivers(matchee, payload) => {
-      Logger.info(s"$self, a matchee delivered some payload. Forwarding it to my client.")
+      Logger.info(s"$self, a matchee delivered some payload (length: ${payload.length}). Forwarding it to my client.")
       val payloadMsg = JsonMessageHelper.createMatcheeSendsPayloadMessage(matchee.idInGroup, payload)
       sendToClient(payloadMsg)
     }
@@ -74,7 +74,7 @@ class ContentExchangeActor extends Actor {
   // Events section
   // *************************************
   def onInput(input: String) = {
-    Logger.info(s"$self, input message from client: $input")
+    Logger.info(s"$self, input message from client. Input length: ${input.length}")
     // try to parse it to Json
     Try(JsonInputHelper.parseInput(input)) match {
 
@@ -177,7 +177,7 @@ class ContentExchangeActor extends Actor {
     // if not valid, this input wiil be simply discarded
     if (isValidInput(delivery.groupId)) {
       // TODO: prevent that we even get here if myInfo == None or groupId == None!
-      Logger.info(s"$self, client delivery, for ${delivery.recipients}, payload: ${delivery.payload}")
+      Logger.info(s"$self, client delivery, for ${delivery.recipients}, payload length: ${delivery.payload.length}")
       // create a delivery message and deliver it to the right recipients!
       val matcheesList: List[Matchee] = matchees.getOrElse(Nil)
       if (matcheesList == Nil) {
