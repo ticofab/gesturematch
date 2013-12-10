@@ -119,7 +119,6 @@ object JsonResponseHelper {
       Json.obj(
         JsonGeneralLabels.KIND -> JsonErrorLabels.KIND_ERROR,
         JsonGeneralLabels.TYPE -> JsonErrorLabels.TYPE_SERVER_ERROR,
-        JsonGeneralLabels.OUTCOME -> JsonGeneralLabels.FAIL,
         JsonGeneralLabels.REASON -> JsonErrorLabels.REASON_SERVER_ERROR_NO_ACTOR
       )
     )
