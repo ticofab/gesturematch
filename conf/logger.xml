@@ -7,7 +7,7 @@
   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
      <file>${application.home}/logs/log_${byDay}.log</file>
      <encoder>
-       <pattern>%d{HH:mm:ss.SSS} - [level: %level] - [logger: %logger], [thread: %thread] [msg: %message] [exc: %xException]%n</pattern>
+       <pattern>%d{HH:mm:ss.SSS} - [level: %level] - [msg: %message] [exc: %xException] [logger: %logger], [thread: %thread]%n</pattern>
      </encoder>
    </appender>
 
