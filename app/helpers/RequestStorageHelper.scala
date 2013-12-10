@@ -9,6 +9,8 @@ import consts.Criteria.Criteria
 // This object is an helper to access the storage of previously received requests.
 object RequestStorageHelper {
 
+  lazy val myName = RequestStorageHelper.getClass.getSimpleName
+
   // true if the given request r is young enough
   private def oldRequestsFilter(r: RequestToMatch): Boolean =
     r.timestamp >= System.currentTimeMillis - Timeouts.maxOldestRequestIntervalMillis
@@ -33,7 +35,7 @@ object RequestStorageHelper {
   }
 
   def storeNewRequest(criteria: Criteria, newRequest: RequestToMatch) = {
-    Logger.info(s"RequestStorageHelper, adding new request to the $criteria storage")
+    Logger.info(s"$myName, adding new request to the $criteria storage")
     getCorrespondingStorage(criteria).addRequest(newRequest)
   }
 

@@ -12,9 +12,10 @@ import play.api.Logger
 import consts.Timeouts
 import java.util.concurrent.TimeoutException
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import helpers.json.JsonResponseHelper
 
 object ApplicationWS extends Controller {
-  Logger.info("\n******* Server starting. Creating ActorSystem. ********")
+  Logger.info("******* Server starting. Creating ActorSystem. ********")
   val positionMatchingActor = Akka.system.actorOf(PositionMatcherActor.props)
   val touchMatchingActor = Akka.system.actorOf(PresenceMatchingActor.props)
 
@@ -30,7 +31,13 @@ object ApplicationWS extends Controller {
       val handlingActor: ActorRef = Akka.system.actorOf(ContentExchangeActor.props)
       val wsLinkFuture = (handlingActor ? ClientConnected(request.remoteAddress))(Timeouts.maxOldestRequestInterval)
       wsLinkFuture.mapTo[(Iteratee[String, _], Enumerator[String])].recover {
-        case e: TimeoutException => ??? // TODO
+        case e: TimeoutException => {
+          // no actor responded.
+          Logger.error(s"openWS endpoint, no actor responded. Close connection, exception: $e")
+          val out = Enumerator(JsonResponseHelper.getServerErrorResponse).andThen(Enumerator.eof)
+          val in: Iteratee[String, Unit] = Iteratee.ignore
+          (in, out)
+        }
       }
     }
   }

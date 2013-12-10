@@ -7,6 +7,8 @@ import consts.json.{JsonGeneralLabels, JsonInputLabels}
 import scala.Some
 
 object JsonInputHelper {
+  lazy val myName = JsonInputHelper.getClass.getSimpleName
+
   def parseInput(input: String): ClientInputMessage = {
     val jsonValue: JsValue = Json.parse(input)
 
@@ -14,7 +16,7 @@ object JsonInputHelper {
 
     inputType match {
       case Some(header) => {
-        Logger.info(s"Input parsed, type $header")
+        Logger.info(s"$myName, input parsed, type $header.")
 
         header match {
           case JsonInputLabels.INPUT_TYPE_MATCH => ClientInputMessageMatch.fromJson(jsonValue)

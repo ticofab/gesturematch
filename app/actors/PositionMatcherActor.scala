@@ -11,6 +11,8 @@ import traits.StringGenerator
 
 class PositionMatcherActor extends Actor with StringGenerator {
 
+  lazy val myName = this.getClass.getSimpleName
+
   private def deliverTo2Group(group: List[RequestToMatch], groupId: String): Unit = {
     // the new request
     val r1 = group.head
@@ -20,8 +22,8 @@ class PositionMatcherActor extends Actor with StringGenerator {
     val r2 = group.tail.head
     val pos2 = ScreenPositionHelper.getPosition(r2.movement, 2)
 
-    Logger.info(s"1st mov & pos:   ${r1.movement}    ${pos1.toString}")
-    Logger.info(s"2nd mov & pos:   ${r2.movement}    ${pos2.toString}")
+    Logger.info(s"$myName, 1st mov & pos:   ${r1.movement}    ${pos1.toString}")
+    Logger.info(s"$myName, 2nd mov & pos:   ${r2.movement}    ${pos2.toString}")
 
     val matchee1 = Matchee(r1.handlingActor, 0, pos1)
     val matchee2 = Matchee(r2.handlingActor, 1, pos2)
@@ -56,10 +58,10 @@ class PositionMatcherActor extends Actor with StringGenerator {
     val r3 = partition3._2.head
     val pos3 = ScreenPositionHelper.getPosition(r3.movement, 4)
 
-    Logger.info(s"1st mov & pos:   ${r1.movement}    ${pos1.toString}")
-    Logger.info(s"2nd mov & pos:   ${r2.movement}    ${pos2.toString}")
-    Logger.info(s"3rd mov & pos:   ${r3.movement}    ${pos3.toString}")
-    Logger.info(s"4th pos:         ${pos4.toString}\n")
+    Logger.info(s"$myName, 1st mov & pos:   ${r1.movement}    ${pos1.toString}")
+    Logger.info(s"$myName, 2nd mov & pos:   ${r2.movement}    ${pos2.toString}")
+    Logger.info(s"$myName, 3rd mov & pos:   ${r3.movement}    ${pos3.toString}")
+    Logger.info(s"$myName, 4th pos:         ${pos4.toString}\n")
 
     val matchee1 = Matchee(r1.handlingActor, 0, pos1)
     val matchee2 = Matchee(r2.handlingActor, 1, pos2)
@@ -91,13 +93,15 @@ class PositionMatcherActor extends Actor with StringGenerator {
     val tmp3: List[(PossibleMatching, List[RequestToMatch])] = tmp2.filter(x => x._1.devicesInGroup == x._2.length + 1)
     val groups: List[MatchingGroup] = tmp3.map(x => MatchingGroup(x._1.devicesInGroup, request :: x._2))
 
-    Logger.debug(s"groups found:\n  ${groups.toString()}")
+    Logger.debug(s"$myName, groups found:\n  ${groups.toString()}")
     groups
   }
 
   def receive: Actor.Receive = {
     case NewRequest(request) => {
-      Logger.info(s"MatcherActor, new ${request.toString}")
+      def getNewRequestLogging(nrExistingRequests: Int, msg: String = "") = {
+        s"$myName, new ${request.toString}, matching it with $nrExistingRequests existing requests --> $msg"
+      }
 
       // This operation should be fine, as the MatcherActor is designed to be a single one,
       // therefore there won't be two concurrent accesses to the RequestListHelper?
@@ -106,7 +110,6 @@ class PositionMatcherActor extends Actor with StringGenerator {
       val existingRequests = RequestStorageHelper.getValidExistingRequests(Criteria.POSITION, request)
 
       // Try to create a match between the requests
-      Logger.info(s"Matching it with ${existingRequests.length} existing requests.")
       val matchedGroups: List[MatchingGroup] = getMatchingGroup(request, existingRequests)
 
       // This is where I know whether I
@@ -115,20 +118,21 @@ class PositionMatcherActor extends Actor with StringGenerator {
       //   3. have identified multiple groups, which is uncertainty.
       matchedGroups match {
         case Nil => {
-          Logger.info(s"  --> no group has been found.")
+          Logger.info(getNewRequestLogging(existingRequests.length, "no group has been found."))
 
           // simply update the requests storage with the new request and the filtered requests
           RequestStorageHelper.storeNewRequest(Criteria.POSITION, request)
         }
 
         case group :: Nil => {
-          Logger.info(s"  --> one group found, size is ${group.devicesInGroup}")
 
           // remove the group from the storage
           RequestStorageHelper.removeRequests(Criteria.POSITION, group.requests)
 
           // generate a unique groupId
           val groupId = getGroupUniqueString
+
+          Logger.info(getNewRequestLogging(existingRequests.length, s"group formed: $getGroupUniqueString, size: ${group.devicesInGroup}"))
 
           // Send a matching notification to the actors managing the corresponding devices
           group.devicesInGroup match {
@@ -138,7 +142,7 @@ class PositionMatcherActor extends Actor with StringGenerator {
         }
 
         case group :: tail => {
-          Logger.info(s"  --> more than one group found. uncertainty.")
+          Logger.info(getNewRequestLogging(existingRequests.length, s"${matchedGroups.size} groups found. uncertainty."))
         }
       }
     }

@@ -2,7 +2,7 @@ package helpers.json
 
 import play.api.libs.json._
 import models.Matchee
-import consts.json.{JsonInputLabels, JsonGeneralLabels, JsonResponseLabels}
+import consts.json.{JsonErrorLabels, JsonInputLabels, JsonGeneralLabels, JsonResponseLabels}
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsString
 import scala.Some
@@ -112,5 +112,16 @@ object JsonResponseHelper {
       case Some(r) => Json.stringify(jsObj.+(JsonGeneralLabels.REASON, JsString(r)))
       case None => Json.stringify(jsObj)
     }
+  }
+
+  def getServerErrorResponse = {
+    Json.stringify(
+      Json.obj(
+        JsonGeneralLabels.KIND -> JsonErrorLabels.KIND_ERROR,
+        JsonGeneralLabels.TYPE -> JsonErrorLabels.TYPE_SERVER_ERROR,
+        JsonGeneralLabels.OUTCOME -> JsonGeneralLabels.FAIL,
+        JsonGeneralLabels.REASON -> JsonErrorLabels.REASON_SERVER_ERROR_NO_ACTOR
+      )
+    )
   }
 }

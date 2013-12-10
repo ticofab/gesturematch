@@ -14,7 +14,10 @@ class PresenceMatchingActor extends Actor with StringGenerator {
 
   def receive: Actor.Receive = {
     case NewRequest(request) => {
-      Logger.info(s"$myName, new ${request.toString}")
+
+      def getNewRequestLogging(nrExistingRequests: Int, msg: String = "") = {
+        s"$myName, new ${request.toString}, matching it with $nrExistingRequests existing requests --> $msg"
+      }
 
       // This operation should be fine, as the MatcherActor is designed to be a single one,
       // therefore there won't be two concurrent accesses to the RequestListHelper?
@@ -35,18 +38,18 @@ class PresenceMatchingActor extends Actor with StringGenerator {
       group match {
         case Nil => {
           // no match. add the request to the storage
-          Logger.info(s"$myName, no match found. Adding request to the storage.")
+          Logger.info(getNewRequestLogging(existingRequests.size, "no match found. Adding request to the storage."))
           RequestStorageHelper.storeNewRequest(Criteria.PRESENCE, request)
         }
 
         case x :: Nil => {
           // only one element. wrong!
-          Logger.info(s"$myName, error: group with one element.")
+          Logger.info(getNewRequestLogging(existingRequests.size, "error: group with one element."))
         }
 
         case x :: xs => {
           // we identified a group!
-          Logger.info(s"$myName, group found, size: ${group.size}")
+          Logger.info(getNewRequestLogging(existingRequests.size, s"group found, size: ${group.size}"))
           RequestStorageHelper.removeRequests(Criteria.PRESENCE, group)
 
           // get unique group id
