@@ -21,7 +21,6 @@ object JsonResponseHelper {
         JsonGeneralLabels.TYPE -> JsonInputLabels.INPUT_TYPE_MATCH,
         JsonGeneralLabels.OUTCOME -> JsonGeneralLabels.OK,
         JsonGeneralLabels.GROUP_ID -> JsString(groupId),
-        JsonResponseLabels.GROUP_SIZE -> JsNumber(otherInfos.size + 1),
         JsonResponseLabels.MYSELF_IN_GROUP -> Matchee.toJson(myInfo),
         JsonResponseLabels.OTHERS_IN_GROUP -> jsonArray
       )

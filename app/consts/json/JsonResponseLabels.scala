@@ -21,7 +21,6 @@ object JsonResponseLabels {
   val REASON_PAYLOAD_DELIVERED = "delivered"
 
   // matched messages labels
-  val GROUP_SIZE = "groupSize"
   val MYSELF_IN_GROUP = "myselfInGroup"
   val OTHERS_IN_GROUP = "othersInGroup"
 
