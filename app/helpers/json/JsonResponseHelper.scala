@@ -6,7 +6,6 @@ import consts.json.{JsonErrorLabels, JsonInputLabels, JsonGeneralLabels, JsonRes
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsString
 import scala.Some
-import play.api.libs.json.JsNumber
 
 object JsonResponseHelper {
 
@@ -75,7 +74,8 @@ object JsonResponseHelper {
 
   def getInvalidInputResponse(reason: Option[String] = None) = {
     val jsObj = Json.obj(
-      JsonGeneralLabels.KIND -> JsonResponseLabels.KIND_INVALID_INPUT
+      JsonGeneralLabels.KIND -> JsonErrorLabels.KIND_ERROR,
+      JsonGeneralLabels.TYPE -> JsonErrorLabels.TYPE_SERVER_ERROR
     )
 
     reason match {
@@ -87,10 +87,10 @@ object JsonResponseHelper {
   private def getGroupOutcomeResponse(groupId: String, `type`: String, outcome: String, reason: Option[String] = None) = {
 
     val jsObj = Json.obj(
-      JsonGeneralLabels.GROUP_ID -> groupId,
       JsonGeneralLabels.KIND -> JsonResponseLabels.KIND_RESPONSE,
       JsonGeneralLabels.TYPE -> `type`,
-      JsonGeneralLabels.OUTCOME -> outcome
+      JsonGeneralLabels.OUTCOME -> outcome,
+      JsonGeneralLabels.GROUP_ID -> groupId
     )
 
     reason match {
