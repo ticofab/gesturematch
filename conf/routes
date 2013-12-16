@@ -3,7 +3,7 @@
 # ~~~~
 
 # Http
-GET     /               controllers.ApplicationHTTP.alive
+GET     /                 controllers.ApplicationHTTP.alive
 
 # Websocket
-GET     /openWS         controllers.ApplicationWS.openWS
+GET     /api/open         controllers.ApplicationWS.openWS

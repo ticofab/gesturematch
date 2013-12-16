@@ -25,7 +25,7 @@ object ApplicationWS extends Controller {
      - I chose not to use WebSocket[JsValue] because this would lead to horrible exceptions
        in case inputs don't come as a valid JsonString.
    */
-  def openWS(): WebSocket[String] = WebSocket.async {
+  def open(): WebSocket[String] = WebSocket.async {
     request => {
       Logger.info(s"openWS endpoint connection: $request")
       val handlingActor: ActorRef = Akka.system.actorOf(ContentExchangeActor.props)
@@ -33,7 +33,7 @@ object ApplicationWS extends Controller {
       wsLinkFuture.mapTo[(Iteratee[String, _], Enumerator[String])].recover {
         case e: TimeoutException => {
           // no actor responded.
-          Logger.error(s"openWS endpoint, no actor responded. Close connection, exception: $e")
+          Logger.error(s"open endpoint, no actor responded. Close connection, exception: $e")
           val out = Enumerator(JsonResponseHelper.getServerErrorResponse).andThen(Enumerator.eof)
           val in: Iteratee[String, Unit] = Iteratee.ignore
           (in, out)
