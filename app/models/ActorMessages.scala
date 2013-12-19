@@ -10,7 +10,7 @@ case class Matched(myInfo: Matchee, matcheesInfo: List[Matchee], groupId: String
 // inter actor messages
 sealed trait MatcheeMessage
 case class MatcheeLeftGroup(matchee: Matchee, reason: Option[String] = None) extends MatcheeMessage
-case class MatcheeDelivers(matchee: Matchee, payload: String) extends MatcheeMessage
+case class MatcheeDelivers(matchee: Matchee, delivery: Delivery) extends MatcheeMessage
 
 
 

@@ -11,16 +11,20 @@ import scala.util.Try
 import models.ClientInputMessages._
 import consts.{Timeouts, Areas, Criteria}
 import play.api.libs.iteratee.{Concurrent, Enumerator, Iteratee}
-import models.NewRequest
-import scala.util.Failure
-import scala.Some
-import scala.util.Success
 import play.api.libs.concurrent.Promise
 import helpers.json.{JsonMessageHelper, JsonResponseHelper, JsonInputHelper}
 import helpers.movements.SwipeMovementHelper
 import controllers.ApplicationWS
 import consts.json.JsonResponseLabels
 import java.util.concurrent.TimeoutException
+import models.NewRequest
+import models.ClientConnected
+import scala.util.Failure
+import scala.Some
+import models.Matched
+import models.MatcheeLeftGroup
+import scala.util.Success
+import models.MatcheeDelivers
 
 class ContentExchangeActor extends Actor {
   var remoteIPAddress: Option[String] = None
@@ -82,9 +86,9 @@ class ContentExchangeActor extends Actor {
       leaveGroup()
     }
 
-    case MatcheeDelivers(matchee, payload) => {
-      Logger.info(s"$self, matchee delivered payload. Matchee: $matchee, payload length: ${payload.length}")
-      val payloadMsg = JsonMessageHelper.createMatcheeSendsPayloadMessage(groupId.get, matchee.idInGroup, payload)
+    case MatcheeDelivers(matchee, delivery) => {
+      Logger.info(s"$self, matchee delivered payload. Matchee: $matchee, payload length: ${delivery.payload.length}")
+      val payloadMsg = JsonMessageHelper.createMatcheeSendsPayloadMessage(groupId.get, matchee.idInGroup, delivery)
       sendToClient(payloadMsg)
     }
   }
@@ -207,13 +211,13 @@ class ContentExchangeActor extends Actor {
     }
   }
 
-  def onDeliveryInput(delivery: ClientInputMessageDelivery) = {
+  def onDeliveryInput(clientDelivery: ClientInputMessageDelivery) = {
     def getDeliveryLog(msg: String = "") = s"$self, client delivery," +
-      s" $msg, groupId: ${delivery.groupId}, recipients: ${delivery.recipients} " +
-      s", payload length: ${delivery.payload.length}"
+      s" $msg, groupId: ${clientDelivery.groupId}, recipients: ${clientDelivery.recipients} " +
+      s", payload length: ${clientDelivery.payload.length}"
 
-    // if not valid, this input wiil be simply discarded
-    if (isValidInputGroup(delivery.groupId)) {
+    // if not valid, this input will be simply discarded
+    if (isValidInputGroup(clientDelivery.groupId)) {
       // TODO: prevent that we even get here if myInfo == None or groupId == None!
 
       val matcheesList: List[Matchee] = matchees.getOrElse(Nil)
@@ -221,16 +225,22 @@ class ContentExchangeActor extends Actor {
         Logger.info(getDeliveryLog("no group is established"))
         sendToClient(JsonResponseHelper.getPayloadEmptyGroupResponse(groupId.get))
       } else {
+
         // create a delivery message and deliver it to the right recipients!
-        val message = MatcheeDelivers(myInfo.get, delivery.payload)
+        val delivery: Delivery = new Delivery(clientDelivery.deliveryId, clientDelivery.payload,
+          clientDelivery.chunkNr, clientDelivery.totalChunks)
+        val message = MatcheeDelivers(myInfo.get, delivery)
+
+        // creates a list of recipients
         val listRecipients: List[ActorRef] = for {
           matchee <- matcheesList
-          recipient <- delivery.recipients
+          recipient <- clientDelivery.recipients
           if matchee.idInGroup == recipient && recipient != -1
         } yield matchee.handlingActor
 
+        // deliver stuff
         listRecipients.foreach(_ ! message)
-        if (listRecipients.size == delivery.recipients.size) {
+        if (listRecipients.size == clientDelivery.recipients.size) {
           Logger.info(getDeliveryLog("delivered to all requested recipients"))
           sendToClient(JsonResponseHelper.getPayloadDeliveredResponse(groupId.get))
         } else {
@@ -242,7 +252,7 @@ class ContentExchangeActor extends Actor {
 
     else {
       Logger.info(getDeliveryLog(s"client is not part of this group"))
-      sendToClient(JsonResponseHelper.getPayloadNotDeliveredResponse(delivery.groupId,
+      sendToClient(JsonResponseHelper.getPayloadNotDeliveredResponse(clientDelivery.groupId,
         Some(JsonResponseLabels.REASON_NOT_PART_OF_THIS_GROUP)))
     }
   }

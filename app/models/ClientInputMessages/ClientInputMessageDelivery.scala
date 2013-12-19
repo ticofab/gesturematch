@@ -1,16 +1,30 @@
 package models.ClientInputMessages
 
-import play.api.libs.json.{JsArray, JsValue}
+import play.api.libs.json.JsValue
 import consts.json.{JsonGeneralLabels, JsonInputLabels}
 
-case class ClientInputMessageDelivery(groupId: String, recipients: List[Int], payload: String) extends ClientInputMessage
+case class ClientInputMessageDelivery(groupId: String,
+                                      recipients: List[Int],
+                                      deliveryId: String,
+                                      payload: String,
+                                      chunkNr: Option[Int],
+                                      totalChunks: Option[Int]) extends ClientInputMessage
 
 object ClientInputMessageDelivery {
   def fromJson(jsonValue: JsValue): ClientInputMessageDelivery = {
+    // mandatory stuff
     val groupId = (jsonValue \ JsonGeneralLabels.GROUP_ID).as[String]
+
+    // delivery stuff
     val recipients = (jsonValue \ JsonInputLabels.INPUT_RECIPIENTS).as[List[Int]]
     val payload: String = (jsonValue \ JsonGeneralLabels.PAYLOAD).as[String]
-    ClientInputMessageDelivery(groupId, recipients, payload)
+    val deliveryId: String = (jsonValue \ JsonInputLabels.INPUT_DELIVERY_ID).as[String]
+
+    // partial delivery stuff
+    val chunk: Option[Int] = (jsonValue \ JsonInputLabels.INPUT_CHUNK_NUMBER).asOpt[Int]
+    val totalChunks: Option[Int] = (jsonValue \ JsonInputLabels.INPUT_TOTAL_CHUNKS).asOpt[Int]
+
+    ClientInputMessageDelivery(groupId, recipients, deliveryId, payload, chunk, totalChunks)
   }
 }
 

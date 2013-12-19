@@ -23,4 +23,7 @@ object JsonInputLabels {
 
   // input delivery keys
   val INPUT_RECIPIENTS = "recipients"
+  val INPUT_CHUNK_NUMBER = "chunkNr"
+  val INPUT_TOTAL_CHUNKS = "totalChunks"
+  val INPUT_DELIVERY_ID = "deliveryId"
 }
