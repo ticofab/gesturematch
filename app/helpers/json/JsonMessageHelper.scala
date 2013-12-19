@@ -17,7 +17,7 @@ object JsonMessageHelper {
     )
 
     if (delivery.chunk.isDefined) json = json + (JsonInputLabels.INPUT_CHUNK_NUMBER, JsNumber(delivery.chunk.get))
-    if (delivery.totalChunks.isDefined) json + (JsonInputLabels.INPUT_TOTAL_CHUNKS, JsNumber(delivery.totalChunks.get))
+    if (delivery.totalChunks.isDefined) json = json + (JsonInputLabels.INPUT_TOTAL_CHUNKS, JsNumber(delivery.totalChunks.get))
 
     Json.stringify(json)
   }

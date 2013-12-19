@@ -240,12 +240,17 @@ class ContentExchangeActor extends Actor {
 
         // deliver stuff
         listRecipients.foreach(_ ! message)
-        if (listRecipients.size == clientDelivery.recipients.size) {
-          Logger.info(getDeliveryLog("delivered to all requested recipients"))
-          sendToClient(JsonResponseHelper.getPayloadDeliveredResponse(groupId.get))
-        } else {
-          Logger.info(getDeliveryLog("delivered to a subset of the requested recipients"))
-          sendToClient(JsonResponseHelper.getPayloadPartiallyDeliveredResponse(groupId.get))
+
+        // TODO: this following is terrible
+        // only send confirmation if this was a complete or final delivery
+        if (clientDelivery.chunkNr.isEmpty) {
+          if (listRecipients.size == clientDelivery.recipients.size) {
+            Logger.info(getDeliveryLog("delivered to all requested recipients"))
+            sendToClient(JsonResponseHelper.getPayloadDeliveredResponse(groupId.get))
+          } else {
+            Logger.info(getDeliveryLog("delivered to a subset of the requested recipients"))
+            sendToClient(JsonResponseHelper.getPayloadPartiallyDeliveredResponse(groupId.get))
+          }
         }
       }
     }

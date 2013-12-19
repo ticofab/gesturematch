@@ -73,44 +73,41 @@ object JsonResponseHelper {
   }
 
   def getInvalidInputResponse(reason: Option[String] = None) = {
-    val jsObj = Json.obj(
+    var jsObj = Json.obj(
       JsonGeneralLabels.KIND -> JsonErrorLabels.KIND_ERROR,
       JsonGeneralLabels.TYPE -> JsonErrorLabels.TYPE_SERVER_ERROR
     )
 
-    reason match {
-      case Some(r) => Json.stringify(jsObj.+(JsonGeneralLabels.REASON, JsString(r)))
-      case None => Json.stringify(jsObj)
-    }
+    if (reason.isDefined) jsObj = jsObj + (JsonGeneralLabels.REASON, JsString(reason.get))
+
+    Json.stringify(jsObj)
   }
 
   private def getGroupOutcomeResponse(groupId: String, `type`: String, outcome: String, reason: Option[String] = None) = {
 
-    val jsObj = Json.obj(
+    var jsObj = Json.obj(
       JsonGeneralLabels.KIND -> JsonResponseLabels.KIND_RESPONSE,
       JsonGeneralLabels.TYPE -> `type`,
       JsonGeneralLabels.OUTCOME -> outcome,
       JsonGeneralLabels.GROUP_ID -> groupId
     )
 
-    reason match {
-      case Some(r) => Json.stringify(jsObj.+(JsonGeneralLabels.REASON, JsString(r)))
-      case None => Json.stringify(jsObj)
-    }
+    if (reason.isDefined) jsObj = jsObj + (JsonGeneralLabels.REASON, JsString(reason.get))
+
+    Json.stringify(jsObj)
   }
 
   private def getOutcomeResponse(`type`: String, outcome: String, reason: Option[String] = None) = {
 
-    val jsObj = Json.obj(
+    var jsObj = Json.obj(
       JsonGeneralLabels.KIND -> JsonResponseLabels.KIND_RESPONSE,
       JsonGeneralLabels.TYPE -> `type`,
       JsonGeneralLabels.OUTCOME -> outcome
     )
 
-    reason match {
-      case Some(r) => Json.stringify(jsObj.+(JsonGeneralLabels.REASON, JsString(r)))
-      case None => Json.stringify(jsObj)
-    }
+    if (reason.isDefined) jsObj = jsObj + (JsonGeneralLabels.REASON, JsString(reason.get))
+
+    Json.stringify(jsObj)
   }
 
   def getServerErrorResponse = {

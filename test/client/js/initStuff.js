@@ -3,7 +3,7 @@ function initStuff(scope) {
     scope.serverUrl = "localhost:9000"
     //scope.serverUrl = "thawing-escarpment-8488.herokuapp.com"
 
-    scope.openWSUrl = "ws://" + scope.serverUrl + "/openWS"
+    scope.openWSUrl = "ws://" + scope.serverUrl + "/open"
 
     scope.dev1rtype = "content"
     scope.dev2rtype = "content"
@@ -11,7 +11,7 @@ function initStuff(scope) {
     scope.dev4rtype = "content"
 
     scope.dev1criteria = "presence"
-    scope.dev2criteria = "position"
+    scope.dev2criteria = "presence"
     scope.dev3criteria = "presence"
     scope.dev4criteria = "presence"
 
