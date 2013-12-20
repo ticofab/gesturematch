@@ -27,13 +27,13 @@ object ApplicationWS extends Controller {
    */
   def open(): WebSocket[String] = WebSocket.async {
     request => {
-      Logger.info(s"openWS endpoint connection: $request")
+      Logger.info(s"open websocket endpoint connection: $request")
       val handlingActor: ActorRef = Akka.system.actorOf(ContentExchangeActor.props)
       val wsLinkFuture = (handlingActor ? ClientConnected(request.remoteAddress))(Timeouts.maxOldestRequestInterval)
       wsLinkFuture.mapTo[(Iteratee[String, _], Enumerator[String])].recover {
         case e: TimeoutException => {
           // no actor responded.
-          Logger.error(s"open endpoint, no actor responded. Close connection, exception: $e")
+          Logger.error(s"open websocket endpoint, no actor responded. Close connection, exception: $e")
           val out = Enumerator(JsonResponseHelper.getServerErrorResponse).andThen(Enumerator.eof)
           val in: Iteratee[String, Unit] = Iteratee.ignore
           (in, out)
