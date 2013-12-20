@@ -9,9 +9,9 @@ import scala.Some
 
 object JsonResponseHelper {
 
-  def createMatchedResponse(myInfo: Matchee, otherInfos: List[Matchee], groupId: String) = {
+  def createMatchedResponse(myself: Matchee, otherMatchees: List[Matchee], groupId: String) = {
 
-    val objList: List[JsObject] = otherInfos.map(info => Matchee.toJson(info))
+    val objList: List[JsObject] = otherMatchees.map(info => Matchee.toJson(info))
     val jsonArray: JsValue = Json.toJson(objList)
 
     Json.stringify(
@@ -20,7 +20,7 @@ object JsonResponseHelper {
         JsonGeneralLabels.TYPE -> JsonInputLabels.INPUT_TYPE_MATCH,
         JsonGeneralLabels.OUTCOME -> JsonGeneralLabels.OK,
         JsonGeneralLabels.GROUP_ID -> JsString(groupId),
-        JsonResponseLabels.MYSELF_IN_GROUP -> Matchee.toJson(myInfo),
+        JsonResponseLabels.MYSELF_IN_GROUP -> Matchee.toJson(myself),
         JsonResponseLabels.OTHERS_IN_GROUP -> jsonArray
       )
     )
