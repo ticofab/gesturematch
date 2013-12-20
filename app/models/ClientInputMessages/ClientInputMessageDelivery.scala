@@ -12,11 +12,11 @@ case class ClientInputMessageDelivery(groupId: String,
 
 object ClientInputMessageDelivery {
   def fromJson(jsonValue: JsValue): ClientInputMessageDelivery = {
-    // mandatory stuff
+    // group stuff
     val groupId = (jsonValue \ JsonGeneralLabels.GROUP_ID).as[String]
 
     // delivery stuff
-    val recipients = (jsonValue \ JsonInputLabels.INPUT_RECIPIENTS).as[List[Int]]
+    val recipients: List[Int] = (jsonValue \ JsonInputLabels.INPUT_RECIPIENTS).as[List[Int]]
     val payload: String = (jsonValue \ JsonGeneralLabels.PAYLOAD).as[String]
     val deliveryId: String = (jsonValue \ JsonInputLabels.INPUT_DELIVERY_ID).as[String]
 

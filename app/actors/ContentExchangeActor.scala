@@ -221,22 +221,24 @@ class ContentExchangeActor extends Actor {
       s", payload length: ${clientDelivery.payload.length}"
 
     // if not valid, this input will be simply discarded
-    if (groupsAreValid(clientDelivery.groupId) && myself.isDefined) {
-
-      // create a delivery message and deliver it to the right recipients!
-      val delivery: Delivery = new Delivery(clientDelivery.deliveryId, clientDelivery.payload,
-        clientDelivery.chunkNr, clientDelivery.totalChunks)
-      val message = MatcheeDelivers(myself.get, delivery)
+    if (groupsAreValid(clientDelivery.groupId) && myself.isDefined && matchees.isDefined) {
 
       // creates a list of recipients
       val listRecipients: List[ActorRef] = for {
-        matchee <- matchees.getOrElse(Nil)
+        matchee <- matchees.get
         recipient <- clientDelivery.recipients
         if matchee.idInGroup == recipient && recipient != -1
       } yield matchee.handlingActor
 
       // deliver stuff
-      listRecipients.foreach(_ ! message)
+      if (!listRecipients.isEmpty) {
+        // create a delivery message and deliver it to the right recipients!
+        val delivery: Delivery = new Delivery(clientDelivery.deliveryId, clientDelivery.payload,
+          clientDelivery.chunkNr, clientDelivery.totalChunks)
+        val message = MatcheeDelivers(myself.get, delivery)
+
+        listRecipients.foreach(_ ! message)
+      }
 
       // TODO: think further how to send an ack
     }
