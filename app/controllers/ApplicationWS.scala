@@ -23,7 +23,7 @@ object ApplicationWS extends Controller {
    Endpoint to open the WebSocket connection.
    NOTES:
      - I chose not to use WebSocket[JsValue] because this would lead to horrible exceptions
-       in case inputs don't come as a valid JsonString.
+       in case inputs don't come as a valid Json String.
    */
   def open(): WebSocket[String] = WebSocket.async {
     request => {

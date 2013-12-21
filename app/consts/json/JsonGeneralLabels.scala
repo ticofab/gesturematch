@@ -12,5 +12,4 @@ object JsonGeneralLabels {
   // top values
   val OK = "ok"
   val FAIL = "fail"
-  val PARTIAL = "partial"
 }

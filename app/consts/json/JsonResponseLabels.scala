@@ -16,9 +16,7 @@ object JsonResponseLabels {
   val REASON_NOT_PART_OF_THIS_GROUP = "notPartOfThisGroup"
 
   // -- reasons to delivery request
-  val REASON_PAYLOAD_PARTIALLY_DELIVERED = "partiallyDelivered"
   val REASON_PAYLOAD_NOT_DELIVERED = "notDelivered"
-  val REASON_PAYLOAD_DELIVERED = "delivered"
 
   // matched messages labels
   val MYSELF_IN_GROUP = "myselfInGroup"

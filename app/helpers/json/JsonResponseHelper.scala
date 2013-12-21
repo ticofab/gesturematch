@@ -53,18 +53,8 @@ object JsonResponseHelper {
     JsonInputLabels.INPUT_TYPE_LEAVE_GROUP, JsonGeneralLabels.FAIL,
     Some(JsonResponseLabels.REASON_NOT_PART_OF_ANY_GROUP))
 
-  def getPayloadPartiallyDeliveredResponse(groupId: String) = getGroupOutcomeResponse(groupId,
-    JsonInputLabels.INPUT_TYPE_DELIVERY, JsonGeneralLabels.PARTIAL,
-    Some(JsonResponseLabels.REASON_PAYLOAD_PARTIALLY_DELIVERED))
-
   def getPayloadNotDeliveredResponse(groupId: String, reason: Option[String] = None) = getGroupOutcomeResponse(groupId,
     JsonInputLabels.INPUT_TYPE_DELIVERY, JsonGeneralLabels.FAIL, reason)
-
-  def getPayloadDeliveredResponse(groupId: String) = getGroupOutcomeResponse(groupId,
-    JsonInputLabels.INPUT_TYPE_DELIVERY, JsonGeneralLabels.OK)
-
-  def getPayloadEmptyGroupResponse(groupId: String) = getOutcomeResponse(JsonInputLabels.INPUT_TYPE_DELIVERY,
-    JsonGeneralLabels.FAIL, Some(JsonResponseLabels.REASON_NOT_PART_OF_ANY_GROUP))
 
   lazy val notPartOfGroup = "You are not part of group "
 

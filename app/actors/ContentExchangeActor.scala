@@ -240,7 +240,7 @@ class ContentExchangeActor extends Actor {
         listRecipients.foreach(_ ! message)
       }
 
-      // TODO: think further how to send an ack
+      // TODO: think further if and how to send an ack
     }
 
     else {
