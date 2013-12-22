@@ -129,7 +129,7 @@ class PositionMatcherActor extends Actor with StringGenerator {
           // generate a unique groupId
           val groupId = getGroupUniqueString
 
-          Logger.info(getNewRequestLogging(existingRequests.length, s"group formed: $getGroupUniqueString, size: ${group.devicesInGroup}"))
+          Logger.info(getNewRequestLogging(existingRequests.length, s"group formed: $groupId, size: ${group.devicesInGroup}"))
 
           // Send a matching notification to the actors managing the corresponding devices
           group.devicesInGroup match {
