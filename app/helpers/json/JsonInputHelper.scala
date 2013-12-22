@@ -15,7 +15,7 @@ object JsonInputHelper {
     val inputType = (jsonValue \ JsonGeneralLabels.TYPE).asOpt[String]
 
     inputType match {
-      case Some(header) => {
+      case Some(header) =>
         Logger.info(s"$myName, input parsed, type $header.")
 
         header match {
@@ -24,7 +24,6 @@ object JsonInputHelper {
           case JsonInputLabels.INPUT_TYPE_DISCONNECT => ClientInputMessageDisconnect.fromJson(jsonValue)
           case JsonInputLabels.INPUT_TYPE_DELIVERY => ClientInputMessageDelivery.fromJson(jsonValue)
         }
-      }
       case None => ??? // TODO: send bad message or something
     }
   }

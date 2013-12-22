@@ -20,6 +20,8 @@ object JsonInputLabels {
   val MATCH_INPUT_AREAEND = "areaEnd"
   val MATCH_INPUT_DEVICEID = "deviceId"
   val MATCH_INPUT_EQUALITYPARAM = "equalityParam"
+  val MATCH_INPUT_TEMPERATURE = "temperature"
+  val MATCH_INPUT_WIFI_NETWORKS = "wifiNetworks"
 
   // input delivery keys
   val INPUT_RECIPIENTS = "recipients"

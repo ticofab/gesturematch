@@ -1,7 +1,7 @@
 package actors
 
 import akka.actor.{Actor, Props}
-import helpers.{RequestAnalyticsHelper, RequestStorageHelper}
+import helpers.RequestStorageHelper
 import play.api.Logger
 import models.{NewRequest, Matched, Matchee, RequestToMatch}
 import consts.Criteria
@@ -13,43 +13,34 @@ class PresenceMatchingActor extends Actor with StringGenerator {
   lazy val myName = this.getClass.getSimpleName
 
   def receive: Actor.Receive = {
-    case NewRequest(request) => {
+    case NewRequest(request) =>
 
-      def getNewRequestLogging(nrExistingRequests: Int, msg: String = "") = {
-        s"$myName, new ${request.toString}, matching it with $nrExistingRequests existing requests --> $msg"
+      def getNewRequestLogging(possiblyMatchingRequests: Int, msg: String = "") = {
+        s"$myName, new ${request.toString}, matching it with $possiblyMatchingRequests existing requests --> $msg"
       }
 
       // This operation should be fine, as the MatcherActor is designed to be a single one,
       // therefore there won't be two concurrent accesses to the RequestListHelper?
 
-      // obtain valid existing requests
-      val existingRequests = RequestStorageHelper.getValidExistingRequests(Criteria.PRESENCE, request)
-
       // get a list of possibly matching requests
-      val possiblyMatchingRequests: List[RequestToMatch] = for {
-        existingRequest <- existingRequests
-        if RequestAnalyticsHelper.requestsAreCompatible(request, existingRequest)
-      } yield (existingRequest)
-
+      val possiblyMatchingRequests: List[RequestToMatch] = RequestStorageHelper.getValidExistingRequests(Criteria.PRESENCE, request)
 
       // try to find a touch pattern
       val group: List[RequestToMatch] = SwipeMovementHelper.getMatchedPattern(request :: possiblyMatchingRequests)
 
       group match {
-        case Nil => {
+        case Nil =>
           // no match. add the request to the storage
-          Logger.info(getNewRequestLogging(existingRequests.size, "no match found. Adding request to the storage."))
+          Logger.info(getNewRequestLogging(possiblyMatchingRequests.size, "no match found. Adding request to the storage."))
           RequestStorageHelper.storeNewRequest(Criteria.PRESENCE, request)
-        }
 
-        case x :: Nil => {
+        case x :: Nil =>
           // only one element. wrong!
-          Logger.info(getNewRequestLogging(existingRequests.size, "error: group with one element."))
-        }
+          Logger.info(getNewRequestLogging(possiblyMatchingRequests.size, "error: group with one element."))
 
-        case x :: xs => {
+        case x :: xs =>
           // we identified a group!
-          Logger.info(getNewRequestLogging(existingRequests.size, s"group found, size: ${group.size}"))
+          Logger.info(getNewRequestLogging(possiblyMatchingRequests.size, s"group found, size: ${group.size}"))
           RequestStorageHelper.removeRequests(Criteria.PRESENCE, group)
 
           // get unique group id
@@ -61,9 +52,8 @@ class PresenceMatchingActor extends Actor with StringGenerator {
             val (myInfo, othersInfo) = matcheesInfo.partition(m => m.handlingActor == r.handlingActor)
             r.handlingActor ! Matched(myInfo.head, othersInfo, groupId)
           })
-        }
+
       }
-    }
   }
 }
 

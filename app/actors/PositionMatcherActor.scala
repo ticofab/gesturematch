@@ -2,7 +2,7 @@ package actors
 
 import akka.actor.{Props, Actor}
 import models._
-import helpers.{RequestAnalyticsHelper, ScreenPositionHelper, RequestStorageHelper}
+import helpers.{ScreenPositionHelper, RequestStorageHelper}
 import consts.Areas._
 import play.api.Logger
 import consts.Criteria
@@ -83,9 +83,7 @@ class PositionMatcherActor extends Actor with StringGenerator {
     val tmp1: List[(PossibleMatching, RequestToMatch)] = for {
       pg <- possibleMatchingGroups // for all the possible matching groups
       prevReq <- existingRequests // for all the previous requests, considered if
-      reqCompatible = RequestAnalyticsHelper.requestsAreCompatible(request, prevReq) // the old request is compatible and
-      hasCoolMovement = pg.necessaryMovements.contains(prevReq.movement) // its movement is necessary
-      if reqCompatible && hasCoolMovement
+      if pg.necessaryMovements.contains(prevReq.movement) // its movement is necessary
     } yield (pg, prevReq)
 
     // data manipulation to get to a List[MatchingGroup]
@@ -98,7 +96,7 @@ class PositionMatcherActor extends Actor with StringGenerator {
   }
 
   def receive: Actor.Receive = {
-    case NewRequest(request) => {
+    case NewRequest(request) =>
       def getNewRequestLogging(nrExistingRequests: Int, msg: String = "") = {
         s"$myName, new ${request.toString}, matching it with $nrExistingRequests existing requests --> $msg"
       }
@@ -117,14 +115,13 @@ class PositionMatcherActor extends Actor with StringGenerator {
       //   2. have univocally identified a group
       //   3. have identified multiple groups, which is uncertainty.
       matchedGroups match {
-        case Nil => {
+        case Nil =>
           Logger.info(getNewRequestLogging(existingRequests.length, "no group has been found."))
 
           // simply update the requests storage with the new request and the filtered requests
           RequestStorageHelper.storeNewRequest(Criteria.POSITION, request)
-        }
 
-        case group :: Nil => {
+        case group :: Nil =>
 
           // remove the group from the storage
           RequestStorageHelper.removeRequests(Criteria.POSITION, group.requests)
@@ -139,13 +136,10 @@ class PositionMatcherActor extends Actor with StringGenerator {
             case 4 => deliverTo4Group(group.requests, groupId)
             case 2 => deliverTo2Group(group.requests, groupId)
           }
-        }
 
-        case group :: tail => {
+        case group :: tail =>
           Logger.info(getNewRequestLogging(existingRequests.length, s"${matchedGroups.size} groups found. uncertainty."))
-        }
       }
-    }
   }
 }
 

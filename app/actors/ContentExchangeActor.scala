@@ -43,7 +43,7 @@ class ContentExchangeActor extends Actor {
   // Actor messaging
   // *************************************
   def receive: Actor.Receive = {
-    case ClientConnected(remoteAddress) => {
+    case ClientConnected(remoteAddress) =>
       Logger.info(s"$self, client connected: $remoteAddress.")
       remoteIPAddress = Some(remoteAddress)
 
@@ -63,9 +63,8 @@ class ContentExchangeActor extends Actor {
 
       val wsLink = (in, out)
       sender ! wsLink
-    }
 
-    case Matched(matchee, others, groupUniqueId) => {
+    case Matched(matchee, others, groupUniqueId) =>
       // the assumption is that the info we got is valid
       Logger.info(s"$self, matched. Group id: $groupUniqueId, myself: $matchee, others: $others")
       myself = Some(matchee)
@@ -74,9 +73,8 @@ class ContentExchangeActor extends Actor {
       haveBeenMatched = true
       val jsonToSend = JsonResponseHelper.createMatchedResponse(matchee, others, groupUniqueId)
       sendToClient(jsonToSend)
-    }
 
-    case MatcheeLeftGroup(matchee, reason) => {
+    case MatcheeLeftGroup(matchee, reason) =>
       if (groupId.isDefined) {
         Logger.info(s"$self, matchee left group: ${groupId.get}, matchee: $matchee, reason: $reason")
         val message = JsonMessageHelper.createMatcheeLeftGroupMessage(groupId.get, matchee.idInGroup)
@@ -87,9 +85,8 @@ class ContentExchangeActor extends Actor {
       } else {
         Logger.error(s"$self, matchee left group, but my groupId is empty. Matchee: $matchee, reason: $reason")
       }
-    }
 
-    case MatcheeDelivers(matchee, delivery) => {
+    case MatcheeDelivers(matchee, delivery) =>
       if (groupId.isDefined) {
         Logger.info(s"$self, matchee delivered payload. Matchee: $matchee, payload length: ${delivery.payload.length}")
         val payloadMsg = JsonMessageHelper.createMatcheeSendsPayloadMessage(groupId.get, matchee.idInGroup, delivery)
@@ -97,7 +94,6 @@ class ContentExchangeActor extends Actor {
       } else {
         Logger.error(s"$self, matchee delivered payload. Matchee: $matchee, but I'm not part of any group!")
       }
-    }
   }
 
   // *************************************
@@ -109,7 +105,7 @@ class ContentExchangeActor extends Actor {
     // try to parse it to Json
     Try(JsonInputHelper.parseInput(input)) match {
 
-      case Success(parsedMessage) => {
+      case Success(parsedMessage) =>
 
         // successfully parsed
         parsedMessage match {
@@ -118,14 +114,12 @@ class ContentExchangeActor extends Actor {
           case leaveGroup: ClientInputMessageLeaveGroup => onLeaveGroupInput(leaveGroup)
           case delivery: ClientInputMessageDelivery => onDeliveryInput(delivery)
         }
-      }
 
-      case Failure(e) => {
+      case Failure(e) =>
         // TODO: more descriptive error
         lazy val invalidJson = "Error parsing the JSON input."
         Logger.info(s"$self, couldn't parse input: $e}")
         sendToClient(JsonResponseHelper.getInvalidInputResponse(Some(invalidJson)))
-      }
     }
   }
 
@@ -139,13 +133,12 @@ class ContentExchangeActor extends Actor {
 
     testValidity match {
 
-      case Failure(e) => {
+      case Failure(e) =>
         // request issue
         Logger.info(s"$self, match request invalid, exception: $e")
         sendToClient(JsonResponseHelper.getInvalidMatchRequestResponse)
-      }
 
-      case Success(isValid) => {
+      case Success(isValid) =>
         Logger.info(s"$self, match request valid.")
 
         // add request to the matcher queue
@@ -168,7 +161,6 @@ class ContentExchangeActor extends Actor {
           case Criteria.POSITION => futureMatched(ApplicationWS.positionMatchingActor)
           case Criteria.PRESENCE => futureMatched(ApplicationWS.touchMatchingActor)
         }
-      }
     }
   }
 
@@ -192,7 +184,7 @@ class ContentExchangeActor extends Actor {
     if (groupsAreValid(leaveGroupMessage.groupId)) {
       // send messages to the other ones in the connection and simply forget about them
       matchees match {
-        case Some(matcheesList) => {
+        case Some(matcheesList) =>
           Logger.info(getLeaveGroupLog("notifying other members"))
 
           if (myself.isDefined) {
@@ -203,11 +195,9 @@ class ContentExchangeActor extends Actor {
           }
 
           leaveGroup()
-        }
-        case None => {
+        case None =>
           Logger.error(getLeaveGroupLog("matchees is empty"))
           sendToClient(JsonResponseHelper.getNotPartOfGroupResponse(leaveGroupMessage.groupId))
-        }
       }
     } else {
       Logger.info(getLeaveGroupLog("client is not part of group"))
@@ -269,7 +259,7 @@ class ContentExchangeActor extends Actor {
   def sendMessageToMatchees(message: MatcheeMessage) = {
     matchees match {
       case Some(matcheeList) => matcheeList.foreach(matchee => matchee.handlingActor ! message)
-      case None => {} // do nothing
+      case None => // do nothing
     }
   }
 }

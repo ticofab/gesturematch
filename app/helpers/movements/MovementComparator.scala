@@ -9,110 +9,94 @@ object MovementComparator {
   */
   def compareMovement(mov1: SwipeMovement, mov2: SwipeMovement): Int = {
     mov1 match {
-      case LEFTINNER => {
+      case LEFTINNER =>
         mov2 match {
           case INNERRIGHT => 2
           case RIGHTBOTTOM | TOPRIGHT | BOTTOMRIGHT | RIGHTTOP | INNERLEFT => 4
           case _ => 0
         }
-      }
-      case INNERRIGHT => {
+      case INNERRIGHT =>
         mov2 match {
           case LEFTINNER => 2
           case LEFTBOTTOM | TOPLEFT | LEFTTOP | BOTTOMLEFT | RIGHTINNER => 4
           case _ => 0
         }
-      }
-      case RIGHTINNER => {
+      case RIGHTINNER =>
         mov2 match {
           case INNERLEFT => 2
           case LEFTBOTTOM | TOPLEFT | BOTTOMLEFT | LEFTTOP | INNERRIGHT => 4
           case _ => 0
         }
-      }
-      case INNERLEFT => {
+      case INNERLEFT =>
         mov2 match {
           case RIGHTINNER => 2
           case RIGHTBOTTOM | TOPRIGHT | RIGHTTOP | BOTTOMRIGHT | LEFTINNER => 4
           case _ => 0
         }
-      }
-      case INNERBOTTOM => {
+      case INNERBOTTOM =>
         mov2 match {
           case TOPINNER => 2
           case TOPRIGHT | LEFTTOP | TOPLEFT | RIGHTTOP | BOTTOMINNER => 4
           case _ => 0
         }
-      }
-      case TOPINNER => {
+      case TOPINNER =>
         mov2 match {
           case INNERBOTTOM => 2
           case LEFTBOTTOM | BOTTOMRIGHT | RIGHTBOTTOM | BOTTOMLEFT | INNERTOP => 4
           case _ => 0
         }
-      }
-      case BOTTOMINNER => {
+      case BOTTOMINNER =>
         mov2 match {
           case INNERTOP => 2
           case RIGHTTOP | TOPLEFT | LEFTTOP | TOPRIGHT | INNERBOTTOM => 4
           case _ => 0
         }
-      }
-      case INNERTOP => {
+      case INNERTOP =>
         mov2 match {
           case BOTTOMINNER => 2
           case BOTTOMRIGHT | LEFTBOTTOM | BOTTOMLEFT | RIGHTBOTTOM | TOPINNER => 4
           case _ => 0
         }
-      }
-      case TOPLEFT => {
+      case TOPLEFT =>
         mov2 match {
           case INNERRIGHT | LEFTBOTTOM | RIGHTINNER | INNERBOTTOM | RIGHTTOP | BOTTOMINNER => 4
           case _ => 0
         }
-      }
-      case LEFTBOTTOM => {
+      case LEFTBOTTOM =>
         mov2 match {
           case INNERRIGHT | TOPLEFT | RIGHTINNER | BOTTOMRIGHT | INNERTOP | TOPINNER => 4
           case _ => 0
         }
-      }
-      case BOTTOMRIGHT => {
+      case BOTTOMRIGHT =>
         mov2 match {
           case INNERTOP | LEFTINNER | TOPINNER | RIGHTTOP | LEFTINNER | INNERLEFT => 4
           case _ => 0
         }
-      }
-      case RIGHTBOTTOM => {
+      case RIGHTBOTTOM =>
         mov2 match {
           case INNERLEFT | TOPRIGHT | LEFTINNER | TOPINNER | INNERTOP | BOTTOMLEFT => 4
           case _ => 0
         }
-      }
-      case TOPRIGHT => {
+      case TOPRIGHT =>
         mov2 match {
           case INNERLEFT | RIGHTBOTTOM | LEFTINNER | INNERBOTTOM | LEFTTOP | BOTTOMINNER => 4
           case _ => 0
         }
-      }
-      case LEFTTOP => {
+      case LEFTTOP =>
         mov2 match {
           case INNERBOTTOM | BOTTOMINNER | TOPRIGHT | INNERRIGHT | BOTTOMLEFT | RIGHTINNER => 4
           case _ => 0
         }
-      }
-      case BOTTOMLEFT => {
+      case BOTTOMLEFT =>
         mov2 match {
           case INNERTOP | RIGHTBOTTOM | TOPINNER | RIGHTINNER | INNERRIGHT | LEFTTOP => 4
           case _ => 0
         }
-      }
-      case RIGHTTOP => {
+      case RIGHTTOP =>
         mov2 match {
           case INNERLEFT | LEFTINNER | BOTTOMRIGHT | TOPLEFT | INNERBOTTOM | BOTTOMINNER => 4
           case _ => 0
         }
-      }
       case _ => 0
     }
   }

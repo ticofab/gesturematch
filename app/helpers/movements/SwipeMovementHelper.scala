@@ -67,7 +67,7 @@ object SwipeMovementHelper {
    */
   def swipesToMovement(swipeStart: Areas, swipeEnd: Areas): SwipeMovement = {
     val areasMix = swipeStart.toString + swipeEnd.toString
-    Try(SwipeMovements.withName(areasMix)) getOrElse(UNKNOWN)
+    Try(SwipeMovements.withName(areasMix)) getOrElse UNKNOWN
   }
 
   /**
@@ -95,7 +95,7 @@ object SwipeMovementHelper {
         coolHead && coolEnd
       }
 
-      res.filter(validCombFilter(_))
+      res.filter(validCombFilter)
     }
 
     def getCombinations(tileHistory: List[RequestToMatch], availableNewTiles: List[RequestToMatch]): List[(List[RequestToMatch], List[RequestToMatch])] = {
@@ -109,17 +109,16 @@ object SwipeMovementHelper {
 
       availableNewTiles match {
         case Nil => List()
-        case x :: xs => {
+        case x :: xs =>
           val expanded = expand
 
-          def addChunks = {
+          def addChunks() = {
             if (expanded == Nil) Nil
             else (for (xs <- expanded) yield getCombinations(xs._1, xs._2)).flatten
           }
 
           if (expanded == Nil) Nil
           else expanded ++ addChunks
-        }
       }
     }
 
@@ -139,7 +138,7 @@ object SwipeMovementHelper {
     head match {
 
       // good, only one InnerX
-      case x :: Nil => {
+      case x :: Nil =>
         // these intermediate values are here for clarity
         val combs = getCombinations(head, tail)
         val skimmedResults = combs.map(x => x._1)
@@ -147,7 +146,6 @@ object SwipeMovementHelper {
         val longestValidResult = getLongestComb(valid)
         val reversed = longestValidResult.reverse
         reversed
-      }
 
       // error, not a single InnerX request
       case Nil => List()

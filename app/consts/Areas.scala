@@ -41,7 +41,7 @@ object Areas extends Enumeration {
   val INNER = Value("inner")
   val INVALID = Value("invalid")
 
-  def getAreaFromString(area: String): Areas = Try(Areas.withName(area)) getOrElse(INVALID)
+  def getAreaFromString(area: String): Areas = Try(Areas.withName(area)) getOrElse INVALID
 
   def getValidOnes = this.values.filter(_ != INVALID)
 }

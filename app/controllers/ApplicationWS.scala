@@ -31,13 +31,12 @@ object ApplicationWS extends Controller {
       val handlingActor: ActorRef = Akka.system.actorOf(ContentExchangeActor.props)
       val wsLinkFuture = (handlingActor ? ClientConnected(request.remoteAddress))(Timeouts.maxOldestRequestInterval)
       wsLinkFuture.mapTo[(Iteratee[String, _], Enumerator[String])].recover {
-        case e: TimeoutException => {
+        case e: TimeoutException =>
           // no actor responded.
           Logger.error(s"open websocket endpoint, no actor responded. Close connection, exception: $e")
           val out = Enumerator(JsonResponseHelper.getServerErrorResponse).andThen(Enumerator.eof)
           val in: Iteratee[String, Unit] = Iteratee.ignore
           (in, out)
-        }
       }
     }
   }

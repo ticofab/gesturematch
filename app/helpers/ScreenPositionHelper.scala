@@ -15,7 +15,7 @@ object ScreenPositionHelper {
    */
   def getPosition(myMovement: SwipeMovement, nrOfScreensInConnection: Int): ScreenPosition = {
     nrOfScreensInConnection match {
-      case 2 => {
+      case 2 =>
         myMovement match {
           case INNERRIGHT | RIGHTINNER => Left
           case LEFTINNER | INNERLEFT => Right
@@ -23,8 +23,7 @@ object ScreenPositionHelper {
           case BOTTOMINNER | INNERBOTTOM => Top
           case _ => Unknown
         }
-      }
-      case 4 => {
+      case 4 =>
         myMovement match {
           // watch out: not including undetermined situations
           case LEFTBOTTOM | BOTTOMLEFT => TopRight
@@ -33,7 +32,6 @@ object ScreenPositionHelper {
           case TOPRIGHT | RIGHTTOP => BottomLeft
           case _ => Undetermined
         }
-      }
       case _ => Unknown
     }
   }
@@ -60,34 +58,30 @@ object ScreenPositionHelper {
    */
   def getCorrespondingFinalPosition(firstMovement: SwipeMovement, firstPosition: ScreenPosition) = {
     firstMovement match {
-      case INNERRIGHT => {
+      case INNERRIGHT =>
         firstPosition match {
           case BottomLeft => TopLeft
           case TopLeft => BottomLeft
           case _ => Unknown
         }
-      }
-      case INNERBOTTOM => {
+      case INNERBOTTOM =>
         firstPosition match {
           case TopLeft => TopRight
           case TopRight => TopLeft
           case _ => Unknown
         }
-      }
-      case INNERTOP => {
+      case INNERTOP =>
         firstPosition match {
           case BottomLeft => BottomRight
           case BottomRight => BottomLeft
           case _ => Unknown
         }
-      }
-      case INNERLEFT => {
+      case INNERLEFT =>
         firstPosition match {
           case BottomRight => TopRight
           case TopRight => BottomRight
           case _ => Unknown
         }
-      }
     }
   }
 

@@ -13,7 +13,7 @@ class RequestToMatch(val apiKey: String,
                      val areaStart: Areas,
                      val areaEnd: Areas,
                      val movement: SwipeMovement,
-                     val equalityParam: String,
+                     val equalityParam: Option[String],
                      val handlingActor: ActorRef) {
   override def toString: String = s"Request: $apiKey $appId $deviceId $latitude $longitude $timestamp $areaStart $areaEnd $movement $equalityParam $handlingActor"
 }

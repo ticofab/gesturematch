@@ -1,3 +1,3 @@
 package models
 
-case class MatchingGroup(val devicesInGroup: Int, val requests: List[RequestToMatch])
+case class MatchingGroup(devicesInGroup: Int, requests: List[RequestToMatch])
