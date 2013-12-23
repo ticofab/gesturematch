@@ -8,7 +8,7 @@ import traits.StringGenerator
 import helpers.requests.RequestStorageHelper
 import helpers.presence.PatternHelper
 
-class PresenceMatchingActor extends Actor with StringGenerator {
+class PresenceMatcherActor extends Actor with StringGenerator {
 
   lazy val myName = this.getClass.getSimpleName
 
@@ -57,6 +57,6 @@ class PresenceMatchingActor extends Actor with StringGenerator {
   }
 }
 
-object PresenceMatchingActor {
-  val props = Props(classOf[PresenceMatchingActor])
+object PresenceMatcherActor {
+  val props = Props(classOf[PresenceMatcherActor])
 }

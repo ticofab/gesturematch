@@ -10,9 +10,9 @@ function initStuff(scope) {
     scope.dev3rtype = "content"
     scope.dev4rtype = "content"
 
-    scope.dev1criteria = "presence"
+    scope.dev1criteria = "pinch"
     scope.dev2criteria = "presence"
-    scope.dev3criteria = "presence"
+    scope.dev3criteria = "pinch"
     scope.dev4criteria = "presence"
 
     scope.dev1apikey = "contact-api-key"
@@ -37,12 +37,12 @@ function initStuff(scope) {
 
     scope.dev1ss = "inner"
     scope.dev2ss = "left"
-    scope.dev3ss = "left"
+    scope.dev3ss = "inner"
     scope.dev4ss = "left"
 
     scope.dev1se = "right"
     scope.dev2se = "inner"
-    scope.dev3se = "inner"
+    scope.dev3se = "left"
     scope.dev4se = "inner"
 
     scope.dev1pl = "[{\"type\":\"NAME\",\"content\":{\"value\":\"Fabio1\"}}]"

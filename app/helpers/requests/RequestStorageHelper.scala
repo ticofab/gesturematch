@@ -2,7 +2,7 @@ package helpers.requests
 
 import models.RequestToMatch
 import consts.{Criteria, Timeouts}
-import storage.{RequestStorage, TouchRequestStorage, PositionRequestStorage}
+import storage.{PinchRequestStorage, RequestStorage, PresenceRequestStorage, PositionRequestStorage}
 import play.api.Logger
 import consts.Criteria.Criteria
 
@@ -42,7 +42,8 @@ object RequestStorageHelper {
   private def getCorrespondingStorage(criteria: Criteria): RequestStorage = {
     criteria match {
       case Criteria.POSITION => PositionRequestStorage
-      case Criteria.PRESENCE => TouchRequestStorage
+      case Criteria.PRESENCE => PresenceRequestStorage
+      case Criteria.PINCH => PinchRequestStorage
     }
   }
 

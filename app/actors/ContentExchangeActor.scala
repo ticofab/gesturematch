@@ -37,7 +37,7 @@ class ContentExchangeActor extends Actor {
   //  groupId or myInfo, as if a connection is established and immediately broken
   //  before the matching timeout expires, then we would still send the timeout message
   //  to the client. Maybe I can find a better way.
-  var haveBeenMatched: Boolean = false
+  var hasBeenMatched: Boolean = false
 
   // *************************************
   // Actor messaging
@@ -70,7 +70,7 @@ class ContentExchangeActor extends Actor {
       myself = Some(matchee)
       matchees = Some(others)
       groupId = Some(groupUniqueId)
-      haveBeenMatched = true
+      hasBeenMatched = true
       val jsonToSend = JsonResponseHelper.createMatchedResponse(matchee, others, groupUniqueId)
       sendToClient(jsonToSend)
 
@@ -152,7 +152,7 @@ class ContentExchangeActor extends Actor {
           val matchedFuture = (matcher ? NewRequest(requestData))(Timeouts.maxOldestRequestInterval)
           matchedFuture recover {
             // basically this timeout will always trigger, but maybe we've been matched in the meantime.
-            case t: TimeoutException => if (!haveBeenMatched) sendToClient(JsonResponseHelper.getTimeoutResponse)
+            case t: TimeoutException => if (!hasBeenMatched) sendToClient(JsonResponseHelper.getTimeoutResponse)
           }
         }
 
@@ -160,6 +160,9 @@ class ContentExchangeActor extends Actor {
           // we only get here if the criteria is valid
           case Criteria.POSITION => futureMatched(ApplicationWS.positionMatchingActor)
           case Criteria.PRESENCE => futureMatched(ApplicationWS.touchMatchingActor)
+          case Criteria.PINCH => futureMatched(ApplicationWS.pinchMatchingActor)
+
+          case _ => Logger.error(s"$self, invalid match criteria!")
         }
     }
   }
@@ -253,7 +256,7 @@ class ContentExchangeActor extends Actor {
     matchees = None
     myself = None
     groupId = None
-    haveBeenMatched = false
+    hasBeenMatched = false
   }
 
   def sendMessageToMatchees(message: MatcheeMessage) = {

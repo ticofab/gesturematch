@@ -7,6 +7,7 @@ object Criteria extends Enumeration {
   val INVALID = Value("invalid")
   val POSITION = Value("position")
   val PRESENCE = Value("presence")
+  val PINCH = Value("pinch")
 
   def getCriteriaFromString(criteria: String) = Try(Criteria.withName(criteria)) getOrElse INVALID
 
