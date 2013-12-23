@@ -5,7 +5,6 @@ import akka.pattern.ask
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-import helpers.RequestAnalyticsHelper
 import models._
 import scala.util.Try
 import models.ClientInputMessages._
@@ -25,6 +24,7 @@ import models.Matched
 import models.MatcheeLeftGroup
 import scala.util.Success
 import models.MatcheeDelivers
+import helpers.requests.RequestAnalyticsHelper
 
 class ContentExchangeActor extends Actor {
   var remoteIPAddress: Option[String] = None

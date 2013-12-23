@@ -1,4 +1,4 @@
-package helpers
+package helpers.requests
 
 import consts.{Areas, Criteria}
 import consts.Criteria.Criteria

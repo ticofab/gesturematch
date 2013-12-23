@@ -2,12 +2,12 @@ package actors
 
 import akka.actor.{Props, Actor}
 import models._
-import helpers.{ScreenPositionHelper, RequestStorageHelper}
 import consts.Areas._
 import play.api.Logger
 import consts.Criteria
-import helpers.movements.SwipeMovementHelper
 import traits.StringGenerator
+import helpers.position.{PossibleMatchingHelper, ScreenPositionHelper}
+import helpers.requests.RequestStorageHelper
 
 class PositionMatcherActor extends Actor with StringGenerator {
 
@@ -77,7 +77,7 @@ class PositionMatcherActor extends Actor with StringGenerator {
   private def getMatchingGroup(request: RequestToMatch, existingRequests: List[RequestToMatch]): List[MatchingGroup] = {
 
     // get all possible matching groups for the given request
-    val possibleMatchingGroups: List[PossibleMatching] = SwipeMovementHelper.getPossibleMatching(request.movement)
+    val possibleMatchingGroups: List[PossibleMatching] = PossibleMatchingHelper.getPossibleMatching(request.movement)
 
     // get all the existing requests that could be part of one of the possible groups
     val tmp1: List[(PossibleMatching, RequestToMatch)] = for {

@@ -1,4 +1,4 @@
-package helpers
+package helpers.position
 
 import consts.ScreenPositions._
 import consts.SwipeMovements._

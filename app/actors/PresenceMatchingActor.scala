@@ -1,12 +1,12 @@
 package actors
 
 import akka.actor.{Actor, Props}
-import helpers.RequestStorageHelper
 import play.api.Logger
 import models.{NewRequest, Matched, Matchee, RequestToMatch}
 import consts.Criteria
-import helpers.movements.SwipeMovementHelper
 import traits.StringGenerator
+import helpers.requests.RequestStorageHelper
+import helpers.presence.PatternHelper
 
 class PresenceMatchingActor extends Actor with StringGenerator {
 
@@ -26,7 +26,7 @@ class PresenceMatchingActor extends Actor with StringGenerator {
       val possiblyMatchingRequests: List[RequestToMatch] = RequestStorageHelper.getValidExistingRequests(Criteria.PRESENCE, request)
 
       // try to find a touch pattern
-      val group: List[RequestToMatch] = SwipeMovementHelper.getMatchedPattern(request :: possiblyMatchingRequests)
+      val group: List[RequestToMatch] = PatternHelper.getMatchedPattern(request :: possiblyMatchingRequests)
 
       group match {
         case Nil =>
