@@ -2,9 +2,9 @@ package storage
 
 import models.RequestToMatch
 
-object PinchRequestStorage extends RequestStorage {
+object AimRequestStorage extends RequestStorage {
 
-  // This could become a mem cache DB or some other abstraction
+  // This could become a memcache DB or some other abstraction
   private var requests: List[RequestToMatch] = List()
 
   // interfaces with the storage

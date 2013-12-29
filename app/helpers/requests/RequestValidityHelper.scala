@@ -6,9 +6,9 @@ import consts.Areas.Areas
 
 case class InvalidRequestException(message: String) extends Exception(message)
 
-object RequestAnalyticsHelper {
+object RequestValidityHelper {
 
-  def requestIsValid(criteria: Criteria, areaStart: Areas, areaEnd: Areas) = {
+  def requestIsValid(criteria: Criteria, areaStart: Areas, areaEnd: Areas, swipeOrientation: Option[Double]) = {
     // TODO:
     //    check more things about parameters
     //    - api key must be valid
@@ -28,6 +28,9 @@ object RequestAnalyticsHelper {
 
     if (areaStart == areaEnd)
       throw InvalidRequestException("Invalid request: starting and ending areas are equal.")
+
+    if (criteria == Criteria.AIM && swipeOrientation.isEmpty)
+      throw InvalidRequestException("Invalid request: when using AIM criteria, the swipeOrientation must be provided")
 
     true
   }

@@ -26,13 +26,14 @@ object JsonResponseHelper {
     )
   }
 
-  def getInvalidMatchRequestResponse = {
+  def getInvalidMatchRequestResponse(msg: String) = {
     Json.stringify(
       Json.obj(
         JsonGeneralLabels.KIND -> JsonResponseLabels.KIND_RESPONSE,
         JsonGeneralLabels.TYPE -> JsonInputLabels.INPUT_TYPE_MATCH,
         JsonGeneralLabels.OUTCOME -> JsonGeneralLabels.FAIL,
-        JsonGeneralLabels.REASON -> JsonResponseLabels.REASON_INVALID_REQUEST
+        JsonGeneralLabels.REASON -> JsonResponseLabels.REASON_INVALID_REQUEST,
+        JsonGeneralLabels.DETAILS -> msg
       )
     )
   }
@@ -68,7 +69,7 @@ object JsonResponseHelper {
       JsonGeneralLabels.TYPE -> JsonErrorLabels.TYPE_SERVER_ERROR
     )
 
-    if (reason.isDefined) jsObj = jsObj + (JsonGeneralLabels.REASON, JsString(reason.get))
+    if (reason.isDefined) jsObj = jsObj +(JsonGeneralLabels.REASON, JsString(reason.get))
 
     Json.stringify(jsObj)
   }
@@ -82,7 +83,7 @@ object JsonResponseHelper {
       JsonGeneralLabels.GROUP_ID -> groupId
     )
 
-    if (reason.isDefined) jsObj = jsObj + (JsonGeneralLabels.REASON, JsString(reason.get))
+    if (reason.isDefined) jsObj = jsObj +(JsonGeneralLabels.REASON, JsString(reason.get))
 
     Json.stringify(jsObj)
   }
@@ -95,7 +96,7 @@ object JsonResponseHelper {
       JsonGeneralLabels.OUTCOME -> outcome
     )
 
-    if (reason.isDefined) jsObj = jsObj + (JsonGeneralLabels.REASON, JsString(reason.get))
+    if (reason.isDefined) jsObj = jsObj +(JsonGeneralLabels.REASON, JsString(reason.get))
 
     Json.stringify(jsObj)
   }

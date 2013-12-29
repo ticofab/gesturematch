@@ -6,6 +6,7 @@ object JsonGeneralLabels {
   val TYPE = "type"
   val OUTCOME = "outcome"
   val REASON = "reason"
+  val DETAILS = "details"
   val PAYLOAD = "payload"
   val GROUP_ID = "groupId"
 

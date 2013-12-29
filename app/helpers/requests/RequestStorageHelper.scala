@@ -2,7 +2,7 @@ package helpers.requests
 
 import models.RequestToMatch
 import consts.{Criteria, Timeouts}
-import storage.{PinchRequestStorage, RequestStorage, PresenceRequestStorage, PositionRequestStorage}
+import storage._
 import play.api.Logger
 import consts.Criteria.Criteria
 
@@ -19,6 +19,17 @@ object RequestStorageHelper {
   private def sameDeviceRequestFilter(rNew: RequestToMatch, rOld: RequestToMatch): Boolean =
     !(rNew.deviceId == rOld.deviceId && rNew.timestamp <= rOld.timestamp + Timeouts.maxOldestRequestIntervalMillis)
 
+  /**
+   * This method provides the mandatory checks between two requests. Only put here the checks that are mandatory
+   * for each request to be matched.
+   *
+   * @param r1
+   * The first of the two requests to possibly match.
+   * @param r2
+   * The second of the two requests to possibly match.
+   * @return
+   * True or false whether the two requests might match.
+   */
   private def compatibilityFilter(r1: RequestToMatch, r2: RequestToMatch): Boolean = {
     // check on latitude
     val latDiff: Double = scala.math.pow(r1.latitude - r2.latitude, 2)
@@ -44,6 +55,7 @@ object RequestStorageHelper {
       case Criteria.POSITION => PositionRequestStorage
       case Criteria.PRESENCE => PresenceRequestStorage
       case Criteria.PINCH => PinchRequestStorage
+      case Criteria.AIM => AimRequestStorage
     }
   }
 
@@ -53,10 +65,8 @@ object RequestStorageHelper {
     storage.skimRequests(oldRequestsFilter)
     storage.skimRequests(sameDeviceRequestFilter, r)
 
-    // TODO: for different criteria, I could allow different timeouts or apply different filters
-    // get the requests and apply subsequent filters as needed
-    val requests = storage.getRequests
-    requests.filter(compatibilityFilter(_, r))
+    // get the requests and apply mandatory filters
+    storage.getRequests.filter(compatibilityFilter(_, r))
   }
 
   def storeNewRequest(criteria: Criteria, newRequest: RequestToMatch) = {

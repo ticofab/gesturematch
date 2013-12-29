@@ -24,7 +24,7 @@ import models.Matched
 import models.MatcheeLeftGroup
 import scala.util.Success
 import models.MatcheeDelivers
-import helpers.requests.RequestAnalyticsHelper
+import helpers.requests.RequestValidityHelper
 
 class ContentExchangeActor extends Actor {
   var remoteIPAddress: Option[String] = None
@@ -33,7 +33,7 @@ class ContentExchangeActor extends Actor {
   var myself: Option[Matchee] = None
   var groupId: Option[String] = None
 
-  // TODO: don't like this trick, not one bit. But I can't rely on the values of
+  // I don't like this trick, not one bit. But I can't rely on the values of
   //  groupId or myInfo, as if a connection is established and immediately broken
   //  before the matching timeout expires, then we would still send the timeout message
   //  to the client. Maybe I can find a better way.
@@ -129,14 +129,15 @@ class ContentExchangeActor extends Actor {
     val areaEndValue = Areas.getAreaFromString(matchRequest.areaEnd)
     val criteriaValue = Criteria.getCriteriaFromString(matchRequest.criteria)
 
-    val testValidity = Try(RequestAnalyticsHelper.requestIsValid(criteriaValue, areaStartValue, areaEndValue))
+    val testValidity = Try(RequestValidityHelper.requestIsValid(criteriaValue, areaStartValue,
+      areaEndValue, matchRequest.swipeOrientation))
 
     testValidity match {
 
       case Failure(e) =>
         // request issue
         Logger.info(s"$self, match request invalid, exception: $e")
-        sendToClient(JsonResponseHelper.getInvalidMatchRequestResponse)
+        sendToClient(JsonResponseHelper.getInvalidMatchRequestResponse(e.getMessage))
 
       case Success(isValid) =>
         Logger.info(s"$self, match request valid.")
@@ -146,7 +147,7 @@ class ContentExchangeActor extends Actor {
         val movement = SwipeMovementHelper.swipesToMovement(areaStartValue, areaEndValue)
         val requestData = new RequestToMatch(matchRequest.apiKey, matchRequest.appId, matchRequest.deviceId,
           matchRequest.latitude, matchRequest.longitude, timestamp, areaStartValue, areaEndValue, movement,
-          matchRequest.equalityParam, self)
+          matchRequest.equalityParam, matchRequest.orientation, matchRequest.swipeOrientation, self)
 
         def futureMatched(matcher: ActorRef) = {
           val matchedFuture = (matcher ? NewRequest(requestData))(Timeouts.maxOldestRequestInterval)
