@@ -17,5 +17,9 @@ class RequestToMatch(val apiKey: String,
                      val orientation: Option[Double],
                      val swipeOrientation: Option[Double],
                      val handlingActor: ActorRef) {
-  override def toString: String = s"Request: $apiKey $appId $deviceId $latitude $longitude $timestamp $areaStart $areaEnd $movement $equalityParam $handlingActor"
+  override def toString: String = s"Request: apiKey $apiKey, appId $appId, " +
+    s"deviceId $deviceId, latitude $latitude, longitude $longitude, " +
+    s"timestamp $timestamp, areaStart $areaStart, areaEnd $areaEnd, " +
+    s"movement $movement, equalityParam $equalityParam, orientation $orientation, " +
+    s"swipeOrientation $swipeOrientation, handlingActor $handlingActor"
 }
