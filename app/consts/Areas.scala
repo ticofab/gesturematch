@@ -40,6 +40,7 @@ object Areas extends Enumeration {
   val RIGHT = Value("right")
   val INNER = Value("inner")
   val INVALID = Value("invalid")
+  val OUTER = Value("outer")
 
   def getAreaFromString(area: String): Areas = Try(Areas.withName(area)) getOrElse INVALID
 

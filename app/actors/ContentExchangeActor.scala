@@ -162,6 +162,7 @@ class ContentExchangeActor extends Actor {
           case Criteria.POSITION => futureMatched(ApplicationWS.positionMatchingActor)
           case Criteria.PRESENCE => futureMatched(ApplicationWS.touchMatchingActor)
           case Criteria.PINCH => futureMatched(ApplicationWS.pinchMatchingActor)
+          case Criteria.AIM => futureMatched(ApplicationWS.aimMatchingActor)
 
           case _ => Logger.error(s"$self, invalid match criteria!")
         }

@@ -4,21 +4,22 @@ import play.api.mvc._
 import play.api.libs.iteratee.{Iteratee, Enumerator}
 import akka.actor.ActorRef
 import akka.pattern.ask
-import actors.{PinchMatcherActor, PresenceMatcherActor, PositionMatcherActor, ContentExchangeActor}
+import actors._
 import play.api.libs.concurrent.Akka
 import play.api.Play.current
-import models.ClientConnected
 import play.api.Logger
 import consts.Timeouts
 import java.util.concurrent.TimeoutException
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import helpers.json.JsonResponseHelper
+import models.ClientConnected
 
 object ApplicationWS extends Controller {
   Logger.info("******* Server starting. Creating ActorSystem. ********")
   val positionMatchingActor = Akka.system.actorOf(PositionMatcherActor.props)
   val touchMatchingActor = Akka.system.actorOf(PresenceMatcherActor.props)
   val pinchMatchingActor = Akka.system.actorOf(PinchMatcherActor.props)
+  val aimMatchingActor = Akka.system.actorOf(AimMatcherActor.props)
 
   /*
    Endpoint to open the WebSocket connection.
