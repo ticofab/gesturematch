@@ -4,6 +4,7 @@
 
 # Http
 GET     /             controllers.ApplicationHTTP.alive
+GET     /db           controllers.ApplicationHTTP.dbTest
 
 # Websocket
 GET     /open         controllers.ApplicationWS.open
