@@ -15,10 +15,10 @@ function initStuff(scope) {
     scope.dev3criteria = "pinch"
     scope.dev4criteria = "presence"
 
-    scope.dev1apikey = "contact-api-key"
-    scope.dev2apikey = "swipeshare-api-key"
-    scope.dev3apikey = "contact-api-key"
-    scope.dev4apikey = "contact-api-key"
+    scope.dev1apikey = "abc"
+    scope.dev2apikey = "abc"
+    scope.dev3apikey = "abc"
+    scope.dev4apikey = "def"
 
     scope.dev1devid = "idjs1"
     scope.dev2devid = "idjs2"
@@ -56,9 +56,9 @@ function initStuff(scope) {
     scope.dev4ep = "uguale"
 
     scope.dev1appId = "123-ABC"
-    scope.dev2appId = "123-ABC"
-    scope.dev3appId = "123-ABC"
-    scope.dev4appId = "123-ABC"
+    scope.dev2appId = "swipeaim-example-ios"
+    scope.dev3appId = "swipeaim-example-android"
+    scope.dev4appId = "swipeaim-example-android"
 
     scope.dev1recip = "1"
     scope.dev2recip = "0"

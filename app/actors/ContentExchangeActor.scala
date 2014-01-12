@@ -125,12 +125,14 @@ class ContentExchangeActor extends Actor {
 
   def onMatchInput(matchRequest: ClientInputMessageMatch) = {
 
-    val areaStartValue = Areas.getAreaFromString(matchRequest.areaStart)
-    val areaEndValue = Areas.getAreaFromString(matchRequest.areaEnd)
-    val criteriaValue = Criteria.getCriteriaFromString(matchRequest.criteria)
+    val apiKey = matchRequest.apiKey
+    val appId = matchRequest.appId
+    val areaStart = Areas.getAreaFromString(matchRequest.areaStart)
+    val areaEnd = Areas.getAreaFromString(matchRequest.areaEnd)
+    val criteria = Criteria.getCriteriaFromString(matchRequest.criteria)
 
-    val testValidity = Try(RequestValidityHelper.requestIsValid(criteriaValue, areaStartValue,
-      areaEndValue, matchRequest.swipeOrientation))
+    val testValidity = Try(RequestValidityHelper.requestIsValid(apiKey, appId,
+      criteria, areaStart, areaEnd, matchRequest.swipeOrientation))
 
     testValidity match {
 
@@ -144,9 +146,9 @@ class ContentExchangeActor extends Actor {
 
         // add request to the matcher queue
         val timestamp = System.currentTimeMillis
-        val movement = SwipeMovementHelper.swipesToMovement(areaStartValue, areaEndValue)
-        val requestData = new RequestToMatch(matchRequest.apiKey, matchRequest.appId, matchRequest.deviceId,
-          matchRequest.latitude, matchRequest.longitude, timestamp, areaStartValue, areaEndValue, movement,
+        val movement = SwipeMovementHelper.swipesToMovement(areaStart, areaEnd)
+        val requestData = new RequestToMatch(apiKey, appId, matchRequest.deviceId,
+          matchRequest.latitude, matchRequest.longitude, timestamp, areaStart, areaEnd, movement,
           matchRequest.equalityParam, matchRequest.orientation, matchRequest.swipeOrientation, self)
 
         def futureMatched(matcher: ActorRef) = {
@@ -157,7 +159,7 @@ class ContentExchangeActor extends Actor {
           }
         }
 
-        criteriaValue match {
+        criteria match {
           // we only get here if the criteria is valid
           case Criteria.POSITION => futureMatched(ApplicationWS.positionMatchingActor)
           case Criteria.PRESENCE => futureMatched(ApplicationWS.touchMatchingActor)
