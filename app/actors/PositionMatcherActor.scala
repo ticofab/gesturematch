@@ -8,6 +8,7 @@ import consts.Criteria
 import traits.StringGenerator
 import helpers.position.{PossibleMatchingHelper, ScreenPositionHelper}
 import helpers.requests.RequestStorageHelper
+import helpers.storage.DBHelper
 
 class PositionMatcherActor extends Actor with StringGenerator {
 
@@ -30,6 +31,8 @@ class PositionMatcherActor extends Actor with StringGenerator {
 
     r1.handlingActor ! Matched(matchee1, List(matchee2), groupId)
     r2.handlingActor ! Matched(matchee2, List(matchee1), groupId)
+
+    DBHelper.addMatchEstablished(r1.apiKey, r1.appId, 2)
   }
 
   private def deliverTo4Group(group: List[RequestToMatch], groupId: String): Unit = {
@@ -72,6 +75,8 @@ class PositionMatcherActor extends Actor with StringGenerator {
     r2.handlingActor ! Matched(matchee2, List(matchee1, matchee3, matchee4), groupId)
     r3.handlingActor ! Matched(matchee3, List(matchee1, matchee2, matchee4), groupId)
     r4.handlingActor ! Matched(matchee4, List(matchee1, matchee2, matchee4), groupId)
+
+    DBHelper.addMatchEstablished(r1.apiKey, r1.appId, 4)
   }
 
   private def getMatchingGroup(request: RequestToMatch, existingRequests: List[RequestToMatch]): List[MatchingGroup] = {

@@ -7,6 +7,7 @@ import consts.Criteria
 import traits.StringGenerator
 import helpers.requests.RequestStorageHelper
 import helpers.presence.PatternHelper
+import helpers.storage.DBHelper
 
 class PresenceMatcherActor extends Actor with StringGenerator {
 
@@ -52,6 +53,8 @@ class PresenceMatcherActor extends Actor with StringGenerator {
             val (myInfo, othersInfo) = matcheesInfo.partition(m => m.handlingActor == r.handlingActor)
             r.handlingActor ! Matched(myInfo.head, othersInfo, groupId)
           })
+
+          DBHelper.addMatchEstablished(request.apiKey, request.appId, group.length)
 
       }
   }

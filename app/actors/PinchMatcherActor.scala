@@ -9,6 +9,7 @@ import helpers.pinch.PinchMatchingHelper
 import consts.SwipeMovements.SwipeMovement
 import traits.StringGenerator
 import models.NewRequest
+import helpers.storage.DBHelper
 
 class PinchMatcherActor extends Actor with StringGenerator {
   lazy val myName = this.getClass.getSimpleName
@@ -69,6 +70,8 @@ class PinchMatcherActor extends Actor with StringGenerator {
           val matchee2 = new Matchee(prevReq.handlingActor, 1, PinchMatchingHelper.getPosition(prevReq.movement))
           request.handlingActor ! Matched(matchee1, List(matchee2), groupId)
           prevReq.handlingActor ! Matched(matchee2, List(matchee1), groupId)
+
+          DBHelper.addMatchEstablished(request.apiKey, request.appId, 2)
 
         case group :: tail =>
           Logger.info(getNewRequestLogging(existingRequests.length, s"${matches.size} groups found. uncertainty."))

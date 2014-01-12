@@ -25,6 +25,7 @@ import models.MatcheeLeftGroup
 import scala.util.Success
 import models.MatcheeDelivers
 import helpers.requests.RequestValidityHelper
+import helpers.storage.DBHelper
 
 class ContentExchangeActor extends Actor {
   var remoteIPAddress: Option[String] = None
@@ -32,6 +33,7 @@ class ContentExchangeActor extends Actor {
   var matchees: Option[List[Matchee]] = None
   var myself: Option[Matchee] = None
   var groupId: Option[String] = None
+  var request: Option[RequestToMatch] = None
 
   // I don't like this trick, not one bit. But I can't rely on the values of
   //  groupId or myInfo, as if a connection is established and immediately broken
@@ -144,6 +146,7 @@ class ContentExchangeActor extends Actor {
 
       case Success(isValid) =>
         Logger.info(s"$self, match request valid.")
+        DBHelper.addMatchRequest(apiKey, appId)
 
         // add request to the matcher queue
         val timestamp = System.currentTimeMillis
@@ -151,6 +154,8 @@ class ContentExchangeActor extends Actor {
         val requestData = new RequestToMatch(apiKey, appId, matchRequest.deviceId,
           matchRequest.latitude, matchRequest.longitude, timestamp, areaStart, areaEnd, movement,
           matchRequest.equalityParam, matchRequest.orientation, swipeOrientation, self)
+
+        request = Some(requestData)
 
         def futureMatched(matcher: ActorRef) = {
           val matchedFuture = (matcher ? NewRequest(requestData))(Timeouts.maxOldestRequestInterval)
@@ -166,8 +171,6 @@ class ContentExchangeActor extends Actor {
           case Criteria.PRESENCE => futureMatched(ApplicationWS.touchMatchingActor)
           case Criteria.PINCH => futureMatched(ApplicationWS.pinchMatchingActor)
           case Criteria.AIM => futureMatched(ApplicationWS.aimMatchingActor)
-
-          case _ => Logger.error(s"$self, invalid match criteria!")
         }
     }
   }
@@ -236,9 +239,17 @@ class ContentExchangeActor extends Actor {
         val message = MatcheeDelivers(myself.get, delivery)
 
         listRecipients.foreach(_ ! message)
+
+        if (request.isDefined) {
+          val apiKey = request.get.apiKey
+          val appId = request.get.appId
+          val payloadLength = clientDelivery.payload.length
+          DBHelper.addPayloadSent(apiKey, appId, payloadLength)
+          DBHelper.addPayloadDelivered(apiKey, appId, payloadLength * listRecipients.length)
+        }
+
       }
 
-      // TODO: think further if and how to send an ack
     }
 
     else {
