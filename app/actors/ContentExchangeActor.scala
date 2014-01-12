@@ -130,9 +130,10 @@ class ContentExchangeActor extends Actor {
     val areaStart = Areas.getAreaFromString(matchRequest.areaStart)
     val areaEnd = Areas.getAreaFromString(matchRequest.areaEnd)
     val criteria = Criteria.getCriteriaFromString(matchRequest.criteria)
+    val swipeOrientation = matchRequest.swipeOrientation
 
     val testValidity = Try(RequestValidityHelper.requestIsValid(apiKey, appId,
-      criteria, areaStart, areaEnd, matchRequest.swipeOrientation))
+      criteria, areaStart, areaEnd, swipeOrientation))
 
     testValidity match {
 
@@ -149,7 +150,7 @@ class ContentExchangeActor extends Actor {
         val movement = SwipeMovementHelper.swipesToMovement(areaStart, areaEnd)
         val requestData = new RequestToMatch(apiKey, appId, matchRequest.deviceId,
           matchRequest.latitude, matchRequest.longitude, timestamp, areaStart, areaEnd, movement,
-          matchRequest.equalityParam, matchRequest.orientation, matchRequest.swipeOrientation, self)
+          matchRequest.equalityParam, matchRequest.orientation, swipeOrientation, self)
 
         def futureMatched(matcher: ActorRef) = {
           val matchedFuture = (matcher ? NewRequest(requestData))(Timeouts.maxOldestRequestInterval)
