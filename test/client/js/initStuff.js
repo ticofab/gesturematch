@@ -11,12 +11,12 @@ function initStuff(scope) {
     scope.dev4rtype = "content"
 
     scope.dev1criteria = "pinch"
-    scope.dev2criteria = "presence"
+    scope.dev2criteria = "pinch"
     scope.dev3criteria = "pinch"
     scope.dev4criteria = "presence"
 
-    scope.dev1apikey = "limebamboo-swipematch-android"
-    scope.dev2apikey = "abc"
+    scope.dev1apikey = "limebamboo-swipematch-examples-android"
+    scope.dev2apikey = "limebamboo-swipematch-examples-android"
     scope.dev3apikey = "abc"
     scope.dev4apikey = "def"
 
@@ -36,12 +36,12 @@ function initStuff(scope) {
     scope.dev4lon = "12.00"
 
     scope.dev1ss = "inner"
-    scope.dev2ss = "left"
+    scope.dev2ss = "inner"
     scope.dev3ss = "inner"
     scope.dev4ss = "left"
 
     scope.dev1se = "right"
-    scope.dev2se = "inner"
+    scope.dev2se = "left"
     scope.dev3se = "left"
     scope.dev4se = "inner"
 
@@ -50,13 +50,13 @@ function initStuff(scope) {
     scope.dev3pl = "[{\"type\":\"NAME\",\"content\":{\"value\":\"Fabio3\"}}]"
     scope.dev4pl = "[{\"type\":\"NAME\",\"content\":{\"value\":\"Fabio4\"}}]"
 
-    scope.dev1ep = "uguale"
+    scope.dev1ep = "blue"
     scope.dev2ep = "blue"
     scope.dev3ep = "uguale"
     scope.dev4ep = "uguale"
 
     scope.dev1appId = "swipepresence-example-android"
-    scope.dev2appId = "swipeaim-example-ios"
+    scope.dev2appId = "swipepresence-example-android"
     scope.dev3appId = "swipeaim-example-android"
     scope.dev4appId = "swipeaim-example-android"
 
