@@ -15,7 +15,7 @@ function initStuff(scope) {
     scope.dev3criteria = "pinch"
     scope.dev4criteria = "presence"
 
-    scope.dev1apikey = "abc"
+    scope.dev1apikey = "limebamboo-swipematch-android"
     scope.dev2apikey = "abc"
     scope.dev3apikey = "abc"
     scope.dev4apikey = "def"
@@ -55,7 +55,7 @@ function initStuff(scope) {
     scope.dev3ep = "uguale"
     scope.dev4ep = "uguale"
 
-    scope.dev1appId = "123-ABC"
+    scope.dev1appId = "swipepresence-example-android"
     scope.dev2appId = "swipeaim-example-ios"
     scope.dev3appId = "swipeaim-example-android"
     scope.dev4appId = "swipeaim-example-android"
