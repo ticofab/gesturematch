@@ -4,7 +4,7 @@ package models
 case class NewRequest(request: RequestToMatch)
 
 // client handling actor messages
-case class ClientConnected(remoteAddress: String)
+case class ConnectedClient(remoteAddress: String, apiKey: String, appId: String, os: String, deviceId: String)
 case class Matched(myInfo: Matchee, matcheesInfo: List[Matchee], groupId: String)
 
 // inter actor messages

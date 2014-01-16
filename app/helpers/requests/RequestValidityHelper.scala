@@ -9,14 +9,18 @@ case class InvalidRequestException(message: String) extends Exception(message)
 
 object RequestValidityHelper {
 
-  def requestIsValid(apiKey: String, appId: String, criteria: Criteria, areaStart: Areas,
-                     areaEnd: Areas, swipeOrientation: Option[Double]) = {
+  def connectionRequestIsValid(apiKey: String, appId: String): Boolean = {
+    if (!DBHelper.areKeyAndIdValid(apiKey, appId))
+      throw new InvalidRequestException(s"ApiKey and AppId pair ($apiKey, $appId) is not valid")
+
+    true
+  }
+
+  def matchRequestIsValid(criteria: Criteria, areaStart: Areas, areaEnd: Areas,
+                          swipeOrientation: Option[Double]): Boolean = {
 
     lazy val invReqHead = "Invalid request: invalid "
     lazy val allowedValues = ". Allowed values are: "
-
-    if (!DBHelper.areKeyAndIdValid(apiKey, appId))
-      throw new InvalidRequestException(s"ApiKey and AppId pair ($apiKey, $appId) is not valid")
 
     if (criteria == Criteria.INVALID)
       throw InvalidRequestException(s"$invReqHead criteria $allowedValues ${Criteria.getValidOnes}")
