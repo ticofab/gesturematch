@@ -17,7 +17,7 @@ import controllers.ApplicationWS
 import consts.json.JsonResponseLabels
 import java.util.concurrent.TimeoutException
 import models.NewRequest
-import models.ClientConnected
+import models.ConnectedClient
 import scala.util.Failure
 import scala.Some
 import models.Matched
@@ -28,12 +28,11 @@ import helpers.requests.RequestValidityHelper
 import helpers.storage.DBHelper
 
 class ContentExchangeActor extends Actor {
-  var remoteIPAddress: Option[String] = None
+  var client: Option[ConnectedClient] = None
   var channel: Option[Concurrent.Channel[String]] = None
   var matchees: Option[List[Matchee]] = None
   var myself: Option[Matchee] = None
   var groupId: Option[String] = None
-  var request: Option[RequestToMatch] = None
 
   // I don't like this trick, not one bit. But I can't rely on the values of
   //  groupId or myInfo, as if a connection is established and immediately broken
@@ -45,9 +44,9 @@ class ContentExchangeActor extends Actor {
   // Actor messaging
   // *************************************
   def receive: Actor.Receive = {
-    case ClientConnected(remoteAddress) =>
-      Logger.info(s"$self, client connected: $remoteAddress.")
-      remoteIPAddress = Some(remoteAddress)
+    case ConnectedClient(remoteAddress, apiKey, appId, os, deviceId) =>
+      Logger.info(s"$self, client connected: $remoteAddress, $apiKey, $appId, $os, $deviceId")
+      client = Some(ConnectedClient(remoteAddress, apiKey, appId, os, deviceId))
 
       val in = Iteratee.foreach[String] {
         input => onInput(input)
@@ -58,7 +57,7 @@ class ContentExchangeActor extends Actor {
 
         // start a timeout to close the connection after a while
         Promise.timeout({
-          Logger.info(s"$self, timeout expired. Closing connection with client at ${remoteIPAddress.getOrElse("<IP unavailable>")}.")
+          Logger.info(s"$self, timeout expired. Closing connection with client at ${client.foreach(_.remoteAddress)}.")
           closeClientConnection()
         }, Timeouts.maxConnectionLifetime)
       })
@@ -126,16 +125,12 @@ class ContentExchangeActor extends Actor {
   }
 
   def onMatchInput(matchRequest: ClientInputMessageMatch) = {
-
-    val apiKey = matchRequest.apiKey
-    val appId = matchRequest.appId
     val areaStart = Areas.getAreaFromString(matchRequest.areaStart)
     val areaEnd = Areas.getAreaFromString(matchRequest.areaEnd)
     val criteria = Criteria.getCriteriaFromString(matchRequest.criteria)
     val swipeOrientation = matchRequest.swipeOrientation
 
-    val testValidity = Try(RequestValidityHelper.requestIsValid(apiKey, appId,
-      criteria, areaStart, areaEnd, swipeOrientation))
+    val testValidity = Try(RequestValidityHelper.matchRequestIsValid(criteria, areaStart, areaEnd, swipeOrientation))
 
     testValidity match {
 
@@ -146,32 +141,37 @@ class ContentExchangeActor extends Actor {
 
       case Success(isValid) =>
         Logger.info(s"$self, match request valid.")
-        DBHelper.addMatchRequest(apiKey, appId)
 
-        // add request to the matcher queue
-        val timestamp = System.currentTimeMillis
-        val movement = SwipeMovementHelper.swipesToMovement(areaStart, areaEnd)
-        val requestData = new RequestToMatch(apiKey, appId, matchRequest.deviceId,
-          matchRequest.latitude, matchRequest.longitude, timestamp, areaStart, areaEnd, movement,
-          matchRequest.equalityParam, matchRequest.orientation, swipeOrientation, self)
+        if (client.isDefined) {
+          val apiKey = client.get.apiKey
+          val appId = client.get.appId
 
-        request = Some(requestData)
+          DBHelper.addMatchRequest(apiKey, appId)
 
-        def futureMatched(matcher: ActorRef) = {
-          val matchedFuture = (matcher ? NewRequest(requestData))(Timeouts.maxOldestRequestInterval)
-          matchedFuture recover {
-            // basically this timeout will always trigger, but maybe we've been matched in the meantime.
-            case t: TimeoutException => if (!hasBeenMatched) sendToClient(JsonResponseHelper.getTimeoutResponse)
+          // add request to the matcher queue
+          val timestamp = System.currentTimeMillis
+          val movement = SwipeMovementHelper.swipesToMovement(areaStart, areaEnd)
+          val requestData = new RequestToMatch(apiKey, appId, client.get.deviceId,
+            matchRequest.latitude, matchRequest.longitude, timestamp, areaStart, areaEnd, movement,
+            matchRequest.equalityParam, matchRequest.orientation, swipeOrientation, self)
+
+          def futureMatched(matcher: ActorRef) = {
+            val matchedFuture = (matcher ? NewRequest(requestData))(Timeouts.maxOldestRequestInterval)
+            matchedFuture recover {
+              // basically this timeout will always trigger, but maybe we've been matched in the meantime.
+              case t: TimeoutException => if (!hasBeenMatched) sendToClient(JsonResponseHelper.getTimeoutResponse)
+            }
+          }
+
+          criteria match {
+            // we only get here if the criteria is valid
+            case Criteria.POSITION => futureMatched(ApplicationWS.positionMatchingActor)
+            case Criteria.PRESENCE => futureMatched(ApplicationWS.touchMatchingActor)
+            case Criteria.PINCH => futureMatched(ApplicationWS.pinchMatchingActor)
+            case Criteria.AIM => futureMatched(ApplicationWS.aimMatchingActor)
           }
         }
 
-        criteria match {
-          // we only get here if the criteria is valid
-          case Criteria.POSITION => futureMatched(ApplicationWS.positionMatchingActor)
-          case Criteria.PRESENCE => futureMatched(ApplicationWS.touchMatchingActor)
-          case Criteria.PINCH => futureMatched(ApplicationWS.pinchMatchingActor)
-          case Criteria.AIM => futureMatched(ApplicationWS.aimMatchingActor)
-        }
     }
   }
 
@@ -240,9 +240,9 @@ class ContentExchangeActor extends Actor {
 
         listRecipients.foreach(_ ! message)
 
-        if (request.isDefined) {
-          val apiKey = request.get.apiKey
-          val appId = request.get.appId
+        if (client.isDefined) {
+          val apiKey = client.get.apiKey
+          val appId = client.get.appId
           val payloadLength = clientDelivery.payload.length
           DBHelper.addPayloadSent(apiKey, appId, payloadLength)
           DBHelper.addPayloadDelivered(apiKey, appId, payloadLength * listRecipients.length)

@@ -12,7 +12,10 @@ import consts.Timeouts
 import java.util.concurrent.TimeoutException
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import helpers.json.JsonResponseHelper
-import models.ClientConnected
+import models.ConnectedClient
+import scala.concurrent.Future
+import helpers.requests.RequestValidityHelper
+import scala.util.{Success, Failure, Try}
 
 object ApplicationWS extends Controller {
   Logger.info("******* Server starting. Creating ActorSystem. ********")
@@ -27,18 +30,34 @@ object ApplicationWS extends Controller {
      - I chose not to use WebSocket[JsValue] because this would lead to horrible exceptions
        in case inputs don't come as a valid Json String.
    */
-  def open(): WebSocket[String] = WebSocket.async {
+  def open(apiKey: String, appId: String, os: String, deviceId: String): WebSocket[String] = WebSocket.async {
     request => {
       Logger.info(s"open websocket endpoint connection: $request")
-      val handlingActor: ActorRef = Akka.system.actorOf(ContentExchangeActor.props)
-      val wsLinkFuture = (handlingActor ? ClientConnected(request.remoteAddress))(Timeouts.maxOldestRequestInterval)
-      wsLinkFuture.mapTo[(Iteratee[String, _], Enumerator[String])].recover {
-        case e: TimeoutException =>
-          // no actor responded.
-          Logger.error(s"open websocket endpoint, no actor responded. Close connection, exception: $e")
-          val out = Enumerator(JsonResponseHelper.getServerErrorResponse).andThen(Enumerator.eof)
-          val in: Iteratee[String, Unit] = Iteratee.ignore
-          (in, out)
+
+      val testValidity = Try(RequestValidityHelper.connectionRequestIsValid(apiKey, appId))
+      testValidity match {
+
+        case Failure(e) =>
+          Future {
+            val out = Enumerator(e.getMessage).andThen(Enumerator.eof)
+            val in: Iteratee[String, Unit] = Iteratee.ignore
+            (in, out)
+          }
+
+        case Success(isValid) =>
+          // request valid
+          val handlingActor: ActorRef = Akka.system.actorOf(ContentExchangeActor.props)
+          val connectionMsg = ConnectedClient(request.remoteAddress, apiKey, appId, os, deviceId)
+          val wsLinkFuture = (handlingActor ? connectionMsg)(Timeouts.maxOldestRequestInterval)
+          wsLinkFuture.mapTo[(Iteratee[String, _], Enumerator[String])].recover {
+            case e: TimeoutException =>
+              // no actor responded.
+              Logger.error(s"open websocket endpoint, no actor responded. Close connection, exception: $e")
+              val out = Enumerator(JsonResponseHelper.getServerErrorResponse).andThen(Enumerator.eof)
+              val in: Iteratee[String, Unit] = Iteratee.ignore
+              (in, out)
+          }
+
       }
     }
   }

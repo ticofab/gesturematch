@@ -7,4 +7,4 @@ GET     /             controllers.ApplicationHTTP.alive
 GET     /db           controllers.ApplicationHTTP.dbTest
 
 # Websocket
-GET     /open         controllers.ApplicationWS.open
+GET     /open         controllers.ApplicationWS.open(apiKey: String, appId: String, os: String, deviceId: String)
