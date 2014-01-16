@@ -244,7 +244,7 @@ class ContentExchangeActor extends Actor {
           val apiKey = client.get.apiKey
           val appId = client.get.appId
           val payloadLength = clientDelivery.payload.length
-          DBHelper.addPayloadSent(apiKey, appId, payloadLength)
+          DBHelper.addPayloadReceived(apiKey, appId, payloadLength)
           DBHelper.addPayloadDelivered(apiKey, appId, payloadLength * listRecipients.length)
         }
 

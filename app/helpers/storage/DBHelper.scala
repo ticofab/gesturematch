@@ -62,8 +62,8 @@ object DBHelper {
     updateOp(apiKey, appId, modifier)
   }
 
-  def addPayloadSent(apiKey: String, appId: String, payloadBytes: Int) = {
-    val modifier = Json.obj("$inc" -> Json.obj("appIds.$.payloadSent" -> payloadBytes))
+  def addPayloadReceived(apiKey: String, appId: String, payloadBytes: Int) = {
+    val modifier = Json.obj("$inc" -> Json.obj("appIds.$.payloadReceived" -> payloadBytes))
     Logger.debug(s"add payload sent, modifier: $modifier")
     updateOp(apiKey, appId, modifier)
   }
