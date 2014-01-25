@@ -21,15 +21,12 @@ function createDeliverJson(recipients, payload) {
 // nv are the parametes in the order in which they're observed...
 function createMatchJson(nv) {
     var matchRequest = {"type":"match",
-                        "criteria":nv[10],
-                        "apiKey":nv[8],
-                        "appId":nv[9],
-                        "latitude":parseFloat(nv[2]),
-                        "longitude":parseFloat(nv[3]),
-                        "areaStart":nv[4],
-                        "areaEnd":nv[5],
-                        "deviceId":nv[1],
-                        "equalityParam":nv[7]
+                        "criteria":nv[6],
+                        "latitude":parseFloat(nv[1]),
+                        "longitude":parseFloat(nv[2]),
+                        "areaStart":nv[3],
+                        "areaEnd":nv[4],
+                        "equalityParam":nv[5]
                     }
     return JSON.stringify(matchRequest)
 }

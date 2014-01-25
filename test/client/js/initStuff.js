@@ -1,9 +1,9 @@
 function initStuff(scope) {
 
-    scope.serverUrl = "localhost:9000"
-    //scope.serverUrl = "thawing-escarpment-8488.herokuapp.com"
-
-    scope.openWSUrl = "ws://" + scope.serverUrl + "/open"
+    scope.serverUrl = "swipematch.herokuapp.com"
+    scope.protocol = "ws"
+    scope.port = "80"
+    scope.openWSUrl = scope.protocol + "://" + scope.serverUrl + ":" + scope.port + "/open"
 
     scope.dev1rtype = "content"
     scope.dev2rtype = "content"
@@ -15,8 +15,8 @@ function initStuff(scope) {
     scope.dev3criteria = "pinch"
     scope.dev4criteria = "presence"
 
-    scope.dev1apikey = "limebamboo-swipematch-examples-android"
-    scope.dev2apikey = "limebamboo-swipematch-examples-android"
+    scope.dev1apikey = "limebamboo-swipematch-example"
+    scope.dev2apikey = "limebamboo-swipematch-example"
     scope.dev3apikey = "abc"
     scope.dev4apikey = "def"
 
@@ -55,7 +55,7 @@ function initStuff(scope) {
     scope.dev3ep = "uguale"
     scope.dev4ep = "uguale"
 
-    scope.dev1appId = "swipepresence-example-android"
+    scope.dev1appId = "swipematch-example"
     scope.dev2appId = "swipepresence-example-android"
     scope.dev3appId = "swipeaim-example-android"
     scope.dev4appId = "swipeaim-example-android"
@@ -64,4 +64,9 @@ function initStuff(scope) {
     scope.dev2recip = "0"
     scope.dev3recip = "2"
     scope.dev4recip = "3"
+
+    scope.dev1os = "android"
+    scope.dev2os = "firefox OS"
+    scope.dev3os = "ios"
+    scope.dev4os = "android"
 }
