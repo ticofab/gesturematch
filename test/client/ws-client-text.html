@@ -10,8 +10,20 @@
 
     <div ng-controller="paramTable">
 
-        Server URL: <input type="text" size="50" maxlength="100" ng-model="serverUrl">
-        <span class="result-api-call">{{openWSUrl}}</span><br><br>
+        <table id="tfhover" class="tftable" border="1">
+            <tr>
+                <th>Protocol:</th>
+                <th>Server Url:</th>
+                <th>Port:</th>
+            </tr>
+            <tr>
+                <td><input type="text" size="20" maxlength="20" ng-model="protocol"></td>
+                <td><input type="text" size="50" maxlength="50" ng-model="serverUrl"></td>
+                <td><input type="text" size="20" maxlength="20" ng-model="port"></td>
+            </tr>
+        </table><br>
+
+        <span class="result-api-call">base connect url: {{openWSUrl}}</span><br><br>
 
         <table id="tfhover" class="tftable" border="1">
             <tr>
@@ -97,6 +109,13 @@
                 <td><input class="table-input" ng-model="dev2recip"></td>
                 <td><input class="table-input" ng-model="dev3recip"></td>
                 <td><input class="table-input" ng-model="dev4recip"></td>
+            </tr>
+            <tr>
+                <td class="vertical-header">OS</td>
+                <td><input class="table-input" ng-model="dev1os"></td>
+                <td><input class="table-input" ng-model="dev2os"></td>
+                <td><input class="table-input" ng-model="dev3os"></td>
+                <td><input class="table-input" ng-model="dev4os"></td>
             </tr>
         </table>
 

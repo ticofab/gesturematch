@@ -6,12 +6,8 @@ object Timeouts {
   // keep alive timeouts
   val keepAlivePingInterval = 29500.milliseconds
 
-  // request timeouts
-  val maxConnectionLifetime = 1.day
-  val maxOldestRequestInterval = 50.seconds // 4.seconds
+  val maxDatabaseResponseTime = 1.seconds
+  val maxConnectionLifetime = 15.minutes
+  val maxOldestRequestInterval = 3.seconds
   val maxOldestRequestIntervalMillis = maxOldestRequestInterval.toMillis
-  val minIntervalBetweenSameDeviceRequestMillis = 1500.milliseconds.toMillis
-
-  // database timeouts
-  val maxDatabaseResponseTime = 5.seconds // 1.seconds
 }
