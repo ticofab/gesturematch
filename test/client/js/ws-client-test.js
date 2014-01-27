@@ -69,7 +69,7 @@ myApp.controller('paramTable', ['$scope', function($scope) {
         $scope.$apply();
     }
     function onC(id, evt) {
-        //$scope[id] = true;
+        $scope[id] = false;
         console.log("Connection closed.");
         $scope.$apply();
     }
@@ -165,9 +165,9 @@ myApp.controller('paramTable', ['$scope', function($scope) {
         myWebSocket3.send(createDeliverJson(ar, $scope.dev3pl));
     }
 
-    $scope.connect1();
-    $scope.connect2();
-    $scope.connect3();
-    $scope.connect4();
+    // $scope.connect1();
+    // $scope.connect2();
+    // $scope.connect3();
+    // $scope.connect4();
 
 }]);

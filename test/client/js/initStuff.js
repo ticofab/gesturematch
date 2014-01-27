@@ -1,8 +1,8 @@
 function initStuff(scope) {
 
     scope.serverUrl = "swipematch.herokuapp.com"
-    scope.protocol = "ws"
-    scope.port = "80"
+    scope.protocol = "wss"
+    scope.port = "443"
     scope.openWSUrl = scope.protocol + "://" + scope.serverUrl + ":" + scope.port + "/open"
 
     scope.dev1rtype = "content"
