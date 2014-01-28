@@ -56,11 +56,54 @@ myApp.controller('paramTable', ['$scope', function($scope) {
     };
 
     // websockets connection stuff
-    function onM(id, evt) {
-        $scope[id] = evt.data;
-        console.log("got data: " + evt.data);
-        $scope.$apply();
+    function onM1(evt) {
+        console.log("dev1 got data: " + evt.data);
+        if (evt.data != "k") {
+            $scope.dev1msg = evt.data;
+            var mjs = JSON.parse(evt.data);
+            if (mjs.groupId != undefined) {
+                $scope.dev1groupId = mjs.groupId;
+            }
+            $scope.$apply();
+        }
     }
+
+    function onM2(evt) {
+        console.log("dev2 got data: " + evt.data);
+        if (evt.data != "k") {
+            $scope.dev2msg = evt.data;
+            var mjs = JSON.parse(evt.data);
+            if (mjs.groupId != undefined) {
+                $scope.dev2groupId = mjs.groupId;
+            }
+            $scope.$apply();
+        }
+    }
+
+    function onM3(evt) {
+        console.log("dev3 got data: " + evt.data);
+        if (evt.data != "k") {
+            $scope.dev3msg = evt.data;
+            var mjs = JSON.parse(evt.data);
+            if (mjs.groupId != undefined) {
+                $scope.dev3groupId = mjs.groupId;
+            }
+            $scope.$apply();
+        }
+    }
+
+    function onM4(evt) {
+        console.log("dev4 got data: " + evt.data);
+        if (evt.data != "k") {
+            $scope.dev4msg = evt.data;
+            var mjs = JSON.parse(evt.data);
+            if (mjs.groupId != undefined) {
+                $scope.dev4groupId = mjs.groupId;
+            }
+            $scope.$apply();
+        }
+    }
+
     function onO(id, evt) {
         // here "id" is a string. equivalent to
         //   $scope.isDisabled1 === $scope["isDisabled1"]
@@ -82,7 +125,7 @@ myApp.controller('paramTable', ['$scope', function($scope) {
         $scope.isDisabled1 = true;
         myConnectUrl = $scope.getConnectUrl($scope.dev1apikey, $scope.dev1appId, $scope.dev1devid, $scope.dev1os)
         myWebSocket1 = new WebSocket(myConnectUrl);
-        myWebSocket1.onmessage = onM.bind(null, "dev1msg");
+        myWebSocket1.onmessage = onM1;
 
         // onO.bind creates a new function with only one parameter,
         //  and the first one will be set as "isDisabled1"
@@ -94,7 +137,7 @@ myApp.controller('paramTable', ['$scope', function($scope) {
         $scope.isDisabled2 = true;
         myConnectUrl = $scope.getConnectUrl($scope.dev2apikey, $scope.dev2appId, $scope.dev2devid, $scope.dev2os)
         myWebSocket2 = new WebSocket(myConnectUrl);
-        myWebSocket2.onmessage = onM.bind(null, "dev2msg");;
+        myWebSocket2.onmessage = onM2;
         myWebSocket2.onopen = onO.bind(null, "isDisabled2");
         myWebSocket2.onclose = onC.bind(null, "isDisabled2");
     };
@@ -103,7 +146,7 @@ myApp.controller('paramTable', ['$scope', function($scope) {
         $scope.isDisabled3 = true;
         myConnectUrl = $scope.getConnectUrl($scope.dev3apikey, $scope.dev3appId, $scope.dev3devid, $scope.dev3os)
         myWebSocket3 = new WebSocket(myConnectUrl);
-        myWebSocket3.onmessage = onM.bind(null, "dev3msg");;
+        myWebSocket3.onmessage = onM3;
         myWebSocket3.onopen = onO.bind(null, "isDisabled3");
         myWebSocket3.onclose = onC.bind(null, "isDisabled3");
     };
@@ -112,7 +155,7 @@ myApp.controller('paramTable', ['$scope', function($scope) {
         $scope.isDisabled4 = true;
         myConnectUrl = $scope.getConnectUrl($scope.dev4apikey, $scope.dev4appId, $scope.dev4devid, $scope.dev4os)
         myWebSocket4 = new WebSocket(myConnectUrl);
-        myWebSocket4.onmessage = onM.bind(null, "dev4msg");
+        myWebSocket4.onmessage = onM4;
         myWebSocket4.onopen = onO.bind(null, "isDisabled4");
         myWebSocket4.onclose = onC.bind(null, "isDisabled4");
     };
@@ -147,22 +190,22 @@ myApp.controller('paramTable', ['$scope', function($scope) {
     $scope.deliver1 = function() {
         var ar = [];
         ar.push(parseInt($scope.dev1recip))
-        myWebSocket1.send(createDeliverJson(ar, $scope.dev1pl));
+        myWebSocket1.send(createDeliverJson(ar, $scope.dev1pl, $scope.dev1groupId));
     }
     $scope.deliver2 = function() {
         var ar = [];
         ar.push(parseInt($scope.dev2recip))
-        myWebSocket2.send(createDeliverJson(ar, $scope.dev2pl));
+        myWebSocket2.send(createDeliverJson(ar, $scope.dev2pl, $scope.dev2groupId));
     }
     $scope.deliver3 = function() {
         var ar = [];
         ar.push(parseInt($scope.dev3recip))
-        myWebSocket3.send(createDeliverJson(ar, $scope.dev3pl));
+        myWebSocket3.send(createDeliverJson(ar, $scope.dev3pl, $scope.dev3groupId));
     }
     $scope.deliver4 = function() {
         var ar = [];
-        ar.push(parseInt($scope.dev3recip))
-        myWebSocket3.send(createDeliverJson(ar, $scope.dev3pl));
+        ar.push(parseInt($scope.dev4recip))
+        myWebSocket3.send(createDeliverJson(ar, $scope.dev3pl, $scope.dev4groupId));
     }
 
     // $scope.connect1();

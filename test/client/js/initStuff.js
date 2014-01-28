@@ -20,6 +20,11 @@ function initStuff(scope) {
     scope.dev3apikey = "abc"
     scope.dev4apikey = "def"
 
+    scope.dev1appId = "swipematch-example"
+    scope.dev2appId = "swipematch-example"
+    scope.dev3appId = "swipeaim-example-android"
+    scope.dev4appId = "swipeaim-example-android"
+
     scope.dev1devid = "idjs1"
     scope.dev2devid = "idjs2"
     scope.dev3devid = "idjs3"
@@ -54,11 +59,6 @@ function initStuff(scope) {
     scope.dev2ep = "blue"
     scope.dev3ep = "uguale"
     scope.dev4ep = "uguale"
-
-    scope.dev1appId = "swipematch-example"
-    scope.dev2appId = "swipepresence-example-android"
-    scope.dev3appId = "swipeaim-example-android"
-    scope.dev4appId = "swipeaim-example-android"
 
     scope.dev1recip = "1"
     scope.dev2recip = "0"

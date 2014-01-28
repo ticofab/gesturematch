@@ -6,10 +6,12 @@ function createBreakMatchJson() {
     return JSON.stringify({"type":"leaveGroup", "groupId":"xxEXAMPLEGROUPxx"});
 }
 
-function createDeliverJson(recipients, payload) {
+function createDeliverJson(recipients, payload, groupId) {
+    var deliveryId = Math.random().toString(36).substring(2, 7);
     var deliver = {"type":"delivery",
-                    "groupId":"WRONGGROUP",
+                    "groupId": groupId,
                     "payload": payload,
+                    "deliveryId": deliveryId,
                     "recipients": []}
     for (var i in recipients) {
         var recip = recipients[i]
