@@ -4,7 +4,7 @@ import play.api.libs.json.JsValue
 import consts.json.{JsonGeneralLabels, JsonInputLabels}
 
 case class ClientInputMessageDelivery(groupId: String,
-                                      recipients: List[Int],
+                                      recipients: Option[List[Int]],
                                       deliveryId: String,
                                       payload: String,
                                       chunkNr: Option[Int],
@@ -16,7 +16,7 @@ object ClientInputMessageDelivery {
     val groupId = (jsonValue \ JsonGeneralLabels.GROUP_ID).as[String]
 
     // delivery stuff
-    val recipients: List[Int] = (jsonValue \ JsonInputLabels.INPUT_RECIPIENTS).as[List[Int]]
+    val recipients: Option[List[Int]] = (jsonValue \ JsonInputLabels.INPUT_RECIPIENTS).asOpt[List[Int]]
     val payload: String = (jsonValue \ JsonGeneralLabels.PAYLOAD).as[String]
     val deliveryId: String = (jsonValue \ JsonInputLabels.INPUT_DELIVERY_ID).as[String]
 
