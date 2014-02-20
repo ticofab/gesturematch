@@ -230,12 +230,18 @@ class ContentExchangeActor extends Actor {
     // if not valid, this input will be simply discarded
     if (groupsAreValid(clientDelivery.groupId) && myself.isDefined && matchees.isDefined) {
 
-      // creates a list of recipients
-      val listRecipients: List[ActorRef] = for {
-        matchee <- matchees.get
-        recipient <- clientDelivery.recipients
-        if matchee.idInGroup == recipient && recipient != -1
-      } yield matchee.handlingActor
+      // creates a list of recipients. If none is specified, take all.
+      val listRecipients: List[ActorRef] =
+        clientDelivery.recipients match {
+          case Some(recipients) => for {
+            matchee <- matchees.get
+            recipient <- recipients
+            if matchee.idInGroup == recipient && recipient != -1
+          } yield matchee.handlingActor
+
+          case None => matchees.get.map(_.handlingActor)
+        }
+
 
       // deliver stuff
       if (!listRecipients.isEmpty) {
