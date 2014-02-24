@@ -26,10 +26,10 @@ class PresenceMatcherActor extends Actor with StringGenerator {
       // get a list of possibly matching requests
       val possiblyMatchingRequests: List[RequestToMatch] = RequestStorageHelper.getValidExistingRequests(Criteria.PRESENCE, request)
 
-      // try to find a touch pattern
-      val group: List[RequestToMatch] = PatternHelper.getMatchedPattern(request :: possiblyMatchingRequests)
+      // try to find a matching pattern
+      val (matches, unique): (List[RequestToMatch], Boolean) = PatternHelper.getMatchedPattern(request :: possiblyMatchingRequests)
 
-      group match {
+      matches match {
         case Nil =>
           // no match. add the request to the storage
           Logger.info(getNewRequestLogging(possiblyMatchingRequests.size, "no match found. Adding request to the storage."))
@@ -41,20 +41,20 @@ class PresenceMatcherActor extends Actor with StringGenerator {
 
         case x :: xs =>
           // we identified a group!
-          Logger.info(getNewRequestLogging(possiblyMatchingRequests.size, s"group found, size: ${group.size}"))
-          RequestStorageHelper.removeRequests(Criteria.PRESENCE, group)
+          Logger.info(getNewRequestLogging(possiblyMatchingRequests.size, s"group found, size: ${matches.size}"))
+          RequestStorageHelper.removeRequests(Criteria.PRESENCE, matches)
 
           // get unique group id
           val groupId = getGroupUniqueString
 
-          val matcheesInfo: List[Matchee] = group.zipWithIndex.map(x => Matchee(x._1.handlingActor, x._2))
-          group.foreach(r => {
+          val matcheesInfo: List[Matchee] = matches.zipWithIndex.map(x => Matchee(x._1.handlingActor, x._2))
+          matches.foreach(r => {
             // this could maybe be done by each actor, but this way it's cleaner
             val (myInfo, othersInfo) = matcheesInfo.partition(m => m.handlingActor == r.handlingActor)
             r.handlingActor ! Matched(myInfo.head, othersInfo, groupId)
           })
 
-          DBHelper.addMatchEstablished(request.apiKey, request.appId, group.length)
+          DBHelper.addMatchEstablished(request.apiKey, request.appId, matches.length)
 
       }
   }

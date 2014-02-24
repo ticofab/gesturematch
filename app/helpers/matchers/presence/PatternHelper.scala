@@ -12,9 +12,10 @@ object PatternHelper {
    * All the requests that we've been able to match based on other criteria.
    *
    * @return
-   * The longest closed sequence possible given the starting point and the other requests.
+   * A pair (List[RequestToMatch], Boolean) where the first is the longest closed sequence possible
+   * given all the requests, and the second indicates whether it is unique or not.
    */
-  def getMatchedPattern(matchingRequests: List[RequestToMatch]): List[RequestToMatch] = {
+  def getMatchedPattern(matchingRequests: List[RequestToMatch]): (List[RequestToMatch], Boolean) = {
     def getLongestComb(res: List[List[RequestToMatch]]): List[RequestToMatch] =
       res match {
         case Nil => Nil
@@ -36,7 +37,6 @@ object PatternHelper {
     def getCombinations(tileHistory: List[RequestToMatch], availableNewTiles: List[RequestToMatch]): List[(List[RequestToMatch], List[RequestToMatch])] = {
 
       def expand = {
-        // debug
         val filtered = availableNewTiles.filter(r => SwipeMovements.getLegalNextOnes(tileHistory.head.movement).contains(r.movement))
         val mapped = filtered.map(elem => (elem :: tileHistory, availableNewTiles.diff(List(elem))))
         mapped
@@ -78,15 +78,19 @@ object PatternHelper {
         val combs = getCombinations(head, tail)
         val skimmedResults = combs.map(x => x._1)
         val valid = getValidCombs(skimmedResults)
-        val longestValidResult = getLongestComb(valid)
-        val reversed = longestValidResult.reverse
-        reversed
+        if (valid.length == 1) {
+          (valid.head.reverse, true)
+        } else {
+          val longestValidResult = getLongestComb(valid)
+          (longestValidResult.reverse, false)
+        }
+
 
       // error, not a single InnerX request
-      case Nil => List()
+      case Nil => (Nil, false)
 
       // error, two or more InnerX requests
-      case _ => List()
+      case _ => (Nil, false)
 
     }
   }
