@@ -16,13 +16,16 @@ object PatternHelper {
    * given all the requests, and the second indicates whether it is unique or not.
    */
   def getMatchedPattern(matchingRequests: List[RequestToMatch]): (List[RequestToMatch], Boolean) = {
-    def getLongestComb(res: List[List[RequestToMatch]]): List[RequestToMatch] =
+
+    def getLongestCombinations(res: List[List[RequestToMatch]]): List[List[RequestToMatch]] =
       res match {
         case Nil => Nil
-        case x :: xs => res.reduceLeft((a, b) => if (a.length > b.length) a else b)
+        case x :: xs =>
+          val longestCombLength = res.maxBy(_.length)
+          res.filter(_.length == longestCombLength)
       }
 
-    def getValidCombs(res: List[List[RequestToMatch]]) = {
+    def getValidCombinations(res: List[List[RequestToMatch]]) = {
       def validCombFilter(res: List[RequestToMatch]): Boolean = {
         // note! it assumes that the collection starts with the last request,
         //   which is then the XInner, and finishes with the first (InnerX)
@@ -72,25 +75,26 @@ object PatternHelper {
 
     head match {
 
-      // good, only one InnerX
-      case x :: Nil =>
-        // these intermediate values are here for clarity
-        val combs = getCombinations(head, tail)
-        val skimmedResults = combs.map(x => x._1)
-        val valid = getValidCombs(skimmedResults)
-        if (valid.length == 1) {
-          (valid.head.reverse, true)
-        } else {
-          val longestValidResult = getLongestComb(valid)
-          (longestValidResult.reverse, false)
-        }
-
-
       // error, not a single InnerX request
       case Nil => (Nil, false)
 
       // error, two or more InnerX requests
       case _ => (Nil, false)
+
+      // good, only one InnerX
+      case x :: Nil =>
+        // these intermediate values are here for clarity
+        val combs = getCombinations(head, tail)
+        val skimmedResults = combs.map(x => x._1)
+        val validCombinations = getValidCombinations(skimmedResults)
+
+        if (validCombinations.isEmpty) {
+          (Nil, false)
+        } else {
+          // return the first longest combination
+          val longestCombinations = getLongestCombinations(validCombinations)
+          (longestCombinations.head.reverse, longestCombinations.length == 1)
+        }
 
     }
   }
