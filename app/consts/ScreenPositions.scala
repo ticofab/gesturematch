@@ -9,6 +9,7 @@ object ScreenPositions extends Enumeration {
   // unknown position
   val Unknown = Value("unknown")
   val Undetermined = Value("undetermined")
+  val Start = Value("start")
   val Left  = Value("left")
   val Right = Value("right")
   val Top = Value("top")

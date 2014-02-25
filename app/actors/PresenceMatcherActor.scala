@@ -2,12 +2,14 @@ package actors
 
 import akka.actor.{Actor, Props}
 import play.api.Logger
-import models.{NewRequest, Matched, Matchee, RequestToMatch}
+import models._
 import consts.Criteria
 import traits.StringGenerator
 import helpers.requests.RequestStorageHelper
-import helpers.presence.PatternHelper
 import helpers.storage.DBHelper
+import models.NewRequest
+import models.Matched
+import helpers.matchers.presence.PatternHelper
 
 class PresenceMatcherActor extends Actor with StringGenerator {
 
@@ -27,7 +29,7 @@ class PresenceMatcherActor extends Actor with StringGenerator {
       val possiblyMatchingRequests: List[RequestToMatch] = RequestStorageHelper.getValidExistingRequests(Criteria.PRESENCE, request)
 
       // try to find a matching pattern
-      val (matches, unique): (List[RequestToMatch], Boolean) = PatternHelper.getMatchedPattern(request :: possiblyMatchingRequests)
+      val (matches, isUnique): (List[RequestToMatch], Boolean) = PatternHelper.getMatchedPattern(request :: possiblyMatchingRequests)
 
       matches match {
         case Nil =>
@@ -47,15 +49,23 @@ class PresenceMatcherActor extends Actor with StringGenerator {
           // get unique group id
           val groupId = getGroupUniqueString
 
-          val matcheesInfo: List[Matchee] = matches.zipWithIndex.map(x => Matchee(x._1.handlingActor, x._2))
+          val zippedMatches = matches.zipWithIndex
+          val matcheesInfo: List[Matchee] = zippedMatches.map(x => Matchee(x._1.handlingActor, x._2))
+
+          // send a position scheme if available
+          val scheme: Option[List[DeviceInScheme]] = if (isUnique) {
+            Some(zippedMatches.map(x => DeviceInScheme(PatternHelper.getDeviceSchemePosition(x._1.areaStart), x._2)))
+          } else {
+            None
+          }
+
           matches.foreach(r => {
             // this could maybe be done by each actor, but this way it's cleaner
             val (myInfo, othersInfo) = matcheesInfo.partition(m => m.handlingActor == r.handlingActor)
-            r.handlingActor ! Matched(myInfo.head, othersInfo, groupId)
+            r.handlingActor ! Matched(myInfo.head, othersInfo, groupId, scheme)
           })
 
           DBHelper.addMatchEstablished(request.apiKey, request.appId, matches.length)
-
       }
   }
 }

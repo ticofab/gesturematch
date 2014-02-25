@@ -1,29 +1,34 @@
 package helpers.json
 
 import play.api.libs.json._
-import models.Matchee
+import models.{DeviceInScheme, Matchee}
 import consts.json.{JsonErrorLabels, JsonInputLabels, JsonGeneralLabels, JsonResponseLabels}
-import play.api.libs.json.JsObject
-import play.api.libs.json.JsString
 import scala.Some
 
 object JsonResponseHelper {
 
-  def createMatchedResponse(myself: Matchee, otherMatchees: List[Matchee], groupId: String) = {
+  def createMatchedResponse(myself: Matchee, otherMatchees: List[Matchee], groupId: String,
+                             scheme: Option[List[DeviceInScheme]]) = {
 
-    val objList: List[JsObject] = otherMatchees.map(info => Matchee.toJson(info))
+    val objList: List[Int] = otherMatchees.map(info => info.idInGroup)
     val jsonArray: JsValue = Json.toJson(objList)
 
-    Json.stringify(
-      Json.obj(
+      var jsObj = Json.obj(
         JsonGeneralLabels.KIND -> JsonResponseLabels.KIND_RESPONSE,
         JsonGeneralLabels.TYPE -> JsonInputLabels.INPUT_TYPE_MATCH,
         JsonGeneralLabels.OUTCOME -> JsonGeneralLabels.OK,
         JsonGeneralLabels.GROUP_ID -> JsString(groupId),
-        JsonResponseLabels.MYSELF_IN_GROUP -> Matchee.toJson(myself),
+        JsonResponseLabels.MYSELF_IN_GROUP -> myself.idInGroup,
         JsonResponseLabels.OTHERS_IN_GROUP -> jsonArray
       )
-    )
+
+    if (scheme.isDefined) {
+      val disList = scheme.get.map(dis => DeviceInScheme.toJson(dis))
+      val disArray = Json.toJson(disList)
+      jsObj = jsObj + (JsonResponseLabels.GROUP_POSITION_SCHEME, disArray)
+    }
+
+    Json.stringify(jsObj)
   }
 
   def getInvalidMatchRequestResponse(msg: String) = {

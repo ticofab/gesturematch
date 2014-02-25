@@ -1,8 +1,12 @@
-package helpers.presence
+package helpers.matchers.presence
 
 import models.RequestToMatch
-import consts.SwipeMovements
+import consts.{Areas, ScreenPositions, SwipeMovements}
 import consts.SwipeMovements._
+import consts.ScreenPositions.ScreenPosition
+import consts.Areas.Areas
+import consts.Areas.Areas
+import play.api.Logger
 
 object PatternHelper {
   /**
@@ -21,7 +25,8 @@ object PatternHelper {
       res match {
         case Nil => Nil
         case x :: xs =>
-          val longestCombLength = res.maxBy(_.length)
+          val longestCombLength = res.maxBy(_.length).length
+          Logger.debug(s"the longest combination is $longestCombLength long.")
           res.filter(_.length == longestCombLength)
       }
 
@@ -78,9 +83,6 @@ object PatternHelper {
       // error, not a single InnerX request
       case Nil => (Nil, false)
 
-      // error, two or more InnerX requests
-      case _ => (Nil, false)
-
       // good, only one InnerX
       case x :: Nil =>
         // these intermediate values are here for clarity
@@ -92,9 +94,26 @@ object PatternHelper {
           (Nil, false)
         } else {
           // return the first longest combination
+          Logger.debug(s"there are ${validCombinations.length} valid combinations.")
           val longestCombinations = getLongestCombinations(validCombinations)
+          Logger.debug(s"there are ${longestCombinations.length} longest combinations.")
           (longestCombinations.head.reverse, longestCombinations.length == 1)
         }
+
+      // error, two or more InnerX requests
+      case _ => (Nil, false)
+
+    }
+  }
+
+  def getDeviceSchemePosition(swipeStart: Areas): ScreenPosition = {
+    swipeStart match {
+      case Areas.INNER => ScreenPositions.Start
+      case Areas.TOP => ScreenPositions.Bottom
+      case Areas.LEFT => ScreenPositions.Right
+      case Areas.RIGHT => ScreenPositions.Left
+      case Areas.BOTTOM => ScreenPositions.Top
+      case _ => ScreenPositions.Unknown
 
     }
   }

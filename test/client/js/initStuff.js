@@ -1,8 +1,8 @@
 function initStuff(scope) {
 
-    scope.serverUrl = "swipematch.herokuapp.com"
-    scope.protocol = "wss"
-    scope.port = "443"
+    scope.serverUrl = "localhost"
+    scope.protocol = "ws"
+    scope.port = "9000"
     scope.openWSUrl = scope.protocol + "://" + scope.serverUrl + ":" + scope.port + "/open"
 
     scope.dev1rtype = "content"
@@ -10,20 +10,20 @@ function initStuff(scope) {
     scope.dev3rtype = "content"
     scope.dev4rtype = "content"
 
-    scope.dev1criteria = "pinch"
-    scope.dev2criteria = "pinch"
-    scope.dev3criteria = "pinch"
+    scope.dev1criteria = "presence"
+    scope.dev2criteria = "presence"
+    scope.dev3criteria = "presence"
     scope.dev4criteria = "presence"
 
     scope.dev1apikey = "limebamboo-swipematch-example"
     scope.dev2apikey = "limebamboo-swipematch-example"
-    scope.dev3apikey = "abc"
-    scope.dev4apikey = "def"
+    scope.dev3apikey = "limebamboo-swipematch-example"
+    scope.dev4apikey = "limebamboo-swipematch-example"
 
     scope.dev1appId = "swipematch-example"
     scope.dev2appId = "swipematch-example"
-    scope.dev3appId = "swipeaim-example-android"
-    scope.dev4appId = "swipeaim-example-android"
+    scope.dev3appId = "swipematch-example"
+    scope.dev4appId = "swipematch-example"
 
     scope.dev1devid = "idjs1"
     scope.dev2devid = "idjs2"
@@ -41,13 +41,13 @@ function initStuff(scope) {
     scope.dev4lon = "12.00"
 
     scope.dev1ss = "inner"
-    scope.dev2ss = "inner"
-    scope.dev3ss = "inner"
+    scope.dev2ss = "left"
+    scope.dev3ss = "top"
     scope.dev4ss = "left"
 
     scope.dev1se = "right"
-    scope.dev2se = "left"
-    scope.dev3se = "left"
+    scope.dev2se = "bottom"
+    scope.dev3se = "right"
     scope.dev4se = "inner"
 
     scope.dev1pl = "[{\"type\":\"NAME\",\"content\":{\"value\":\"Fabio1\"}}]"
@@ -57,8 +57,8 @@ function initStuff(scope) {
 
     scope.dev1ep = "blue"
     scope.dev2ep = "blue"
-    scope.dev3ep = "uguale"
-    scope.dev4ep = "uguale"
+    scope.dev3ep = "blue"
+    scope.dev4ep = "blue"
 
     scope.dev1recip = "1"
     scope.dev2recip = "0"

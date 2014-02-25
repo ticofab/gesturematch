@@ -65,14 +65,14 @@ class ContentExchangeActor extends Actor {
       val wsLink = (in, out)
       sender ! wsLink
 
-    case Matched(matchee, others, groupUniqueId) =>
+    case Matched(matchee, others, groupUniqueId, scheme) =>
       // the assumption is that the info we got is valid
       Logger.info(s"$self, matched. Group id: $groupUniqueId, myself: $matchee, others: $others")
       myself = Some(matchee)
       matchees = Some(others)
       groupId = Some(groupUniqueId)
       hasBeenMatched = true
-      val jsonToSend = JsonResponseHelper.createMatchedResponse(matchee, others, groupUniqueId)
+      val jsonToSend = JsonResponseHelper.createMatchedResponse(matchee, others, groupUniqueId, scheme)
       sendToClient(jsonToSend)
 
     case MatcheeLeftGroup(matchee, reason) =>
@@ -165,7 +165,6 @@ class ContentExchangeActor extends Actor {
 
           criteria match {
             // we only get here if the criteria is valid
-            case Criteria.POSITION => futureMatched(ApplicationWS.positionMatchingActor)
             case Criteria.PRESENCE => futureMatched(ApplicationWS.touchMatchingActor)
             case Criteria.PINCH => futureMatched(ApplicationWS.pinchMatchingActor)
             case Criteria.AIM => futureMatched(ApplicationWS.aimMatchingActor)
