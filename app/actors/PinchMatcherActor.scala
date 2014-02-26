@@ -10,7 +10,7 @@ import traits.StringGenerator
 import models.NewRequest
 import helpers.storage.DBHelper
 import helpers.matchers.pinch.PinchMatchingHelper
-import helpers.matchers.presence.PatternHelper
+import helpers.matchers.swipe.PatternHelper
 
 class PinchMatcherActor extends Actor with StringGenerator {
   lazy val myName = this.getClass.getSimpleName

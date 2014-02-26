@@ -19,7 +19,7 @@ import scala.util.{Success, Failure, Try}
 
 object ApplicationWS extends Controller {
   Logger.info("******* Server starting. Creating ActorSystem. ********")
-  val touchMatchingActor = Akka.system.actorOf(PresenceMatcherActor.props)
+  val swipeMatchingActor = Akka.system.actorOf(SwipeMatcherActor.props)
   val pinchMatchingActor = Akka.system.actorOf(PinchMatcherActor.props)
   val aimMatchingActor = Akka.system.actorOf(AimMatcherActor.props)
 

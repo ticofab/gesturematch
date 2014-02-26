@@ -1,4 +1,4 @@
-package helpers.matchers.presence
+package helpers.matchers.swipe
 
 import models.RequestToMatch
 import consts.{Areas, ScreenPositions, SwipeMovements}

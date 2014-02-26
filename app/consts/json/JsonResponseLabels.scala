@@ -23,7 +23,4 @@ object JsonResponseLabels {
   val OTHERS_IN_GROUP = "othersInGroup"
   val GROUP_POSITION_SCHEME = "scheme"
 
-  // matchee object
-  val ID_IN_GROUP = "idInGroup"
-  val POSITION_IN_GROUP = "position"
 }

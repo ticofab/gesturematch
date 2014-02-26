@@ -8,19 +8,19 @@ myApp.controller('paramTable', ['$scope', function($scope) {
       $scope.openWSUrl = $scope.protocol + "://" + $scope.serverUrl + ":" + $scope.port + "/open"
     });
 
-    $scope.$watchCollection("[dev1rtype,dev1lat,dev1lon,dev1ss,dev1se,dev1ep,dev1criteria]", function(nv) {
+    $scope.$watchCollection("[dev1lat,dev1lon,dev1ss,dev1se,dev1ep,dev1criteria]", function(nv) {
         $scope.match1json = createMatchJson(nv)
     });
 
-    $scope.$watchCollection("[dev2rtype,dev2lat,dev2lon,dev2ss,dev2se,dev2ep,dev2criteria]", function(nv) {
+    $scope.$watchCollection("[dev2lat,dev2lon,dev2ss,dev2se,dev2ep,dev2criteria]", function(nv) {
         $scope.match2json = createMatchJson(nv)
     });
 
-    $scope.$watchCollection("[dev3rtype,dev3lat,dev3lon,dev3ss,dev3se,dev3ep,dev3criteria]", function(nv) {
+    $scope.$watchCollection("[dev3lat,dev3lon,dev3ss,dev3se,dev3ep,dev3criteria]", function(nv) {
         $scope.match3json = createMatchJson(nv)
     });
 
-    $scope.$watchCollection("[dev4rtype,dev4lat,dev4lon,dev4ss,dev4se,dev4ep,dev4criteria]", function(nv) {
+    $scope.$watchCollection("[dev4lat,dev4lon,dev4ss,dev4se,dev4ep,dev4criteria]", function(nv) {
         $scope.match4json = createMatchJson(nv)
     });
 

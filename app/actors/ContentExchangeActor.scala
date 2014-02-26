@@ -165,7 +165,7 @@ class ContentExchangeActor extends Actor {
 
           criteria match {
             // we only get here if the criteria is valid
-            case Criteria.PRESENCE => futureMatched(ApplicationWS.touchMatchingActor)
+            case Criteria.SWIPE => futureMatched(ApplicationWS.swipeMatchingActor)
             case Criteria.PINCH => futureMatched(ApplicationWS.pinchMatchingActor)
             case Criteria.AIM => futureMatched(ApplicationWS.aimMatchingActor)
           }

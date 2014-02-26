@@ -5,15 +5,10 @@ function initStuff(scope) {
     scope.port = "9000"
     scope.openWSUrl = scope.protocol + "://" + scope.serverUrl + ":" + scope.port + "/open"
 
-    scope.dev1rtype = "content"
-    scope.dev2rtype = "content"
-    scope.dev3rtype = "content"
-    scope.dev4rtype = "content"
-
-    scope.dev1criteria = "presence"
-    scope.dev2criteria = "presence"
-    scope.dev3criteria = "presence"
-    scope.dev4criteria = "presence"
+    scope.dev1criteria = "swipe"
+    scope.dev2criteria = "swipe"
+    scope.dev3criteria = "swipe"
+    scope.dev4criteria = "swipe"
 
     scope.dev1apikey = "limebamboo-swipematch-example"
     scope.dev2apikey = "limebamboo-swipematch-example"

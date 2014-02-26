@@ -5,8 +5,7 @@ import scala.util.Try
 object Criteria extends Enumeration {
   type Criteria = Value
   val INVALID = Value("invalid")
-  val POSITION = Value("position")
-  val PRESENCE = Value("presence")
+  val SWIPE = Value("swipe")
   val AIM = Value("aim")
   val PINCH = Value("pinch")
 

@@ -9,9 +9,9 @@ import helpers.requests.RequestStorageHelper
 import helpers.storage.DBHelper
 import models.NewRequest
 import models.Matched
-import helpers.matchers.presence.PatternHelper
+import helpers.matchers.swipe.PatternHelper
 
-class PresenceMatcherActor extends Actor with StringGenerator {
+class SwipeMatcherActor extends Actor with StringGenerator {
 
   lazy val myName = this.getClass.getSimpleName
 
@@ -26,7 +26,7 @@ class PresenceMatcherActor extends Actor with StringGenerator {
       // therefore there won't be two concurrent accesses to the RequestListHelper?
 
       // get a list of possibly matching requests
-      val possiblyMatchingRequests: List[RequestToMatch] = RequestStorageHelper.getValidExistingRequests(Criteria.PRESENCE, request)
+      val possiblyMatchingRequests: List[RequestToMatch] = RequestStorageHelper.getValidExistingRequests(Criteria.SWIPE, request)
 
       // try to find a matching pattern
       val (matches, isUnique): (List[RequestToMatch], Boolean) = PatternHelper.getMatchedPattern(request :: possiblyMatchingRequests)
@@ -35,7 +35,7 @@ class PresenceMatcherActor extends Actor with StringGenerator {
         case Nil =>
           // no match. add the request to the storage
           Logger.info(getNewRequestLogging(possiblyMatchingRequests.size, "no match found. Adding request to the storage."))
-          RequestStorageHelper.storeNewRequest(Criteria.PRESENCE, request)
+          RequestStorageHelper.storeNewRequest(Criteria.SWIPE, request)
 
         case x :: Nil =>
           // only one element. wrong!
@@ -44,7 +44,7 @@ class PresenceMatcherActor extends Actor with StringGenerator {
         case x :: xs =>
           // we identified a group!
           Logger.info(getNewRequestLogging(possiblyMatchingRequests.size, s"group found, size: ${matches.size}"))
-          RequestStorageHelper.removeRequests(Criteria.PRESENCE, matches)
+          RequestStorageHelper.removeRequests(Criteria.SWIPE, matches)
 
           // get unique group id
           val groupId = getGroupUniqueString
@@ -70,6 +70,6 @@ class PresenceMatcherActor extends Actor with StringGenerator {
   }
 }
 
-object PresenceMatcherActor {
-  val props = Props(classOf[PresenceMatcherActor])
+object SwipeMatcherActor {
+  val props = Props(classOf[SwipeMatcherActor])
 }
