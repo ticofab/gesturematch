@@ -52,8 +52,7 @@ object RequestStorageHelper {
 
   private def getCorrespondingStorage(criteria: Criteria): RequestStorage = {
     criteria match {
-      case Criteria.POSITION => PositionRequestStorage
-      case Criteria.PRESENCE => PresenceRequestStorage
+      case Criteria.SWIPE => SwipeRequestStorage
       case Criteria.PINCH => PinchRequestStorage
       case Criteria.AIM => AimRequestStorage
     }

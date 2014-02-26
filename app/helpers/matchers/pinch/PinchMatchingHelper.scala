@@ -1,4 +1,4 @@
-package helpers.pinch
+package helpers.matchers.pinch
 
 import consts.SwipeMovements._
 import consts.ScreenPositions.ScreenPosition

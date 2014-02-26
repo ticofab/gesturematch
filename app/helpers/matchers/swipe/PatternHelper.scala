@@ -1,8 +1,12 @@
-package helpers.presence
+package helpers.matchers.swipe
 
 import models.RequestToMatch
-import consts.SwipeMovements
+import consts.{Areas, ScreenPositions, SwipeMovements}
 import consts.SwipeMovements._
+import consts.ScreenPositions.ScreenPosition
+import consts.Areas.Areas
+import consts.Areas.Areas
+import play.api.Logger
 
 object PatternHelper {
   /**
@@ -12,16 +16,21 @@ object PatternHelper {
    * All the requests that we've been able to match based on other criteria.
    *
    * @return
-   * The longest closed sequence possible given the starting point and the other requests.
+   * A pair (List[RequestToMatch], Boolean) where the first is the longest closed sequence possible
+   * given all the requests, and the second indicates whether it is unique or not.
    */
-  def getMatchedPattern(matchingRequests: List[RequestToMatch]): List[RequestToMatch] = {
-    def getLongestComb(res: List[List[RequestToMatch]]): List[RequestToMatch] =
+  def getMatchedPattern(matchingRequests: List[RequestToMatch]): (List[RequestToMatch], Boolean) = {
+
+    def getLongestCombinations(res: List[List[RequestToMatch]]): List[List[RequestToMatch]] =
       res match {
         case Nil => Nil
-        case x :: xs => res.reduceLeft((a, b) => if (a.length > b.length) a else b)
+        case x :: xs =>
+          val longestCombLength = res.maxBy(_.length).length
+          Logger.debug(s"the longest combination is $longestCombLength long.")
+          res.filter(_.length == longestCombLength)
       }
 
-    def getValidCombs(res: List[List[RequestToMatch]]) = {
+    def getValidCombinations(res: List[List[RequestToMatch]]) = {
       def validCombFilter(res: List[RequestToMatch]): Boolean = {
         // note! it assumes that the collection starts with the last request,
         //   which is then the XInner, and finishes with the first (InnerX)
@@ -36,7 +45,6 @@ object PatternHelper {
     def getCombinations(tileHistory: List[RequestToMatch], availableNewTiles: List[RequestToMatch]): List[(List[RequestToMatch], List[RequestToMatch])] = {
 
       def expand = {
-        // debug
         val filtered = availableNewTiles.filter(r => SwipeMovements.getLegalNextOnes(tileHistory.head.movement).contains(r.movement))
         val mapped = filtered.map(elem => (elem :: tileHistory, availableNewTiles.diff(List(elem))))
         mapped
@@ -72,21 +80,40 @@ object PatternHelper {
 
     head match {
 
+      // error, not a single InnerX request
+      case Nil => (Nil, false)
+
       // good, only one InnerX
       case x :: Nil =>
         // these intermediate values are here for clarity
         val combs = getCombinations(head, tail)
         val skimmedResults = combs.map(x => x._1)
-        val valid = getValidCombs(skimmedResults)
-        val longestValidResult = getLongestComb(valid)
-        val reversed = longestValidResult.reverse
-        reversed
+        val validCombinations = getValidCombinations(skimmedResults)
 
-      // error, not a single InnerX request
-      case Nil => List()
+        if (validCombinations.isEmpty) {
+          (Nil, false)
+        } else {
+          // return the first longest combination
+          Logger.debug(s"there are ${validCombinations.length} valid combinations.")
+          val longestCombinations = getLongestCombinations(validCombinations)
+          Logger.debug(s"there are ${longestCombinations.length} longest combinations.")
+          (longestCombinations.head.reverse, longestCombinations.length == 1)
+        }
 
       // error, two or more InnerX requests
-      case _ => List()
+      case _ => (Nil, false)
+
+    }
+  }
+
+  def getDeviceSchemePosition(swipeStart: Areas): ScreenPosition = {
+    swipeStart match {
+      case Areas.INNER => ScreenPositions.Start
+      case Areas.TOP => ScreenPositions.Bottom
+      case Areas.LEFT => ScreenPositions.Right
+      case Areas.RIGHT => ScreenPositions.Left
+      case Areas.BOTTOM => ScreenPositions.Top
+      case _ => ScreenPositions.Unknown
 
     }
   }

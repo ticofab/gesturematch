@@ -5,7 +5,7 @@ import models.RequestToMatch
 /*
  * This object is an abstraction to access the storage.
  */
-object PresenceRequestStorage extends RequestStorage {
+object SwipeRequestStorage extends RequestStorage {
   // This could become a memcache DB or some other abstraction
   private var requests: List[RequestToMatch] = List()
 

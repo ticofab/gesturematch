@@ -2,12 +2,12 @@ package actors
 
 import traits.StringGenerator
 import akka.actor.{Props, Actor}
-import models.{Matched, Matchee, RequestToMatch, NewRequest}
+import models._
 import helpers.requests.RequestStorageHelper
 import consts.Criteria
 import play.api.Logger
-import helpers.pinch.PinchMatchingHelper
 import helpers.storage.DBHelper
+import models.NewRequest
 
 class AimMatcherActor extends Actor with StringGenerator {
   lazy val myName = this.getClass.getSimpleName
@@ -55,8 +55,9 @@ class AimMatcherActor extends Actor with StringGenerator {
           Logger.info(getNewRequestLogging(existingRequests.length, s"match found: $groupId"))
 
           // Send a matching notification to the actors managing the corresponding devices
-          val matchee1 = new Matchee(request.handlingActor, 0, PinchMatchingHelper.getPosition(request.movement))
-          val matchee2 = new Matchee(prevReq.handlingActor, 1, PinchMatchingHelper.getPosition(prevReq.movement))
+          val matchee1 = new Matchee(request.handlingActor, 0)
+          val matchee2 = new Matchee(prevReq.handlingActor, 1)
+
           request.handlingActor ! Matched(matchee1, List(matchee2), groupId)
           prevReq.handlingActor ! Matched(matchee2, List(matchee1), groupId)
 

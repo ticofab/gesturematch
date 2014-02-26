@@ -5,11 +5,12 @@ import models._
 import helpers.requests.RequestStorageHelper
 import consts.Criteria
 import play.api.Logger
-import helpers.pinch.PinchMatchingHelper
 import consts.SwipeMovements.SwipeMovement
 import traits.StringGenerator
 import models.NewRequest
 import helpers.storage.DBHelper
+import helpers.matchers.pinch.PinchMatchingHelper
+import helpers.matchers.swipe.PatternHelper
 
 class PinchMatcherActor extends Actor with StringGenerator {
   lazy val myName = this.getClass.getSimpleName
@@ -66,16 +67,21 @@ class PinchMatcherActor extends Actor with StringGenerator {
           Logger.info(getNewRequestLogging(existingRequests.length, s"match found: $groupId"))
 
           // Send a matching notification to the actors managing the corresponding devices
-          val matchee1 = new Matchee(request.handlingActor, 0, PinchMatchingHelper.getPosition(request.movement))
-          val matchee2 = new Matchee(prevReq.handlingActor, 1, PinchMatchingHelper.getPosition(prevReq.movement))
-          request.handlingActor ! Matched(matchee1, List(matchee2), groupId)
-          prevReq.handlingActor ! Matched(matchee2, List(matchee1), groupId)
+          val matchee1 = new Matchee(request.handlingActor, 0)
+          val matchee2 = new Matchee(prevReq.handlingActor, 1)
+          val scheme: Option[List[DeviceInScheme]] = Some(List(
+            DeviceInScheme(PatternHelper.getDeviceSchemePosition(request.areaStart), 0),
+            DeviceInScheme(PatternHelper.getDeviceSchemePosition(prevReq.areaEnd), 1)
+          ))
+
+          request.handlingActor ! Matched(matchee1, List(matchee2), groupId, scheme)
+          prevReq.handlingActor ! Matched(matchee2, List(matchee1), groupId, scheme)
 
           DBHelper.addMatchEstablished(request.apiKey, request.appId, 2)
 
         case group :: tail =>
           Logger.info(getNewRequestLogging(existingRequests.length, s"${matches.size} groups found. uncertainty."))
-          // TODO
+        // TODO
       }
   }
 }
