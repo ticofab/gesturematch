@@ -20,19 +20,11 @@ object DBHelper {
   private val db: DefaultDB = ReactiveMongoPlugin.db
   private val coll: JSONCollection = db.collection[JSONCollection]("apiKeys")
 
-  def areKeyAndIdValid(apiKey: String, appId: String): Boolean = {
+  def areKeyAndIdValid(apiKey: String, appId: String): Future[Boolean] = {
     val query = Json.obj("apiKey" -> apiKey, "appIds.appId" -> appId)
     val filter = Json.obj("_id" -> 1)
     val fu: Future[List[JsValue]] = coll.find(query, filter).cursor[JsValue].collect[List](1)
-    val retrievedDocs: List[JsValue] = Await.result(fu, Timeouts.maxDatabaseResponseTime)
-    fu recover {
-      case t: TimeoutException => {
-        val exceptionMsg = s"Database didn't respond within ${Timeouts.maxDatabaseResponseTime.toString()}"
-        throw new TimeoutException(exceptionMsg)
-      }
-    }
-    Logger.debug(s"areKeyAndIdValid: ($apiKey, $appId), retrieved ${retrievedDocs.length} documents.")
-    retrievedDocs.length > 0
+    fu.map(_.length > 0)
   }
 
   private def updateOp(apiKey: String, appId: String, modifier: JsObject) = {

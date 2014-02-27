@@ -6,6 +6,7 @@ case class NewRequest(request: RequestToMatch)
 // client handling actor messages
 case class ConnectedClient(remoteAddress: String, apiKey: String, appId: String, os: String, deviceId: String)
 case class Matched(myInfo: Matchee, matcheesInfo: List[Matchee], groupId: String, scheme: Option[List[DeviceInScheme]] = None)
+case class Input(input: String)
 
 // inter actor messages
 sealed trait MatcheeMessage

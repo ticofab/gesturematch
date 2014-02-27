@@ -44,12 +44,13 @@ class ContentExchangeActor extends Actor {
   // Actor messaging
   // *************************************
   def receive: Actor.Receive = {
-    case connectedClient @ ConnectedClient(remoteAddress, apiKey, appId, os, deviceId) =>
+    case connectedClient@ConnectedClient(remoteAddress, apiKey, appId, os, deviceId) =>
       Logger.info(s"$self, client connected: $remoteAddress, $apiKey, $appId, $os, $deviceId")
       client = Some(connectedClient)
 
       val in = Iteratee.foreach[String] {
-        input => onInput(input)
+        // sending a message to self, so they are nicely pipelined
+        input => self ! Input(input)
       }
 
       val out: Enumerator[String] = Concurrent.unicast(c => {
@@ -64,6 +65,8 @@ class ContentExchangeActor extends Actor {
 
       val wsLink = (in, out)
       sender ! wsLink
+
+    case Input(input) => onInput(input)
 
     case Matched(matchee, others, groupUniqueId, scheme) =>
       // the assumption is that the info we got is valid

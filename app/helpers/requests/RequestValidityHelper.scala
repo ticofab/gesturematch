@@ -3,18 +3,10 @@ package helpers.requests
 import consts.{Areas, Criteria}
 import consts.Criteria.Criteria
 import consts.Areas.Areas
-import helpers.storage.DBHelper
 
 case class InvalidRequestException(message: String) extends Exception(message)
 
 object RequestValidityHelper {
-
-  def connectionRequestIsValid(apiKey: String, appId: String): Boolean = {
-    if (!DBHelper.areKeyAndIdValid(apiKey, appId))
-      throw new InvalidRequestException(s"ApiKey and AppId pair ($apiKey, $appId) is not valid")
-
-    true
-  }
 
   def matchRequestIsValid(criteria: Criteria, areaStart: Areas, areaEnd: Areas,
                           swipeOrientation: Option[Double]): Boolean = {
