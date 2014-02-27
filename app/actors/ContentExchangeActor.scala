@@ -44,9 +44,9 @@ class ContentExchangeActor extends Actor {
   // Actor messaging
   // *************************************
   def receive: Actor.Receive = {
-    case ConnectedClient(remoteAddress, apiKey, appId, os, deviceId) =>
+    case connectedClient @ ConnectedClient(remoteAddress, apiKey, appId, os, deviceId) =>
       Logger.info(s"$self, client connected: $remoteAddress, $apiKey, $appId, $os, $deviceId")
-      client = Some(ConnectedClient(remoteAddress, apiKey, appId, os, deviceId))
+      client = Some(connectedClient)
 
       val in = Iteratee.foreach[String] {
         input => onInput(input)

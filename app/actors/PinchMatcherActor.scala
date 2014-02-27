@@ -80,8 +80,9 @@ class PinchMatcherActor extends Actor with StringGenerator {
           DBHelper.addMatchEstablished(request.apiKey, request.appId, 2)
 
         case group :: tail =>
+          // TODO
           Logger.info(getNewRequestLogging(existingRequests.length, s"${matches.size} groups found. uncertainty."))
-        // TODO
+
       }
   }
 }

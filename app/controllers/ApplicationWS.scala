@@ -23,12 +23,7 @@ object ApplicationWS extends Controller {
   val pinchMatchingActor = Akka.system.actorOf(PinchMatcherActor.props)
   val aimMatchingActor = Akka.system.actorOf(AimMatcherActor.props)
 
-  /*
-   Endpoint to open the WebSocket connection.
-   NOTES:
-     - I chose not to use WebSocket[JsValue] because this would lead to horrible exceptions
-       in case inputs don't come as a valid Json String.
-   */
+  // Endpoint to open the WebSocket connection.
   def open(apiKey: String, appId: String, os: String, deviceId: String): WebSocket[String] = WebSocket.async {
     request => {
       Logger.info(s"open websocket endpoint connection: $request")
