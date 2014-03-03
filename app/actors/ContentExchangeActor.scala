@@ -68,14 +68,15 @@ class ContentExchangeActor extends Actor {
 
     case Input(input) => onInput(input)
 
-    case Matched(matchee, others, groupUniqueId, scheme) =>
+    case Matched(groupMatchees, groupUniqueId, scheme) =>
       // the assumption is that the info we got is valid
-      Logger.info(s"$self, matched. Group id: $groupUniqueId, myself: $matchee, others: $others")
-      myself = Some(matchee)
+      Logger.info(s"$self, matched. Group id: $groupUniqueId, groupMatchees: $matchees")
+      val (me, others) = groupMatchees.partition(m => m.handlingActor == self)
+      myself = Some(me.head)
       matchees = Some(others)
       groupId = Some(groupUniqueId)
       hasBeenMatched = true
-      val jsonToSend = JsonResponseHelper.createMatchedResponse(matchee, others, groupUniqueId, scheme)
+      val jsonToSend = JsonResponseHelper.createMatchedResponse(me.head, groupMatchees, groupUniqueId, scheme)
       sendToClient(jsonToSend)
 
     case MatcheeLeftGroup(matchee, reason) =>

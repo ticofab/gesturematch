@@ -57,9 +57,10 @@ class AimMatcherActor extends Actor with StringGenerator {
           // Send a matching notification to the actors managing the corresponding devices
           val matchee1 = new Matchee(request.handlingActor, 0)
           val matchee2 = new Matchee(prevReq.handlingActor, 1)
+          val message = new Matched(List(matchee1, matchee2), groupId)
 
-          request.handlingActor ! Matched(matchee1, List(matchee2), groupId)
-          prevReq.handlingActor ! Matched(matchee2, List(matchee1), groupId)
+          request.handlingActor ! message
+          prevReq.handlingActor ! message
 
           DBHelper.addMatchEstablished(request.apiKey, request.appId, 2)
 

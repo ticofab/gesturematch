@@ -19,8 +19,8 @@ object JsonResponseLabels {
   val REASON_PAYLOAD_NOT_DELIVERED = "notDelivered"
 
   // matched messages labels
-  val MYSELF_IN_GROUP = "myselfInGroup"
-  val OTHERS_IN_GROUP = "othersInGroup"
+  val MYSELF_IN_GROUP = "myId"
+  val OTHERS_IN_GROUP = "group"
   val GROUP_POSITION_SCHEME = "scheme"
 
 }
