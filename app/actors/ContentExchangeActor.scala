@@ -45,12 +45,13 @@ class ContentExchangeActor extends Actor {
   // Actor messaging
   // *************************************
   def receive: Actor.Receive = {
-    case ConnectedClient(remoteAddress, apiKey, appId, os, deviceId) =>
+    case connectedClient@ConnectedClient(remoteAddress, apiKey, appId, os, deviceId) =>
       Logger.info(s"$self, client connected: $remoteAddress, $apiKey, $appId, $os, $deviceId")
-      client = Some(ConnectedClient(remoteAddress, apiKey, appId, os, deviceId))
+      client = Some(connectedClient)
 
       val in = Iteratee.foreach[String] {
-        input => onInput(input)
+        // sending a message to self, so they are nicely pipelined
+        input => self ! Input(input)
       }
 
       val out: Enumerator[String] = Concurrent.unicast(c => {
@@ -71,14 +72,17 @@ class ContentExchangeActor extends Actor {
       val wsLink = (in, out)
       sender ! wsLink
 
-    case Matched(matchee, others, groupUniqueId, scheme) =>
+    case Input(input) => onInput(input)
+
+    case Matched(groupMatchees, groupUniqueId, scheme) =>
       // the assumption is that the info we got is valid
-      Logger.info(s"$self, matched. Group id: $groupUniqueId, myself: $matchee, others: $others")
-      myself = Some(matchee)
+      Logger.info(s"$self, matched. Group id: $groupUniqueId, groupMatchees: $matchees")
+      val (me, others) = groupMatchees.partition(m => m.handlingActor == self)
+      myself = Some(me.head)
       matchees = Some(others)
       groupId = Some(groupUniqueId)
       hasBeenMatched = true
-      val jsonToSend = JsonResponseHelper.createMatchedResponse(matchee, others, groupUniqueId, scheme)
+      val jsonToSend = JsonResponseHelper.createMatchedResponse(me.head, groupMatchees, groupUniqueId, scheme)
       sendToClient(jsonToSend)
 
     case MatcheeLeftGroup(matchee, reason) =>

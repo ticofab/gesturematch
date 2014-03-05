@@ -74,14 +74,17 @@ class PinchMatcherActor extends Actor with StringGenerator {
             DeviceInScheme(PatternHelper.getDeviceSchemePosition(prevReq.areaEnd), 1)
           ))
 
-          request.handlingActor ! Matched(matchee1, List(matchee2), groupId, scheme)
-          prevReq.handlingActor ! Matched(matchee2, List(matchee1), groupId, scheme)
+          val message = new Matched(List(matchee1, matchee2), groupId, scheme)
+
+          request.handlingActor ! message
+          prevReq.handlingActor ! message
 
           DBHelper.addMatchEstablished(request.apiKey, request.appId, 2)
 
         case group :: tail =>
+          // TODO
           Logger.info(getNewRequestLogging(existingRequests.length, s"${matches.size} groups found. uncertainty."))
-        // TODO
+
       }
   }
 }

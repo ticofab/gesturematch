@@ -59,11 +59,7 @@ class SwipeMatcherActor extends Actor with StringGenerator {
             None
           }
 
-          matches.foreach(r => {
-            // this could maybe be done by each actor, but this way it's cleaner
-            val (myInfo, othersInfo) = matcheesInfo.partition(m => m.handlingActor == r.handlingActor)
-            r.handlingActor ! Matched(myInfo.head, othersInfo, groupId, scheme)
-          })
+          matches.foreach(r => r.handlingActor ! Matched(matcheesInfo, groupId, scheme))
 
           DBHelper.addMatchEstablished(request.apiKey, request.appId, matches.length)
       }

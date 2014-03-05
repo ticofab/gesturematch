@@ -5,20 +5,20 @@ function initStuff(scope) {
     scope.port = "9000"
     scope.openWSUrl = scope.protocol + "://" + scope.serverUrl + ":" + scope.port + "/open"
 
-    scope.dev1criteria = "swipe"
-    scope.dev2criteria = "swipe"
+    scope.dev1criteria = "pinch"
+    scope.dev2criteria = "pinch"
     scope.dev3criteria = "swipe"
     scope.dev4criteria = "swipe"
 
-    scope.dev1apikey = "limebamboo-swipematch-example"
-    scope.dev2apikey = "limebamboo-swipematch-example"
-    scope.dev3apikey = "limebamboo-swipematch-example"
-    scope.dev4apikey = "limebamboo-swipematch-example"
+    scope.dev1apikey = "limebamboo-gesturematch"
+    scope.dev2apikey = "limebamboo-gesturematch"
+    scope.dev3apikey = "limebamboo-gesturematch"
+    scope.dev4apikey = "limebamboo-gesturematch"
 
-    scope.dev1appId = "swipematch-example"
-    scope.dev2appId = "swipematch-example"
-    scope.dev3appId = "swipematch-example"
-    scope.dev4appId = "swipematch-example"
+    scope.dev1appId = "gesturematch-demo"
+    scope.dev2appId = "gesturematch-demo"
+    scope.dev3appId = "gesturematch-demo"
+    scope.dev4appId = "gesturematch-demo"
 
     scope.dev1devid = "idjs1"
     scope.dev2devid = "idjs2"
@@ -36,12 +36,12 @@ function initStuff(scope) {
     scope.dev4lon = "12.00"
 
     scope.dev1ss = "inner"
-    scope.dev2ss = "left"
+    scope.dev2ss = "inner"
     scope.dev3ss = "top"
     scope.dev4ss = "left"
 
     scope.dev1se = "right"
-    scope.dev2se = "bottom"
+    scope.dev2se = "left"
     scope.dev3se = "right"
     scope.dev4se = "inner"
 

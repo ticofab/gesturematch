@@ -7,10 +7,10 @@ import scala.Some
 
 object JsonResponseHelper {
 
-  def createMatchedResponse(myself: Matchee, otherMatchees: List[Matchee], groupId: String,
+  def createMatchedResponse(myself: Matchee, allMatchees: List[Matchee], groupId: String,
                              scheme: Option[List[DeviceInScheme]]) = {
 
-    val objList: List[Int] = otherMatchees.map(info => info.idInGroup)
+    val objList: List[Int] = allMatchees.map(info => info.idInGroup)
     val jsonArray: JsValue = Json.toJson(objList)
 
       var jsObj = Json.obj(
