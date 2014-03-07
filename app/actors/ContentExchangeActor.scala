@@ -3,7 +3,6 @@ package actors
 import akka.actor.{ActorRef, Actor, Props}
 import akka.pattern.ask
 import play.api.Logger
-import play.api.Play.current
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import models._
@@ -11,7 +10,7 @@ import scala.util.Try
 import models.ClientInputMessages._
 import consts.{Timeouts, Areas, Criteria}
 import play.api.libs.iteratee.{Concurrent, Enumerator, Iteratee}
-import play.api.libs.concurrent.{Akka, Promise}
+import play.api.libs.concurrent.Promise
 import helpers.json.{JsonMessageHelper, JsonResponseHelper, JsonInputHelper}
 import helpers.movements.SwipeMovementHelper
 import controllers.ApplicationWS
@@ -56,11 +55,6 @@ class ContentExchangeActor extends Actor {
 
       val out: Enumerator[String] = Concurrent.unicast(c => {
         channel = Some(c)
-
-        // for the entire duration of the connection, start sending keep-alive messages
-        Akka.system.scheduler.schedule(Timeouts.keepAlivePingInterval, Timeouts.keepAlivePingInterval) {
-          channel.foreach(c => c.push("k"))
-        }
 
         // start a timeout to close the connection after a while
         Promise.timeout({
