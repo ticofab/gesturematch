@@ -3,7 +3,7 @@ function initStuff(scope) {
     scope.serverUrl = "localhost"
     scope.protocol = "ws"
     scope.port = "9000"
-    scope.openWSUrl = scope.protocol + "://" + scope.serverUrl + ":" + scope.port + "/open"
+    scope.openWSUrl = scope.protocol + "://" + scope.serverUrl + ":" + scope.port + "/v1/open"
 
     scope.dev1criteria = "pinch"
     scope.dev2criteria = "pinch"
