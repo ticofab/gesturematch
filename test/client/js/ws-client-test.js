@@ -5,7 +5,7 @@ myApp.controller('paramTable', ['$scope', function($scope) {
     initStuff($scope);
 
     $scope.$watchCollection("[protocol,serverUrl,port]", function() {
-      $scope.openWSUrl = $scope.protocol + "://" + $scope.serverUrl + ":" + $scope.port + "/open"
+      $scope.openWSUrl = $scope.protocol + "://" + $scope.serverUrl + ":" + $scope.port + "/v1/open"
     });
 
     $scope.$watchCollection("[dev1lat,dev1lon,dev1ss,dev1se,dev1ep,dev1criteria]", function(nv) {

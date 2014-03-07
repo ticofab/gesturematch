@@ -3,7 +3,6 @@ package models
 import consts.ScreenPositions.ScreenPosition
 import consts.ScreenPositions
 import play.api.libs.json.Json
-import consts.json.JsonResponseLabels
 
 class Scheme() {
   var width: Int = 0
@@ -11,10 +10,6 @@ class Scheme() {
   var devices: List[DeviceInScheme] = Nil
 
   private def getDeviceFromId(id: Int) = devices.filter(x => x.id == id).head
-
-private def fabio(pos: ScreenPosition, newId: Int) = {
-
-}
 
   def addFirstDevice() = {
     // first device

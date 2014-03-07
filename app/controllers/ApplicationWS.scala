@@ -25,7 +25,7 @@ object ApplicationWS extends Controller {
   // TODO: putting actor here in objects makes it hard to test. I can use the Global object.
 
   // Endpoint to open the WebSocket connection.
-  def open(apiKey: String, appId: String, os: String, deviceId: String): WebSocket[String] = WebSocket.async {
+  def openv1(apiKey: String, appId: String, os: String, deviceId: String): WebSocket[String] = WebSocket.async {
     request => {
       Logger.info(s"open websocket endpoint connection: $request")
 
