@@ -49,15 +49,27 @@ class SwipeMatcherActor extends Actor with StringGenerator {
           // get unique group id
           val groupId = getGroupUniqueString
 
-          val zippedMatches = matches.zipWithIndex
-          val matcheesInfo: List[Matchee] = zippedMatches.map(x => Matchee(x._1.handlingActor, x._2))
 
-          // send a position scheme if available
-          val scheme: Option[List[DeviceInScheme]] = if (isUnique) {
-            Some(zippedMatches.map(x => DeviceInScheme(PatternHelper.getDeviceSchemePosition(x._1.areaStart), x._2)))
-          } else {
-            None
-          }
+          val zippedMatches: List[(RequestToMatch, Int)] = matches.zipWithIndex
+
+          val scheme: Option[Scheme] = if (isUnique) {
+            def addZippedDevicesToScheme(devices: List[(RequestToMatch, Int)], scheme: Scheme): Unit = {
+              if (!devices.isEmpty) {
+                val (r, id) = devices.head
+                val pos = PatternHelper.getDeviceSchemePosition(r.areaStart)
+                scheme.addNextDevice(pos, id)
+                addZippedDevicesToScheme(devices.tail, scheme)
+              }
+            }
+
+            val scheme: Scheme = new Scheme()
+            addZippedDevicesToScheme(zippedMatches, scheme)
+            Some(scheme)
+          } else None
+
+          val matcheesInfo: List[Matchee] = zippedMatches.map(x => Matchee(x._1.handlingActor, x._2))
+          matches.foreach(r => r.handlingActor ! Matched(matcheesInfo, groupId, scheme))
+
 
           matches.foreach(r => r.handlingActor ! Matched(matcheesInfo, groupId, scheme))
 
