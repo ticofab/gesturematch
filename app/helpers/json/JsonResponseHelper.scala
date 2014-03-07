@@ -1,14 +1,14 @@
 package helpers.json
 
 import play.api.libs.json._
-import models.{DeviceInScheme, Matchee}
+import models.{Scheme, DeviceInScheme, Matchee}
 import consts.json.{JsonErrorLabels, JsonInputLabels, JsonGeneralLabels, JsonResponseLabels}
 import scala.Some
 
 object JsonResponseHelper {
 
   def createMatchedResponse(myself: Matchee, allMatchees: List[Matchee], groupId: String,
-                             scheme: Option[List[DeviceInScheme]]) = {
+                             scheme: Option[Scheme]) = {
 
     val objList: List[Int] = allMatchees.map(info => info.idInGroup)
     val jsonArray: JsValue = Json.toJson(objList)
@@ -23,9 +23,7 @@ object JsonResponseHelper {
       )
 
     if (scheme.isDefined) {
-      val disList = scheme.get.map(dis => DeviceInScheme.toJson(dis))
-      val disArray = Json.toJson(disList)
-      jsObj = jsObj + (JsonResponseLabels.GROUP_POSITION_SCHEME, disArray)
+      jsObj = jsObj + (JsonResponseLabels.GROUP_POSITION_SCHEME, Scheme.toJson(scheme.get))
     }
 
     Json.stringify(jsObj)

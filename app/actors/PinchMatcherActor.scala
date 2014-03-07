@@ -67,14 +67,13 @@ class PinchMatcherActor extends Actor with StringGenerator {
           Logger.info(getNewRequestLogging(existingRequests.length, s"match found: $groupId"))
 
           // Send a matching notification to the actors managing the corresponding devices
-          val matchee1 = new Matchee(request.handlingActor, 0)
-          val matchee2 = new Matchee(prevReq.handlingActor, 1)
-          val scheme: Option[List[DeviceInScheme]] = Some(List(
-            DeviceInScheme(PatternHelper.getDeviceSchemePosition(request.areaStart), 0),
-            DeviceInScheme(PatternHelper.getDeviceSchemePosition(prevReq.areaEnd), 1)
-          ))
+          val scheme: Scheme = new Scheme
+          val id1: Int = scheme.addFirstDevice
+          val id2: Int = scheme.addDevice(PatternHelper.getDeviceSchemePosition(prevReq.areaEnd), id1)
+          val matchee1 = new Matchee(request.handlingActor, id1)
+          val matchee2 = new Matchee(prevReq.handlingActor, id2)
 
-          val message = new Matched(List(matchee1, matchee2), groupId, scheme)
+          val message = new Matched(List(matchee1, matchee2), groupId, Some(scheme))
 
           request.handlingActor ! message
           prevReq.handlingActor ! message

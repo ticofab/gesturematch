@@ -22,5 +22,4 @@ object JsonResponseLabels {
   val MYSELF_IN_GROUP = "myId"
   val OTHERS_IN_GROUP = "group"
   val GROUP_POSITION_SCHEME = "scheme"
-
 }

@@ -1,10 +1,27 @@
 package models
 
-import consts.ScreenPositions.ScreenPosition
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, JsObject, __}
+import play.api.libs.functional.syntax._
+import play.api.libs.json.Writes._
 
-case class DeviceInScheme(position: ScreenPosition, idInGroup: Int)
+
+case class DeviceInScheme(id: Int, x: Int, y: Int)
 
 object DeviceInScheme {
-  def toJson(deviceInScheme: DeviceInScheme) = Json.obj(deviceInScheme.position.toString -> deviceInScheme.idInGroup)
+  val ID = "id"
+  val X = "x"
+  val Y = "y"
+
+  def toJson(deviceInScheme: DeviceInScheme): JsObject = Json.obj(
+    ID -> deviceInScheme.id,
+    X -> deviceInScheme.x,
+    Y -> deviceInScheme.y
+  )
+
+  implicit val deviceInSchemeWrites = (
+    (__ \ ID).write[Int] and
+      (__ \ X).write[Int] and
+      (__ \ Y).write[Int]
+    )(unlift(DeviceInScheme.unapply))
 }
+
