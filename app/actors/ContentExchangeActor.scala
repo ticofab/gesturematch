@@ -230,13 +230,13 @@ class ContentExchangeActor extends Actor {
       // creates a list of recipients. If none is specified, take all.
       val listRecipients: List[ActorRef] =
         clientDelivery.recipients match {
+          case None | Some(Nil) => matchees.get.map(_.handlingActor)
+
           case Some(recipients) => for {
             matchee <- matchees.get
             recipient <- recipients
             if matchee.idInGroup == recipient && recipient != -1
           } yield matchee.handlingActor
-
-          case None => matchees.get.map(_.handlingActor)
         }
 
 
@@ -256,12 +256,8 @@ class ContentExchangeActor extends Actor {
           DBHelper.addPayloadReceived(apiKey, appId, payloadLength)
           DBHelper.addPayloadDelivered(apiKey, appId, payloadLength * listRecipients.length)
         }
-
       }
-
-    }
-
-    else {
+    } else {
       Logger.info(getDeliveryLog(s"client is not part of this group"))
       sendToClient(JsonResponseHelper.getPayloadNotDeliveredResponse(clientDelivery.groupId,
         Some(JsonResponseLabels.REASON_NOT_PART_OF_THIS_GROUP)))
