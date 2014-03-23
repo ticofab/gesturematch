@@ -1,7 +1,7 @@
 package helpers.json
 
 import play.api.libs.json._
-import models.{Scheme, DeviceInScheme, Matchee}
+import models.{Scheme, Matchee}
 import consts.json.{JsonErrorLabels, JsonInputLabels, JsonGeneralLabels, JsonResponseLabels}
 import scala.Some
 
@@ -18,7 +18,7 @@ object JsonResponseHelper {
         JsonGeneralLabels.TYPE -> JsonInputLabels.INPUT_TYPE_MATCH,
         JsonGeneralLabels.OUTCOME -> JsonGeneralLabels.OK,
         JsonGeneralLabels.GROUP_ID -> JsString(groupId),
-        JsonResponseLabels.MYSELF_IN_GROUP -> myself.idInGroup,
+        JsonResponseLabels.MYSELF_IN_GROUP -> JsNumber(myself.idInGroup),
         JsonResponseLabels.OTHERS_IN_GROUP -> jsonArray
       )
 
