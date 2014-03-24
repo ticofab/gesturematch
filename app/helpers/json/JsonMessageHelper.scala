@@ -11,7 +11,7 @@ object JsonMessageHelper {
       JsonGeneralLabels.KIND -> JsonMessageLabels.KIND_MESSAGE,
       JsonGeneralLabels.TYPE -> JsonMessageLabels.MESSAGE_TYPE_DELIVERY,
       JsonGeneralLabels.GROUP_ID -> groupId,
-      JsonMessageLabels.MESSAGE_MATCHEE_ID -> senderId,
+      JsonMessageLabels.MESSAGE_MATCHEE_ID -> JsNumber(senderId),
       JsonInputLabels.INPUT_DELIVERY_ID -> delivery.id,
       JsonGeneralLabels.PAYLOAD -> delivery.payload
     )
@@ -28,7 +28,7 @@ object JsonMessageHelper {
         JsonGeneralLabels.KIND -> JsonMessageLabels.KIND_MESSAGE,
         JsonGeneralLabels.TYPE -> JsonMessageLabels.MESSAGE_TYPE_MATCHEE_LEFT_GROUP,
         JsonGeneralLabels.GROUP_ID -> groupId,
-        JsonMessageLabels.MESSAGE_MATCHEE_ID -> leaverId
+        JsonMessageLabels.MESSAGE_MATCHEE_ID -> JsNumber(leaverId)
       )
     )
   }
