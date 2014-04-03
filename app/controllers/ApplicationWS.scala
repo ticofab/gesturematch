@@ -34,7 +34,7 @@ object ApplicationWS extends Controller {
         isValid => {
           if (isValid) {
             // request valid
-            Logger.debug(s"areKeyAndIdValid: ($apiKey, $appId) are valid.")
+            Logger.debug(s"apiKey and appId: ($apiKey, $appId) are valid.")
             val handlingActor: ActorRef = Akka.system.actorOf(ContentExchangeActor.props)
             val connectionMsg = ConnectedClient(request.remoteAddress, apiKey, appId, os, deviceId)
             val wsLinkFuture = (handlingActor ? connectionMsg)(Timeouts.maxOldestRequestInterval)
@@ -49,6 +49,7 @@ object ApplicationWS extends Controller {
             }
           } else {
             Future {
+              Logger.debug(s"apiKey and appId: ($apiKey, $appId) are NOT valid.")
               val out = Enumerator(s"ApiKey and AppId pair ($apiKey, $appId) is not valid.").andThen(Enumerator.eof)
               val in: Iteratee[String, Unit] = Iteratee.ignore
               (in, out)
