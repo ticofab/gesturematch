@@ -10,10 +10,10 @@ function initStuff(scope) {
     scope.dev3criteria = "swipe"
     scope.dev4criteria = "swipe"
 
-    scope.dev1apikey = "limebamboo-gesturematch"
-    scope.dev2apikey = "limebamboo-gesturematch"
-    scope.dev3apikey = "limebamboo-gesturematch"
-    scope.dev4apikey = "limebamboo-gesturematch"
+    scope.dev1apikey = "fabway-gesturematch"
+    scope.dev2apikey = "fabway-gesturematch"
+    scope.dev3apikey = "fabway-gesturematch"
+    scope.dev4apikey = "fabway-gesturematch"
 
     scope.dev1appId = "gesturematch-demo"
     scope.dev2appId = "gesturematch-demo"
