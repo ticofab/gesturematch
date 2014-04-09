@@ -1,0 +1,141 @@
+<html ng-app="app">
+<head>
+    <script type="text/javascript" src="js/angular.min.js"></script>
+    <script type="text/javascript" src="js/ws-client-test.js"></script>
+    <script type="text/javascript" src="js/jsonHelper.js"></script>
+    <script type="text/javascript" src="js/initStuff.js"></script>
+    <link rel="stylesheet" href="css/client-test.css">
+</head>
+<body>
+
+    <div ng-controller="paramTable">
+
+        <table id="tfhover" class="tftable" border="1">
+            <tr>
+                <th>Protocol:</th>
+                <th>Server Url:</th>
+                <th>Port:</th>
+            </tr>
+            <tr>
+                <td><input type="text" size="20" maxlength="20" ng-model="protocol"></td>
+                <td><input type="text" size="50" maxlength="50" ng-model="serverUrl"></td>
+                <td><input type="text" size="20" maxlength="20" ng-model="port"></td>
+            </tr>
+        </table><br>
+
+        <span class="result-api-call">base connect url: {{openWSUrl}}</span><br><br>
+
+        <table id="tfhover" class="tftable" border="1">
+            <tr>
+                <th></th>
+                <th>Device 1</th>
+                <th>Device 2</th>
+                <th>Device 3</th>
+                <th>Device 4</th>
+            </tr>
+            <tr>
+                <td class="vertical-header">Criteria</td>
+                <td><input class="table-input" ng-model="dev1criteria"></td>
+                <td><input class="table-input" ng-model="dev2criteria"></td>
+                <td><input class="table-input" ng-model="dev3criteria"></td>
+                <td><input class="table-input" ng-model="dev4criteria"></td>
+            </tr>
+            <tr>
+                <td class="vertical-header">Device ID</td>
+                <td><input class="table-input" ng-model="dev1devid"></td>
+                <td><input class="table-input" ng-model="dev2devid"></td>
+                <td><input class="table-input" ng-model="dev3devid"></td>
+                <td><input class="table-input" ng-model="dev4devid"></td>
+            </tr>
+            <tr>
+                <td class="vertical-header">Latitude</td>
+                <td><input class="table-input" ng-model="dev1lat"></td>
+                <td><input class="table-input" ng-model="dev2lat"></td>
+                <td><input class="table-input" ng-model="dev3lat"></td>
+                <td><input class="table-input" ng-model="dev4lat"></td>
+            </tr>
+            <tr>
+                <td class="vertical-header">Longitude</td>
+                <td><input class="table-input" ng-model="dev1lon"></td>
+                <td><input class="table-input" ng-model="dev2lon"></td>
+                <td><input class="table-input" ng-model="dev3lon"></td>
+                <td><input class="table-input" ng-model="dev4lon"></td>
+            </tr>
+            <tr>
+                <td class="vertical-header">Swipe START</td>
+                <td><input class="table-input" ng-model="dev1ss"></td>
+                <td><input class="table-input" ng-model="dev2ss"></td>
+                <td><input class="table-input" ng-model="dev3ss"></td>
+                <td><input class="table-input" ng-model="dev4ss"></td>
+            </tr>
+            <tr>
+                <td class="vertical-header">Swipe END</td>
+                <td><input class="table-input" ng-model="dev1se"></td>
+                <td><input class="table-input" ng-model="dev2se"></td>
+                <td><input class="table-input" ng-model="dev3se"></td>
+                <td><input class="table-input" ng-model="dev4se"></td>
+            </tr>
+            <tr>
+                <td class="vertical-header">Payload</td>
+                <td><input class="table-input" ng-model="dev1pl"></td>
+                <td><input class="table-input" ng-model="dev2pl"></td>
+                <td><input class="table-input" ng-model="dev3pl"></td>
+                <td><input class="table-input" ng-model="dev4pl"></td>
+            </tr>
+            <tr>
+                <td class="vertical-header">Eq Param</td>
+                <td><input class="table-input" ng-model="dev1ep"></td>
+                <td><input class="table-input" ng-model="dev2ep"></td>
+                <td><input class="table-input" ng-model="dev3ep"></td>
+                <td><input class="table-input" ng-model="dev4ep"></td>
+            </tr>
+            <tr>
+                <td class="vertical-header">Recipients</td>
+                <td><input class="table-input" ng-model="dev1recip"></td>
+                <td><input class="table-input" ng-model="dev2recip"></td>
+                <td><input class="table-input" ng-model="dev3recip"></td>
+                <td><input class="table-input" ng-model="dev4recip"></td>
+            </tr>
+        </table>
+
+        <br>
+
+        <button ng-click="connect1()" ng-disabled="isDisabled1">connect 1</button>
+        <button ng-click="match1()">match 1</button>
+        <button ng-click="disconnect1()">disconnect 1</button>
+        <button ng-click="breakmatch1()">break group 1</button>
+        <button ng-click="deliver1()">deliver 1</button>
+        <span class="received-stuff"> {{dev1groupId}}</span><br>
+
+        <button ng-click="connect2()" ng-disabled="isDisabled2">connect 2</button>
+        <button ng-click="match2()">match 2</button>
+        <button ng-click="disconnect2()">disconnect 2</button>
+        <button ng-click="breakmatch2()">break group 2</button>
+        <button ng-click="deliver2()">deliver 2</button>
+        <span class="received-stuff"> {{dev2groupId}}</span><br>
+
+        <button ng-click="connect3()" ng-disabled="isDisabled3">connect 3</button>
+        <button ng-click="match3()">match 3</button>
+        <button ng-click="disconnect3()">disconnect 3</button>
+        <button ng-click="breakmatch3()">break group 3</button>
+        <button ng-click="deliver3()">deliver 3</button>
+        <span class="received-stuff"> {{dev3groupId}}</span><br>
+
+
+        <button ng-click="connect4()" ng-disabled="isDisabled4">connect 4</button>
+        <button ng-click="match4()">match 4</button>
+        <button ng-click="disconnect4()">disconnect 4</button>
+        <button ng-click="breakmatch4()">break group 4</button>
+        <button ng-click="deliver4()">deliver 4</button>
+        <span class="received-stuff"> {{dev4groupId}}</span><br><br>
+
+        <div class="received-stuff-header">Data received:</div>
+        <span class="received-stuff-header">dev1:</span><span class="received-stuff"> {{dev1msg}}</span><br>
+        <span class="received-stuff-header">dev2:</span><span class="received-stuff"> {{dev2msg}}</span><br>
+        <span class="received-stuff-header">dev3:</span><span class="received-stuff"> {{dev3msg}}</span><br>
+        <span class="received-stuff-header">dev4:</span><span class="received-stuff"> {{dev4msg}}</span>
+
+    </div>
+
+</body>
+</html>

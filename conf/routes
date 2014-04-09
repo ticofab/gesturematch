@@ -1,0 +1,9 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Http
+GET     /             controllers.ApplicationHTTP.alive
+
+# Websocket
+GET     /v1/open    controllers.ApplicationWS.openv1(deviceId: String)
