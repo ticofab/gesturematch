@@ -1,3 +1,19 @@
+/*
+ * Copyright 2014 Fabio Tiriticco, Fabway
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package actors
 
 import akka.actor.{ActorRef, Actor, Props}
@@ -132,9 +148,7 @@ class ContentExchangeActor extends Actor {
     val areaStart = Areas.getAreaFromString(matchRequest.areaStart)
     val areaEnd = Areas.getAreaFromString(matchRequest.areaEnd)
     val criteria = Criteria.getCriteriaFromString(matchRequest.criteria)
-    val swipeOrientation = matchRequest.swipeOrientation
-
-    val testValidity = Try(RequestValidityHelper.matchRequestIsValid(criteria, areaStart, areaEnd, swipeOrientation))
+    val testValidity = Try(RequestValidityHelper.matchRequestIsValid(criteria, areaStart, areaEnd))
 
     testValidity match {
 
@@ -157,7 +171,7 @@ class ContentExchangeActor extends Actor {
           val movement = SwipeMovementHelper.swipesToMovement(areaStart, areaEnd)
           val requestData = new RequestToMatch(apiKey, appId, client.get.deviceId,
             matchRequest.latitude, matchRequest.longitude, timestamp, areaStart, areaEnd, movement,
-            matchRequest.equalityParam, matchRequest.orientation, swipeOrientation, self)
+            matchRequest.equalityParam, self)
 
           def futureMatched(matcher: ActorRef) = {
             val matchedFuture = (matcher ? NewRequest(requestData))(Timeouts.maxOldestRequestInterval)
@@ -171,7 +185,6 @@ class ContentExchangeActor extends Actor {
             // we only get here if the criteria is valid
             case Criteria.SWIPE => futureMatched(ApplicationWS.swipeMatchingActor)
             case Criteria.PINCH => futureMatched(ApplicationWS.pinchMatchingActor)
-            case Criteria.AIM => futureMatched(ApplicationWS.aimMatchingActor)
           }
         }
 
