@@ -25,9 +25,7 @@ case class ClientInputMessageMatch(criteria: String,
                                    longitude: Double,
                                    areaStart: String,
                                    areaEnd: String,
-                                   equalityParam: Option[String],
-                                   temperature: Option[Int],
-                                   wifiNetworks: Option[List[String]]) extends ClientInputMessage
+                                   equalityParam: Option[String]) extends ClientInputMessage
 
 object ClientInputMessageMatch {
 
@@ -38,12 +36,10 @@ object ClientInputMessageMatch {
     val areaStart = (jsonValue \ JsonInputLabels.MATCH_INPUT_AREASTART).as[String]
     val areaEnd = (jsonValue \ JsonInputLabels.MATCH_INPUT_AREAEND).as[String]
     val equalityParam = (jsonValue \ JsonInputLabels.MATCH_INPUT_EQUALITYPARAM).asOpt[String]
-    val temperature = (jsonValue \ JsonInputLabels.MATCH_INPUT_TEMPERATURE).asOpt[Int]
-    val wifiNetworks = (jsonValue \ JsonInputLabels.MATCH_INPUT_WIFI_NETWORKS).asOpt[List[String]]
 
     // if we got here, it means that everything is fine
     ClientInputMessageMatch(criteria, latitude, longitude, areaStart, areaEnd,
-      equalityParam, temperature, wifiNetworks)
+      equalityParam)
   }
 
 }
