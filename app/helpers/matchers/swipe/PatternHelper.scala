@@ -20,8 +20,7 @@ import models.RequestToMatch
 import consts.{Areas, ScreenPositions, SwipeMovements}
 import consts.SwipeMovements._
 import consts.ScreenPositions.ScreenPosition
-import consts.Areas.Areas
-import consts.Areas.Areas
+import consts.Areas._
 import play.api.Logger
 
 object PatternHelper {
@@ -37,88 +36,33 @@ object PatternHelper {
    */
   def getMatchedPattern(matchingRequests: List[RequestToMatch]): (List[RequestToMatch], Boolean) = {
 
-    def getLongestCombinations(res: List[List[RequestToMatch]]): List[List[RequestToMatch]] =
-      res match {
-        case Nil => Nil
-        case x :: xs =>
-          val longestCombLength = res.maxBy(_.length).length
-          Logger.debug(s"the longest combination is $longestCombLength long.")
-          res.filter(_.length == longestCombLength)
-      }
+    type Path = List[RequestToMatch]
 
-    def getValidCombinations(res: List[List[RequestToMatch]]) = {
-      def validCombFilter(res: List[RequestToMatch]): Boolean = {
-        // note! it assumes that the collection starts with the last request,
-        //   which is then the XInner, and finishes with the first (InnerX)
-        val coolHead = isXInner(res.head.movement)
-        val coolEnd = isInnerX(res.last.movement)
-        coolHead && coolEnd
-      }
-
-      res.filter(validCombFilter)
-    }
-
-    def getCombinations(tileHistory: List[RequestToMatch], availableNewTiles: List[RequestToMatch]): List[(List[RequestToMatch], List[RequestToMatch])] = {
-
-      def expand = {
-        val filtered = availableNewTiles.filter(r => SwipeMovements.getLegalNextOnes(tileHistory.head.movement).contains(r.movement))
-        val mapped = filtered.map(elem => (elem :: tileHistory, availableNewTiles.diff(List(elem))))
-        mapped
-      }
-
-      availableNewTiles match {
-        case Nil => List()
-        case x :: xs =>
-          val expanded = expand
-
-          def addChunks() = {
-            if (expanded == Nil) Nil
-            else (for (xs <- expanded) yield getCombinations(xs._1, xs._2)).flatten
-          }
-
-          if (expanded == Nil) Nil
-          else expanded ++ addChunks
+    implicit class PathWrapper(path: Path) {
+      def isPrepandable(request: RequestToMatch) = {
+        if (path.isEmpty) request.areaEnd == INNER
+        else path.head.areaStart =!= request.areaEnd
       }
     }
 
-    def isInnerX(movement: SwipeMovement): Boolean = movement match {
-      case INNERLEFT | INNERRIGHT | INNERTOP | INNERBOTTOM => true
-      case _ => false
+    def findPatterns(source: List[RequestToMatch], path: Path): List[Path] = {
+      val flatmapped = source.zipWithIndex.filter(ti => path.isPrepandable(ti._1)).flatMap(ti => {
+        var res = findPatterns(source.take(ti._2) ++ source.drop(ti._2 + 1), ti._1 +: path)
+        if (ti._1.areaStart == INNER) res = res :+ (ti._1 +: path)
+        res
+      })
+      flatmapped
     }
 
-    def isXInner(movement: SwipeMovement): Boolean = movement match {
-      case LEFTINNER | RIGHTINNER | TOPINNER | BOTTOMINNER => true
-      case _ => false
+    val paths = findPatterns(matchingRequests, List())
+    if (paths.isEmpty) {
+      Logger.debug("Not a single path found.")
+      (Nil, false)
     }
-
-    // find the one with Inner and use it as first
-    val (head, tail) = matchingRequests.partition(r => isInnerX(r.movement))
-
-    head match {
-
-      // error, not a single InnerX request
-      case Nil => (Nil, false)
-
-      // good, only one InnerX
-      case x :: Nil =>
-        // these intermediate values are here for clarity
-        val combs = getCombinations(head, tail)
-        val skimmedResults = combs.map(x => x._1)
-        val validCombinations = getValidCombinations(skimmedResults)
-
-        if (validCombinations.isEmpty) {
-          (Nil, false)
-        } else {
-          // return the first longest combination
-          Logger.debug(s"there are ${validCombinations.length} valid combinations.")
-          val longestCombinations = getLongestCombinations(validCombinations)
-          Logger.debug(s"there are ${longestCombinations.length} longest combinations.")
-          (longestCombinations.head.reverse, longestCombinations.length == 1)
-        }
-
-      // error, two or more InnerX requests
-      case _ => (Nil, false)
-
+    else {
+      val longestPaths: (Int, List[Path]) = paths.groupBy(_.length).maxBy(_._1)
+      Logger.debug(s"Found ${longestPaths._2.length} paths of length ${longestPaths._1}")
+      (longestPaths._2.head, longestPaths._2.length == 1)
     }
   }
 
