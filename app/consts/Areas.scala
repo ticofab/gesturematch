@@ -16,49 +16,73 @@
 
 package consts
 
-import scala.util.Try
 
 /**
  * The device screen is split into 5 areas plus 4 invalid ones:
  *
- *  ---------------------------------------------------
- *  |           |                         |           |
- *  |  Invalid  |          Top            |  Invalid  |
- *  |     5     |           0             |     5     |
- *  |           |                         |           |
- *  | --------- | ----------------------- | --------- |
- *  |           |                         |           |
- *  |           |                         |           |
- *  |           |                         |           |
- *  |           |                         |           |
- *  |   Left    |         Inner           |   Right   |
- *  |    2      |           4             |     3     |
- *  |           |                         |           |
- *  |           |                         |           |
- *  |           |                         |           |
- *  |           |                         |           |
- *  | --------- | ----------------------- | --------- |
- *  |           |                         |           |
- *  |  Invalid  |          Bottom         |  Invalid  |
- *  |     5     |            1            |     5     |
- *  |           |                         |           |
- *  | --------- | ----------------------- | --------- |
+ * ---------------------------------------------------
+ * |           |                         |           |
+ * |  Invalid  |          Top            |  Invalid  |
+ * |     5     |           0             |     5     |
+ * |           |                         |           |
+ * | --------- | ----------------------- | --------- |
+ * |           |                         |           |
+ * |           |                         |           |
+ * |           |                         |           |
+ * |           |                         |           |
+ * |   Left    |         Inner           |   Right   |
+ * |    2      |           4             |     3     |
+ * |           |                         |           |
+ * |           |                         |           |
+ * |           |                         |           |
+ * |           |                         |           |
+ * | --------- | ----------------------- | --------- |
+ * |           |                         |           |
+ * |  Invalid  |          Bottom         |  Invalid  |
+ * |     5     |            1            |     5     |
+ * |           |                         |           |
+ * | --------- | ----------------------- | --------- |
  *
  * These values need to be statically defined (as integers) as they are what comes through
  * the APIs when a client sends a matching request.
  */
 
 object Areas extends Enumeration {
-  type Areas = Value
-  val TOP = Value("top")
-  val BOTTOM = Value("bottom")
-  val LEFT = Value("left")
-  val RIGHT = Value("right")
-  val INNER = Value("inner")
-  val INVALID = Value("invalid")
-  val OUTER = Value("outer")
 
-  def getAreaFromString(area: String): Areas = Try(Areas.withName(area)) getOrElse INVALID
+  case class Areas() extends Val {
 
-  def getValidOnes = this.values.filter(_ != INVALID)
+    /** Imagine you want to put two devices next to each other. This operator checks that two areas can
+      * be next to each other in a sequence of devices.
+      *
+      * @param other
+      * another Areas object
+      *
+      * @return
+      * true if the two areas can be next to each other in a sequence of devices
+      */
+    def =!=(other: Areas): Boolean = {
+      this match {
+        case TOP => other == BOTTOM
+        case BOTTOM => other == TOP
+        case RIGHT => other == LEFT
+        case LEFT => other == RIGHT
+        case _ => false
+      }
+    }
+  }
+
+  val INNER, TOP, RIGHT, BOTTOM, LEFT, INVALID, OUTER = Areas()
+
+  def getAreaFromString(area: String): Areas =
+    area match {
+      case "top" => TOP
+      case "bottom" => BOTTOM
+      case "left" => LEFT
+      case "right" => RIGHT
+      case "inner" => INNER
+      case "outer" => OUTER
+      case _ => INVALID
+    }
+
+  def getValidOnes = this.values.filter(a => a != INVALID && a != OUTER)
 }

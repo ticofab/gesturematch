@@ -86,9 +86,6 @@ class SwipeMatcherActor extends Actor with StringGenerator {
           val matcheesInfo: List[Matchee] = zippedMatches.map(x => Matchee(x._1.handlingActor, x._2))
           matches.foreach(r => r.handlingActor ! Matched(matcheesInfo, groupId, scheme))
 
-
-          matches.foreach(r => r.handlingActor ! Matched(matcheesInfo, groupId, scheme))
-
           DBHelper.addMatchEstablished(request.apiKey, request.appId, matches.length)
       }
   }

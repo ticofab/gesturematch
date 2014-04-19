@@ -43,6 +43,9 @@ import models.MatcheeDelivers
 import helpers.requests.RequestValidityHelper
 import helpers.storage.DBHelper
 
+/** Will manage a client connection and take the appropriate action upon receiving a client input.
+  *
+  */
 class ContentExchangeActor extends Actor {
   var client: Option[ConnectedClient] = None
   var channel: Option[Concurrent.Channel[String]] = None
@@ -59,6 +62,10 @@ class ContentExchangeActor extends Actor {
   // *************************************
   // Actor messaging
   // *************************************
+
+  /** Deals with messages sent to this actor.
+    *
+    */
   def receive: Actor.Receive = {
     case connectedClient@ConnectedClient(remoteAddress, apiKey, appId, os, deviceId) =>
       Logger.info(s"$self, client connected: $remoteAddress, $apiKey, $appId, $os, $deviceId")
@@ -120,6 +127,12 @@ class ContentExchangeActor extends Actor {
   // *************************************
   // Events section
   // *************************************
+
+  /** Deals with a raw input coming from the connected client.
+    * It parses it and then triggers the necessary action.
+    *
+    * @param input the input coming from the client through the WebSocket channel.
+    */
   def onInput(input: String) = {
     Logger.info(s"$self, client input. Length: ${input.length}")
 
@@ -144,6 +157,13 @@ class ContentExchangeActor extends Actor {
     }
   }
 
+  /** Handles match requests.
+    *
+    * It will try to establish a group with previously received requests. Will inform the connected client and
+    * the actors managing the other clients in the group that has been formed.
+    *
+    * @param matchRequest the match request
+    */
   def onMatchInput(matchRequest: ClientInputMessageMatch) = {
     val areaStart = Areas.getAreaFromString(matchRequest.areaStart)
     val areaEnd = Areas.getAreaFromString(matchRequest.areaEnd)
@@ -191,6 +211,13 @@ class ContentExchangeActor extends Actor {
     }
   }
 
+  /** Handles disconnect requests.
+    *
+    * Will send acknowledge of the disconnect request. If the disconnecting client is part of a group, the other
+    * members will be informed. Finally, the connection will be closed.
+    *
+    * @param disconnect the disconnect request
+    */
   def onDisconnectInput(disconnect: ClientInputMessageDisconnect) = {
     // a disconnect message doesn't have a groupId
     Logger.info(s"$self, disconnect input, reason: ${disconnect.reason}")
@@ -202,6 +229,13 @@ class ContentExchangeActor extends Actor {
     leaveGroup()
   }
 
+  /** Handles requests to leave a group.
+    *
+    * Will check if the client is effectively part of a group and, in case, inform the other memebers that this
+    * client has left the group.
+    *
+    * @param leaveGroupMessage the request to leave the group
+    */
   def onLeaveGroupInput(leaveGroupMessage: ClientInputMessageLeaveGroup) = {
     def getLeaveGroupLog(msg: String) = {
       s"$self, leave group input, $msg, group id: ${leaveGroupMessage.groupId}, reason: ${leaveGroupMessage.reason}"
@@ -232,6 +266,10 @@ class ContentExchangeActor extends Actor {
     }
   }
 
+  /** Handles requests to deliver content to other clients.
+    *
+    * @param clientDelivery the delivery request containing some payload
+    */
   def onDeliveryInput(clientDelivery: ClientInputMessageDelivery) = {
     def getDeliveryLog(msg: String = "") = s"$self, client delivery," +
       s" $msg, groupId: ${clientDelivery.groupId}, recipients: ${clientDelivery.recipients} " +
@@ -251,7 +289,6 @@ class ContentExchangeActor extends Actor {
             if matchee.idInGroup == recipient && recipient != -1
           } yield matchee.handlingActor
         }
-
 
       // deliver stuff
       if (!listRecipients.isEmpty) {

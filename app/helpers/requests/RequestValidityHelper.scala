@@ -18,7 +18,7 @@ package helpers.requests
 
 import consts.{Areas, Criteria}
 import consts.Criteria.Criteria
-import consts.Areas.Areas
+import consts.Areas._
 
 case class InvalidRequestException(message: String) extends Exception(message)
 
