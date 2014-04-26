@@ -51,7 +51,7 @@ object Areas extends Enumeration {
 
   case class Areas() extends Val {
 
-    /** Imagine you want to put two devices next to each other. This operator checks that two areas can
+    /** Imagine you want to put two devices next to each other. This method checks that two areas can
       * be next to each other in a sequence of devices.
       *
       * @param other
@@ -60,7 +60,7 @@ object Areas extends Enumeration {
       * @return
       * true if the two areas can be next to each other in a sequence of devices
       */
-    def =!=(other: Areas): Boolean = {
+    def isChainable(other: Areas): Boolean = {
       this match {
         case TOP => other == BOTTOM
         case BOTTOM => other == TOP

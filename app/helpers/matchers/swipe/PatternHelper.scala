@@ -41,7 +41,7 @@ object PatternHelper {
     implicit class PathWrapper(path: Path) {
       def isPrepandable(request: RequestToMatch) = {
         if (path.isEmpty) request.areaEnd == INNER
-        else path.head.areaStart =!= request.areaEnd
+        else path.head.areaStart isChainable request.areaEnd
       }
     }
 
