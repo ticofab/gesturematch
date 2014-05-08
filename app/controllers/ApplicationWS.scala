@@ -27,7 +27,7 @@ import play.api.Logger
 import consts.Timeouts
 import java.util.concurrent.TimeoutException
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import helpers.json.JsonResponseHelper
+import helpers.json.{JsonErrorHelper, JsonResponseHelper}
 import models.ConnectedClient
 import scala.concurrent.Future
 import helpers.storage.DBHelper
@@ -58,14 +58,15 @@ object ApplicationWS extends Controller {
                 // no actor responded.
                 // this is the recover of a Future so this will be a Future! No need for "Future { }"
                 Logger.error(s"open websocket endpoint, no actor responded. Close connection, exception: $e")
-                val out = Enumerator(JsonResponseHelper.getServerErrorResponse).andThen(Enumerator.eof)
+                val out = Enumerator(JsonErrorHelper.createServerError).andThen(Enumerator.eof)
                 val in: Iteratee[String, Unit] = Iteratee.ignore
                 (in, out)
             }
           } else {
             Future {
               Logger.debug(s"apiKey and appId: ($apiKey, $appId) are NOT valid.")
-              val out = Enumerator(s"ApiKey and AppId pair ($apiKey, $appId) is not valid.").andThen(Enumerator.eof)
+              val errorMsg = JsonErrorHelper.createInvalidCredentialsError(apiKey, appId)
+              val out = Enumerator(errorMsg).andThen(Enumerator.eof)
               val in: Iteratee[String, Unit] = Iteratee.ignore
               (in, out)
             }
@@ -76,7 +77,7 @@ object ApplicationWS extends Controller {
         case t: TimeoutException => {
           // database timeout.
           Logger.debug(s"Database TimeoutException: $t")
-          val exceptionMsg = s"Database didn't respond within ${Timeouts.maxDatabaseResponseTime.toString()}"
+          val exceptionMsg = JsonErrorHelper.createDatabaseError
           val out = Enumerator(exceptionMsg).andThen(Enumerator.eof)
           val in: Iteratee[String, Unit] = Iteratee.ignore
           (in, out)

@@ -16,8 +16,18 @@
 
 package consts.json
 
+import consts.Timeouts
+
 object JsonErrorLabels {
+  // kind
   val KIND_ERROR = "error"
+
+  // types
   val TYPE_SERVER_ERROR = "server_error"
+  val TYPE_APIKEY_APP_ID_INVALID = "invalidCredentials"
+
+  // reasons
+  val REASON_DATABASE_UNAVAILABLE = s"Database didn't respond within ${Timeouts.maxDatabaseResponseTime.toString()}"
+  val REASON_APIKEY_APPID_INVALID = "The provided APIKey / AppID pair is invalid"
   val REASON_SERVER_ERROR_NO_ACTOR = "the connection cannot be managed"
 }
