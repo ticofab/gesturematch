@@ -119,14 +119,4 @@ object JsonResponseHelper {
 
     Json.stringify(jsObj)
   }
-
-  def getServerErrorResponse = {
-    Json.stringify(
-      Json.obj(
-        JsonGeneralLabels.KIND -> JsonErrorLabels.KIND_ERROR,
-        JsonGeneralLabels.TYPE -> JsonErrorLabels.TYPE_SERVER_ERROR,
-        JsonGeneralLabels.REASON -> JsonErrorLabels.REASON_SERVER_ERROR_NO_ACTOR
-      )
-    )
-  }
 }

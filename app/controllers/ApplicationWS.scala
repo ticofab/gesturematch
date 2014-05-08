@@ -27,7 +27,7 @@ import play.api.Logger
 import consts.Timeouts
 import java.util.concurrent.TimeoutException
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import helpers.json.JsonResponseHelper
+import helpers.json.JsonErrorHelper
 import models.ConnectedClient
 
 object ApplicationWS extends Controller {
@@ -48,8 +48,8 @@ object ApplicationWS extends Controller {
         case e: TimeoutException =>
           // no actor responded.
           Logger.error(s"open websocket endpoint, no actor responded. Close connection, exception: $e")
-          val out = Enumerator(JsonResponseHelper.getServerErrorResponse).andThen(Enumerator.eof)
-          val in: Iteratee[String, Unit] = Iteratee.ignore
+          val out = Enumerator(JsonErrorHelper.createServerError).andThen(Enumerator.eof)
+          val in: Iteratee[String, _] = Iteratee.ignore
           (in, out)
       }
     }
