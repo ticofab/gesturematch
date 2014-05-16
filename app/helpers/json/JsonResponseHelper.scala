@@ -63,8 +63,6 @@ object JsonResponseHelper {
   def getGroupLeftResponse(groupId: String) = getGroupOutcomeResponse(groupId,
     JsonInputLabels.INPUT_TYPE_LEAVE_GROUP, JsonGeneralLabels.OK)
 
-  def getDisconnectResponse = getOutcomeResponse(JsonInputLabels.INPUT_TYPE_DISCONNECT, JsonGeneralLabels.OK)
-
   def getNotPartOfGroupResponse(groupId: String) = getGroupOutcomeResponse(groupId,
     JsonInputLabels.INPUT_TYPE_LEAVE_GROUP, JsonGeneralLabels.FAIL,
     Some(JsonResponseLabels.REASON_NOT_PART_OF_THIS_GROUP))

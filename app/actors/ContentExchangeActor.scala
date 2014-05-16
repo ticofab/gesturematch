@@ -16,7 +16,7 @@
 
 package actors
 
-import akka.actor.{ActorRef, Actor, Props}
+import akka.actor.{PoisonPill, ActorRef, Actor, Props}
 import akka.pattern.ask
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -67,15 +67,30 @@ class ContentExchangeActor extends Actor {
     */
   def receive: Actor.Receive = {
     case connectedClient@ConnectedClient(remoteAddress, deviceId) =>
+
+      def shutdownMyself() = {
+        Logger.info(s"$self, shutdown")
+        channel = None
+        self ! PoisonPill
+      }
+
       Logger.info(s"$self, client connected: $remoteAddress, $deviceId")
       client = Some(connectedClient)
 
-      val in = Iteratee.foreach[String] {
+      val in: Iteratee[String, Unit] = Iteratee.foreach[String] {
         // sending a message to self, so they are nicely pipelined
         input => self ! Input(input)
-      }
+      }.map(_ => {
+        // the client disconnected
+        Logger.info(s"$self, client disconnected: $remoteAddress, $deviceId")
+        if (matchees.isDefined && myself.isDefined) {
+          sendMessageToMatchees(MatcheeLeftGroup(myself.get, None))
+        }
+        shutdownMyself()
+      })
 
       val out: Enumerator[String] = Concurrent.unicast(c => {
+        // onStart
         channel = Some(c)
 
         // start a timeout to close the connection after a while
@@ -83,6 +98,12 @@ class ContentExchangeActor extends Actor {
           Logger.info(s"$self, timeout expired. Closing connection with client at ${client.foreach(_.remoteAddress)}.")
           closeClientConnection()
         }, Timeouts.maxConnectionLifetime)
+      }, {
+        // onComplete
+        Logger.debug("onComplete")
+      }, (s, i) => {
+        Logger.error(s"onError: $s, input: $i")
+        shutdownMyself()
       })
 
       val wsLink = (in, out)
@@ -217,12 +238,11 @@ class ContentExchangeActor extends Actor {
   def onDisconnectInput(disconnect: ClientInputMessageDisconnect) = {
     // a disconnect message doesn't have a groupId
     Logger.info(s"$self, disconnect input, reason: ${disconnect.reason}")
-    sendToClient(JsonResponseHelper.getDisconnectResponse)
     if (matchees.isDefined && myself.isDefined) {
       sendMessageToMatchees(MatcheeLeftGroup(myself.get, disconnect.reason))
+      leaveGroup()
     }
     closeClientConnection()
-    leaveGroup()
   }
 
   /** Handles requests to leave a group.
