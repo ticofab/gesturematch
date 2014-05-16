@@ -27,7 +27,7 @@ import play.api.Logger
 import consts.Timeouts
 import java.util.concurrent.TimeoutException
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import helpers.json.{JsonErrorHelper, JsonResponseHelper}
+import helpers.json.JsonErrorHelper
 import models.ConnectedClient
 import scala.concurrent.Future
 import helpers.storage.DBHelper

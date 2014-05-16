@@ -1,7 +1,7 @@
 package helpers.json
 
-import play.api.libs.json.Json
 import consts.json.{JsonErrorLabels, JsonGeneralLabels}
+import play.api.libs.json.Json
 
 object JsonErrorHelper {
   def createInvalidCredentialsError(apiKey: String, appId: String) = {
