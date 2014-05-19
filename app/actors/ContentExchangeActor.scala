@@ -129,9 +129,6 @@ class ContentExchangeActor extends Actor {
         Logger.info(s"$self, matchee left group: ${groupId.get}, matchee: $matchee, reason: $reason")
         val message = JsonMessageHelper.createMatcheeLeftGroupMessage(groupId.get, matchee.idInGroup)
         sendToClient(message)
-
-        // TODO: this needs to be improved, the client might stay in the group.
-        leaveGroup()
       } else {
         Logger.error(s"$self, matchee left group, but my groupId is empty. Matchee: $matchee, reason: $reason")
       }
