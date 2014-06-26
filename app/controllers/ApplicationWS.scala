@@ -74,10 +74,20 @@ object ApplicationWS extends Controller {
         }
       } recover {
         // this is the recover of a Future so this will be a Future! No need for "Future { }"
+
         case t: TimeoutException => {
           // database timeout.
-          Logger.debug(s"Database TimeoutException: $t")
+          Logger.error(s"Database TimeoutException: $t")
           val exceptionMsg = JsonErrorHelper.createDatabaseError
+          val out = Enumerator(exceptionMsg).andThen(Enumerator.eof)
+          val in: Iteratee[String, Unit] = Iteratee.ignore
+          (in, out)
+        }
+
+        case e: Exception => {
+          // database timeout.
+          Logger.error(s"Future failure: $e")
+          val exceptionMsg = s"Database failure."
           val out = Enumerator(exceptionMsg).andThen(Enumerator.eof)
           val in: Iteratee[String, Unit] = Iteratee.ignore
           (in, out)
