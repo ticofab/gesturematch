@@ -16,6 +16,7 @@
 
 package helpers.requests
 
+import math._
 import models.RequestToMatch
 import consts.{Criteria, Timeouts}
 import storage._
@@ -47,10 +48,24 @@ object RequestStorageHelper {
    * True or false whether the two requests might match.
    */
   private def compatibilityFilter(r1: RequestToMatch, r2: RequestToMatch): Boolean = {
-    // check on latitude
-    val latDiff: Double = scala.math.pow(r1.latitude - r2.latitude, 2)
-    val lonDiff: Double = scala.math.pow(r1.longitude - r2.longitude, 2)
-    val closeEnough: Boolean = latDiff < 0.01 && lonDiff < 0.01
+
+    def haversineDistanceInKm(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double = {
+      val R = 6372.8 // radius in km
+
+      val dLat = (lat2 - lat1).toRadians
+      val dLon = (lon2 - lon1).toRadians
+
+      val a = pow(sin(dLat / 2), 2) + pow(sin(dLon / 2), 2) * cos(lat1.toRadians) * cos(lat2.toRadians)
+      val c = 2 * asin(sqrt(a))
+      R * c
+    }
+
+
+    // check on location
+    val distanceInMeters: Double = haversineDistanceInKm(r1.latitude, r1.longitude, r2.latitude, r2.longitude) * 1000
+    Logger.info(s"distance in meters: $distanceInMeters")
+
+    val closeEnough: Boolean = distanceInMeters < 50
 
     // check if equality parameters are the same
     val equality =
