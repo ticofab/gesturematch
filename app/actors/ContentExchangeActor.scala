@@ -83,7 +83,16 @@ class ContentExchangeActor(client: ConnectedClient) extends Actor {
     case MatcheeLeftGroup(matchee, reason) =>
       if (groupId.isDefined) {
         Logger.info(s"$self, matchee left group: ${groupId.get}, matchee: $matchee, reason: $reason")
-        matchees = Some(matchees.get.filterNot(_.idInGroup == matchee.idInGroup))
+
+        // update information about my group
+        val newMatchees = matchees.get.filterNot(_.idInGroup == matchee.idInGroup)
+        if (newMatchees.isEmpty) {
+          matchees = None
+          groupId = None
+        } else {
+          matchees = Some(newMatchees)
+        }
+
         val message = JsonMessageHelper.createMatcheeLeftGroupMessage(groupId.get, matchee.idInGroup)
         sendToClient(message)
       } else {
