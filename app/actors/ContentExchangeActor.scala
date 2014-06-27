@@ -16,38 +16,36 @@
 
 package actors
 
-import akka.actor.{PoisonPill, ActorRef, Actor, Props}
+import java.util.concurrent.TimeoutException
+
+import akka.actor.{Actor, ActorRef, PoisonPill, Props}
 import akka.pattern.ask
+import consts.json.JsonResponseLabels
+import consts.{Areas, Criteria, Timeouts}
+import controllers.ApplicationWS
+import helpers.json.{JsonInputHelper, JsonMessageHelper, JsonResponseHelper}
+import helpers.movements.SwipeMovementHelper
+import helpers.requests.RequestValidityHelper
+import models.ClientInputMessages._
+import models._
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-
-import models._
-import scala.util.Try
-import models.ClientInputMessages._
-import consts.{Timeouts, Areas, Criteria}
-import play.api.libs.iteratee.{Concurrent, Enumerator, Iteratee}
 import play.api.libs.concurrent.Promise
-import helpers.json.{JsonMessageHelper, JsonResponseHelper, JsonInputHelper}
-import helpers.movements.SwipeMovementHelper
-import controllers.ApplicationWS
-import consts.json.JsonResponseLabels
-import java.util.concurrent.TimeoutException
-import models.NewRequest
-import models.ConnectedClient
-import scala.util.Failure
-import scala.Some
-import models.Matched
-import models.MatcheeLeftGroup
-import scala.util.Success
-import models.MatcheeDelivers
-import helpers.requests.RequestValidityHelper
+
+import scala.util.{Failure, Success, Try}
 
 /** Will manage a client connection and take the appropriate action upon receiving a client input.
   *
   */
-class ContentExchangeActor extends Actor {
-  var client: Option[ConnectedClient] = None
-  var channel: Option[Concurrent.Channel[String]] = None
+class ContentExchangeActor(client: ConnectedClient) extends Actor {
+  Logger.info(s"$self, client connected: ${client.remoteAddress}, ${client.deviceId}")
+
+  // initiate a timeout which will close the connection after the timeout
+  Promise.timeout({
+    Logger.info(s"$self, timeout expired. Closing connection with client at ${client.remoteAddress}.")
+    closeClientConnection()
+  }, Timeouts.maxConnectionLifetime)
+
   var matchees: Option[List[Matchee]] = None
   var myself: Option[Matchee] = None
   var groupId: Option[String] = None
@@ -66,51 +64,11 @@ class ContentExchangeActor extends Actor {
     *
     */
   def receive: Actor.Receive = {
-    case connectedClient@ConnectedClient(remoteAddress, deviceId) =>
-
-      def shutdownMyself() = {
-        Logger.info(s"$self, shutdown")
-        channel = None
-        self ! PoisonPill
-      }
-
-      Logger.info(s"$self, client connected: $remoteAddress, $deviceId")
-      client = Some(connectedClient)
-
-      val in: Iteratee[String, Unit] = Iteratee.foreach[String] {
-        // sending a message to self, so they are nicely pipelined
-        input => self ! Input(input)
-      }.map(_ => {
-        // the client disconnected
-        Logger.info(s"$self, client disconnected: $remoteAddress, $deviceId")
-        if (matchees.isDefined && myself.isDefined) {
-          sendMessageToMatchees(MatcheeLeftGroup(myself.get, None))
-        }
-        shutdownMyself()
-      })
-
-      val out: Enumerator[String] = Concurrent.unicast(c => {
-        // onStart
-        channel = Some(c)
-
-        // start a timeout to close the connection after a while
-        Promise.timeout({
-          Logger.info(s"$self, timeout expired. Closing connection with client at ${client.foreach(_.remoteAddress)}.")
-          closeClientConnection()
-        }, Timeouts.maxConnectionLifetime)
-      }, {
-        // onComplete
-        Logger.debug("onComplete")
-      }, (s, i) => {
-        Logger.error(s"onError: $s, input: $i")
-        shutdownMyself()
-      })
-
-      val wsLink = (in, out)
-      sender ! wsLink
-
+    // data received from the client that this actor is managing
+    case input: String => self ! Input(input)
     case Input(input) => onInput(input)
 
+    // messages received from other actors
     case Matched(groupMatchees, groupUniqueId, scheme) =>
       // the assumption is that the info we got is valid
       val (me, others) = groupMatchees.partition(m => m.handlingActor == self)
@@ -125,6 +83,7 @@ class ContentExchangeActor extends Actor {
     case MatcheeLeftGroup(matchee, reason) =>
       if (groupId.isDefined) {
         Logger.info(s"$self, matchee left group: ${groupId.get}, matchee: $matchee, reason: $reason")
+        matchees = Some(matchees.get.filterNot(_.idInGroup == matchee.idInGroup))
         val message = JsonMessageHelper.createMatcheeLeftGroupMessage(groupId.get, matchee.idInGroup)
         sendToClient(message)
       } else {
@@ -139,6 +98,18 @@ class ContentExchangeActor extends Actor {
       } else {
         Logger.error(s"$self, matchee delivered payload. Matchee: $matchee, but I'm not part of any group!")
       }
+  }
+
+  // *************************************
+  // ContentExchangeActor lifecycle
+  // *************************************
+  override def postStop() = {
+    Logger.info("postStop")
+    // the client disconnected
+    Logger.info(s"$self, client disconnected: ${client.remoteAddress}, ${client.deviceId}")
+    if (matchees.isDefined && myself.isDefined) {
+      sendMessageToMatchees(MatcheeLeftGroup(myself.get, None))
+    }
   }
 
   // *************************************
@@ -198,28 +169,25 @@ class ContentExchangeActor extends Actor {
       case Success(isValid) =>
         Logger.info(s"$self, match request valid.")
 
-        if (client.isDefined) {
+        // add request to the matcher queue
+        val timestamp = System.currentTimeMillis
+        val movement = SwipeMovementHelper.swipesToMovement(areaStart, areaEnd)
+        val requestData = new RequestToMatch(client.deviceId,
+          matchRequest.latitude, matchRequest.longitude, timestamp, areaStart, areaEnd, movement,
+          matchRequest.equalityParam, self)
 
-          // add request to the matcher queue
-          val timestamp = System.currentTimeMillis
-          val movement = SwipeMovementHelper.swipesToMovement(areaStart, areaEnd)
-          val requestData = new RequestToMatch(client.get.deviceId,
-            matchRequest.latitude, matchRequest.longitude, timestamp, areaStart, areaEnd, movement,
-            matchRequest.equalityParam, self)
-
-          def futureMatched(matcher: ActorRef) = {
-            val matchedFuture = (matcher ? NewRequest(requestData))(Timeouts.maxOldestRequestInterval)
-            matchedFuture recover {
-              // basically this timeout will always trigger, but maybe we've been matched in the meantime.
-              case t: TimeoutException => if (!hasBeenMatched) sendToClient(JsonResponseHelper.getTimeoutResponse)
-            }
+        def futureMatched(matcher: ActorRef) = {
+          val matchedFuture = (matcher ? NewRequest(requestData))(Timeouts.maxOldestRequestInterval)
+          matchedFuture recover {
+            // basically this timeout will always trigger, but maybe we've been matched in the meantime.
+            case t: TimeoutException => if (!hasBeenMatched) sendToClient(JsonResponseHelper.getTimeoutResponse)
           }
+        }
 
-          criteria match {
-            // we only get here if the criteria is valid
-            case Criteria.SWIPE => futureMatched(ApplicationWS.swipeMatchingActor)
-            case Criteria.PINCH => futureMatched(ApplicationWS.pinchMatchingActor)
-          }
+        criteria match {
+          // we only get here if the criteria is valid
+          case Criteria.SWIPE => futureMatched(ApplicationWS.swipeMatchingActor)
+          case Criteria.PINCH => futureMatched(ApplicationWS.pinchMatchingActor)
         }
 
     }
@@ -234,11 +202,6 @@ class ContentExchangeActor extends Actor {
     */
   def onDisconnectInput(disconnect: ClientInputMessageDisconnect) = {
     // a disconnect message doesn't have a groupId
-    Logger.info(s"$self, disconnect input, reason: ${disconnect.reason}")
-    if (matchees.isDefined && myself.isDefined) {
-      sendMessageToMatchees(MatcheeLeftGroup(myself.get, disconnect.reason))
-      leaveGroup()
-    }
     closeClientConnection()
   }
 
@@ -304,7 +267,7 @@ class ContentExchangeActor extends Actor {
         }
 
       // deliver stuff
-      if (!listRecipients.isEmpty) {
+      if (listRecipients.nonEmpty) {
         // create a delivery message and deliver it to the right recipients!
         val delivery: Delivery = new Delivery(clientDelivery.deliveryId, clientDelivery.payload,
           clientDelivery.chunkNr, clientDelivery.totalChunks)
@@ -324,9 +287,9 @@ class ContentExchangeActor extends Actor {
   // *************************************
   def groupsAreValid(inputGroupId: String) = groupId.isDefined && inputGroupId == groupId.get
 
-  def sendToClient(message: String) = channel.foreach(x => x.push(message))
+  def sendToClient(message: String) = client.outActor ! message
 
-  def closeClientConnection() = channel.foreach(x => x.eofAndEnd())
+  def closeClientConnection() = self ! PoisonPill
 
   def leaveGroup() = {
     matchees = None
@@ -344,5 +307,5 @@ class ContentExchangeActor extends Actor {
 }
 
 object ContentExchangeActor {
-  def props: Props = Props(classOf[ContentExchangeActor])
+  def props(client: ConnectedClient) = Props(new ContentExchangeActor(client))
 }

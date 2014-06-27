@@ -16,19 +16,12 @@
 
 package controllers
 
-import play.api.mvc._
-import play.api.libs.iteratee.{Iteratee, Enumerator}
-import akka.actor.ActorRef
-import akka.pattern.ask
 import actors._
-import play.api.libs.concurrent.Akka
-import play.api.Play.current
-import play.api.Logger
-import consts.Timeouts
-import java.util.concurrent.TimeoutException
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import helpers.json.JsonErrorHelper
 import models.ConnectedClient
+import play.api.Logger
+import play.api.Play.current
+import play.api.libs.concurrent.Akka
+import play.api.mvc._
 
 object ApplicationWS extends Controller {
   Logger.info("******* Server starting. Creating ActorSystem. ********")
@@ -37,21 +30,7 @@ object ApplicationWS extends Controller {
 
   // TODO: putting actor here in objects makes it hard to test. I can use the Global object.
 
-  // Endpoint to open the WebSocket connection.
-  def openv1(deviceId: String): WebSocket[String] = WebSocket.async {
-    request => {
-      Logger.info(s"open websocket endpoint connection: $request")
-      val handlingActor: ActorRef = Akka.system.actorOf(ContentExchangeActor.props)
-      val connectionMsg = ConnectedClient(request.remoteAddress, deviceId)
-      val wsLinkFuture = (handlingActor ? connectionMsg)(Timeouts.maxOldestRequestInterval)
-      wsLinkFuture.mapTo[(Iteratee[String, _], Enumerator[String])].recover {
-        case e: TimeoutException =>
-          // no actor responded.
-          Logger.error(s"open websocket endpoint, no actor responded. Close connection, exception: $e")
-          val out = Enumerator(JsonErrorHelper.createServerError).andThen(Enumerator.eof)
-          val in: Iteratee[String, _] = Iteratee.ignore
-          (in, out)
-      }
-    }
+  def openv1(deviceId: String) = WebSocket.acceptWithActor[String, String] {
+    request => out => ContentExchangeActor.props(ConnectedClient(out, request.remoteAddress, deviceId))
   }
 }
