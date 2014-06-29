@@ -2,8 +2,8 @@ function createDisconnectJson() {
     return JSON.stringify({"type":"disconnect"});
 }
 
-function createBreakMatchJson() {
-    return JSON.stringify({"type":"leaveGroup", "groupId":"xxEXAMPLEGROUPxx"});
+function createBreakMatchJson(groupId) {
+    return JSON.stringify({"type":"leaveGroup", "groupId": groupId});
 }
 
 function createDeliverJson(recipients, payload, groupId) {

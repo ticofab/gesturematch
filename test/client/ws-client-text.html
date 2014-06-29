@@ -96,6 +96,13 @@
                 <td><input class="table-input" ng-model="dev3recip"></td>
                 <td><input class="table-input" ng-model="dev4recip"></td>
             </tr>
+            <tr>
+                <td class="vertical-header">Group ID</td>
+                <td><input class="table-input" ng-model="dev1groupId"></td>
+                <td><input class="table-input" ng-model="dev2groupId"></td>
+                <td><input class="table-input" ng-model="dev3groupId"></td>
+                <td><input class="table-input" ng-model="dev4groupId"></td>
+            </tr>
         </table>
 
         <br>
@@ -104,30 +111,26 @@
         <button ng-click="match1()">match 1</button>
         <button ng-click="disconnect1()">disconnect 1</button>
         <button ng-click="breakmatch1()">break group 1</button>
-        <button ng-click="deliver1()">deliver 1</button>
-        <span class="received-stuff"> {{dev1groupId}}</span><br>
+        <button ng-click="deliver1()">deliver 1</button><br>
 
         <button ng-click="connect2()" ng-disabled="isDisabled2">connect 2</button>
         <button ng-click="match2()">match 2</button>
         <button ng-click="disconnect2()">disconnect 2</button>
         <button ng-click="breakmatch2()">break group 2</button>
-        <button ng-click="deliver2()">deliver 2</button>
-        <span class="received-stuff"> {{dev2groupId}}</span><br>
+        <button ng-click="deliver2()">deliver 2</button><br>
 
         <button ng-click="connect3()" ng-disabled="isDisabled3">connect 3</button>
         <button ng-click="match3()">match 3</button>
         <button ng-click="disconnect3()">disconnect 3</button>
         <button ng-click="breakmatch3()">break group 3</button>
-        <button ng-click="deliver3()">deliver 3</button>
-        <span class="received-stuff"> {{dev3groupId}}</span><br>
+        <button ng-click="deliver3()">deliver 3</button><br>
 
 
         <button ng-click="connect4()" ng-disabled="isDisabled4">connect 4</button>
         <button ng-click="match4()">match 4</button>
         <button ng-click="disconnect4()">disconnect 4</button>
         <button ng-click="breakmatch4()">break group 4</button>
-        <button ng-click="deliver4()">deliver 4</button>
-        <span class="received-stuff"> {{dev4groupId}}</span><br><br>
+        <button ng-click="deliver4()">deliver 4</button><br><br>
 
         <div class="received-stuff-header">Data received:</div>
         <span class="received-stuff-header">dev1:</span><span class="received-stuff"> {{dev1msg}}</span><br>

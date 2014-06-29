@@ -182,10 +182,10 @@ myApp.controller('paramTable', ['$scope', function($scope) {
     $scope.match3 = function() {myWebSocket3.send($scope.match3json)}
     $scope.match4 = function() {myWebSocket4.send($scope.match4json)}
 
-    $scope.breakmatch1 = function() {myWebSocket1.send(createBreakMatchJson());}
-    $scope.breakmatch2 = function() {myWebSocket2.send(createBreakMatchJson());}
-    $scope.breakmatch3 = function() {myWebSocket3.send(createBreakMatchJson());}
-    $scope.breakmatch4 = function() {myWebSocket4.send(createBreakMatchJson());}
+    $scope.breakmatch1 = function() {myWebSocket1.send(createBreakMatchJson($scope.dev1groupId));}
+    $scope.breakmatch2 = function() {myWebSocket2.send(createBreakMatchJson($scope.dev2groupId));}
+    $scope.breakmatch3 = function() {myWebSocket3.send(createBreakMatchJson($scope.dev3groupId));}
+    $scope.breakmatch4 = function() {myWebSocket4.send(createBreakMatchJson($scope.dev4groupId));}
 
     $scope.deliver1 = function() {
         var ar = [];

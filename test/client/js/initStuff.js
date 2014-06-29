@@ -35,18 +35,18 @@ function initStuff(scope) {
     scope.dev3se = "right"
     scope.dev4se = "inner"
 
-    scope.dev1pl = "[{\"type\":\"NAME\",\"content\":{\"value\":\"Fabio1\"}}]"
-    scope.dev2pl = "[{\"type\":\"NAME\",\"content\":{\"value\":\"Fabio2\"}}]"
-    scope.dev3pl = "[{\"type\":\"NAME\",\"content\":{\"value\":\"Fabio3\"}}]"
-    scope.dev4pl = "[{\"type\":\"NAME\",\"content\":{\"value\":\"Fabio4\"}}]"
+    scope.dev1pl = "payload_from_1"
+    scope.dev2pl = "payload_from_2"
+    scope.dev3pl = "payload_from_3"
+    scope.dev4pl = "payload_from_4"
 
     scope.dev1ep = "blue"
     scope.dev2ep = "blue"
     scope.dev3ep = "blue"
     scope.dev4ep = "blue"
 
-    scope.dev1recip = "1"
-    scope.dev2recip = "0"
+    scope.dev1recip = "0"
+    scope.dev2recip = "1"
     scope.dev3recip = "2"
     scope.dev4recip = "3"
 
@@ -54,4 +54,10 @@ function initStuff(scope) {
     scope.dev2os = "firefox OS"
     scope.dev3os = "ios"
     scope.dev4os = "android"
+
+    scope.dev1groupId = "none"
+    scope.dev2groupId = "none"
+    scope.dev3groupId = "none"
+    scope.dev4groupId = "none"
+
 }

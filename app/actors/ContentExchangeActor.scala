@@ -84,17 +84,15 @@ class ContentExchangeActor(client: ConnectedClient) extends Actor {
       if (groupId.isDefined) {
         Logger.info(s"$self, matchee left group: ${groupId.get}, matchee: $matchee, reason: $reason")
 
-        // update information about my group
-        val newMatchees = matchees.get.filterNot(_.idInGroup == matchee.idInGroup)
-        if (newMatchees.isEmpty) {
-          matchees = None
-          groupId = None
-        } else {
-          matchees = Some(newMatchees)
-        }
-
+        // notify client of broken group
         val message = JsonMessageHelper.createMatcheeLeftGroupMessage(groupId.get, matchee.idInGroup)
         sendToClient(message)
+
+        // update information about my group
+        // TODO: we leave the group standing, for now
+        val newMatchees = matchees.get.filterNot(_.idInGroup == matchee.idInGroup)
+        if (newMatchees.isEmpty) matchees = None else matchees = Some(newMatchees)
+
       } else {
         Logger.error(s"$self, matchee left group, but my groupId is empty. Matchee: $matchee, reason: $reason")
       }
@@ -113,7 +111,6 @@ class ContentExchangeActor(client: ConnectedClient) extends Actor {
   // ContentExchangeActor lifecycle
   // *************************************
   override def postStop() = {
-    Logger.info("postStop")
     // the client disconnected
     Logger.info(s"$self, client disconnected: ${client.remoteAddress}, ${client.deviceId}")
     if (matchees.isDefined && myself.isDefined) {
