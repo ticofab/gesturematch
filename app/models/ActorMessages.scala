@@ -16,11 +16,13 @@
 
 package models
 
+import akka.actor.ActorRef
+
 // matching stuff
 case class NewRequest(request: RequestToMatch)
 
 // client handling actor messages
-case class ConnectedClient(remoteAddress: String, apiKey: String, appId: String, os: String, deviceId: String)
+case class ConnectedClient(outActor: ActorRef, remoteAddress: String, deviceId: String, apiKey: String, appId: String, os: String)
 case class Matched(matchees: List[Matchee], groupId: String, scheme: Option[Scheme] = None)
 case class Input(input: String)
 

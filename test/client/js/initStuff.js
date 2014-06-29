@@ -10,15 +10,15 @@ function initStuff(scope) {
     scope.dev3criteria = "swipe"
     scope.dev4criteria = "swipe"
 
-    scope.dev1apikey = "fabway-gesturematch"
-    scope.dev2apikey = "fabway-gesturematch"
-    scope.dev3apikey = "fabway-gesturematch"
-    scope.dev4apikey = "fabway-gesturematch"
+    scope.dev1apikey = "7c0d9da1c63d4ed2958ca68ecc6522a0"
+    scope.dev2apikey = "7c0d9da1c63d4ed2958ca68ecc6522a0"
+    scope.dev3apikey = "7c0d9da1c63d4ed2958ca68ecc6522a0"
+    scope.dev4apikey = "7c0d9da1c63d4ed2958ca68ecc6522a0"
 
-    scope.dev1appId = "gesturematch-demo"
-    scope.dev2appId = "gesturematch-demo"
-    scope.dev3appId = "gesturematch-demo"
-    scope.dev4appId = "gesturematch-demo"
+    scope.dev1appId = "7fd63036300f408093b6ae22149a1395"
+    scope.dev2appId = "7fd63036300f408093b6ae22149a1395"
+    scope.dev3appId = "7fd63036300f408093b6ae22149a1395"
+    scope.dev4appId = "7fd63036300f408093b6ae22149a1395"
 
     scope.dev1devid = "idjs1"
     scope.dev2devid = "idjs2"
@@ -45,18 +45,18 @@ function initStuff(scope) {
     scope.dev3se = "right"
     scope.dev4se = "inner"
 
-    scope.dev1pl = "[{\"type\":\"NAME\",\"content\":{\"value\":\"Fabio1\"}}]"
-    scope.dev2pl = "[{\"type\":\"NAME\",\"content\":{\"value\":\"Fabio2\"}}]"
-    scope.dev3pl = "[{\"type\":\"NAME\",\"content\":{\"value\":\"Fabio3\"}}]"
-    scope.dev4pl = "[{\"type\":\"NAME\",\"content\":{\"value\":\"Fabio4\"}}]"
+    scope.dev1pl = "payload_from_1"
+    scope.dev2pl = "payload_from_2"
+    scope.dev3pl = "payload_from_3"
+    scope.dev4pl = "payload_from_4"
 
     scope.dev1ep = "blue"
     scope.dev2ep = "blue"
     scope.dev3ep = "blue"
     scope.dev4ep = "blue"
 
-    scope.dev1recip = "1"
-    scope.dev2recip = "0"
+    scope.dev1recip = "0"
+    scope.dev2recip = "1"
     scope.dev3recip = "2"
     scope.dev4recip = "3"
 
@@ -64,4 +64,10 @@ function initStuff(scope) {
     scope.dev2os = "firefox OS"
     scope.dev3os = "ios"
     scope.dev4os = "android"
+
+    scope.dev1groupId = "none"
+    scope.dev2groupId = "none"
+    scope.dev3groupId = "none"
+    scope.dev4groupId = "none"
+
 }

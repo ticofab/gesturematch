@@ -16,21 +16,19 @@
 
 package controllers
 
-import play.api.mvc._
-import play.api.libs.iteratee.{Iteratee, Enumerator}
-import akka.actor.ActorRef
-import akka.pattern.ask
-import actors._
-import play.api.libs.concurrent.Akka
-import play.api.Play.current
-import play.api.Logger
-import consts.Timeouts
 import java.util.concurrent.TimeoutException
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import actors._
+import akka.actor.ActorRef
 import helpers.json.JsonErrorHelper
-import models.ConnectedClient
-import scala.concurrent.Future
 import helpers.storage.DBHelper
+import models.ConnectedClient
+import play.api.Logger
+import play.api.Play.current
+import play.api.libs.concurrent.Akka
+import play.api.mvc._
+
+import scala.concurrent.Future
 
 object ApplicationWS extends Controller {
   Logger.info("******* Server starting. Creating ActorSystem. ********")
@@ -39,60 +37,43 @@ object ApplicationWS extends Controller {
 
   // TODO: putting actor here in objects makes it hard to test. I can use the Global object.
 
-  // Endpoint to open the WebSocket connection.
-  def openv1(apiKey: String, appId: String, os: String, deviceId: String): WebSocket[String] = WebSocket.async {
+  def openv1(apiKey: String, appId: String, os: String, deviceId: String) = WebSocket.tryAcceptWithActor[String, String] {
+
     request => {
       Logger.info(s"open websocket endpoint connection: $request")
 
       val testValidity: Future[Boolean] = DBHelper.areKeyAndIdValid(apiKey, appId)
-      testValidity.flatMap {
-        isValid => {
+
+      testValidity map {
+        isValid =>
           if (isValid) {
-            // request valid
-            Logger.debug(s"apiKey and appId: ($apiKey, $appId) are valid.")
-            val handlingActor: ActorRef = Akka.system.actorOf(ContentExchangeActor.props)
-            val connectionMsg = ConnectedClient(request.remoteAddress, apiKey, appId, os, deviceId)
-            val wsLinkFuture = (handlingActor ? connectionMsg)(Timeouts.maxOldestRequestInterval)
-            wsLinkFuture.mapTo[(Iteratee[String, _], Enumerator[String])].recover {
-              case e: TimeoutException =>
-                // no actor responded.
-                // this is the recover of a Future so this will be a Future! No need for "Future { }"
-                Logger.error(s"open websocket endpoint, no actor responded. Close connection, exception: $e")
-                val out = Enumerator(JsonErrorHelper.createServerError).andThen(Enumerator.eof)
-                val in: Iteratee[String, Unit] = Iteratee.ignore
-                (in, out)
-            }
+            Right((out: ActorRef) => {
+              val c = ConnectedClient(out, request.remoteAddress, deviceId, apiKey, appId, os)
+              ContentExchangeActor.props(c)
+            })
           } else {
-            Future {
-              Logger.debug(s"apiKey and appId: ($apiKey, $appId) are NOT valid.")
-              val errorMsg = JsonErrorHelper.createInvalidCredentialsError(apiKey, appId)
-              val out = Enumerator(errorMsg).andThen(Enumerator.eof)
-              val in: Iteratee[String, Unit] = Iteratee.ignore
-              (in, out)
-            }
+            Logger.debug(s"apiKey and appId: ($apiKey, $appId) are NOT valid.")
+            val errorMsg = JsonErrorHelper.createInvalidCredentialsError(apiKey, appId)
+            Left(Forbidden(errorMsg))
           }
-        }
       } recover {
         // this is the recover of a Future so this will be a Future! No need for "Future { }"
 
-        case t: TimeoutException => {
+        case t: TimeoutException =>
           // database timeout.
           Logger.error(s"Database TimeoutException: $t")
           val exceptionMsg = JsonErrorHelper.createDatabaseError
-          val out = Enumerator(exceptionMsg).andThen(Enumerator.eof)
-          val in: Iteratee[String, Unit] = Iteratee.ignore
-          (in, out)
-        }
+          Left(InternalServerError(exceptionMsg))
 
-        case e: Exception => {
+        case e: Exception =>
           // database timeout.
           Logger.error(s"Future failure: $e")
           val exceptionMsg = s"Database failure."
-          val out = Enumerator(exceptionMsg).andThen(Enumerator.eof)
-          val in: Iteratee[String, Unit] = Iteratee.ignore
-          (in, out)
-        }
+          Left(InternalServerError(exceptionMsg))
+
       }
+
     }
   }
 }
+
