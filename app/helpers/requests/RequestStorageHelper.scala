@@ -16,12 +16,13 @@
 
 package helpers.requests
 
-import math._
-import models.RequestToMatch
-import consts.{Criteria, Timeouts}
-import storage._
-import play.api.Logger
 import consts.Criteria.Criteria
+import consts.{Criteria, MatchingDistance, Timeouts}
+import models.RequestToMatch
+import play.api.Logger
+import storage._
+
+import scala.math._
 
 // This object is an helper to access the storage of previously received requests.
 object RequestStorageHelper {
@@ -65,7 +66,7 @@ object RequestStorageHelper {
     val distanceInMeters: Double = haversineDistanceInKm(r1.latitude, r1.longitude, r2.latitude, r2.longitude) * 1000
     Logger.info(s"distance in meters: $distanceInMeters")
 
-    val closeEnough: Boolean = distanceInMeters < 50
+    val closeEnough: Boolean = distanceInMeters < MatchingDistance.closeEnoughDistance
 
     // check if equality parameters are the same
     val equality =
