@@ -2,14 +2,18 @@
 
   <conversionRule conversionWord="coloredLevel" converterClass="play.api.Logger$ColoredLevel" />
 
-  <timestamp key="byDay" datePattern="yyyyMMdd"/>
-
-  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-     <file>${application.home}/logs/log_${byDay}.log</file>
-     <encoder>
-       <pattern>%d{HH:mm:ss.SSS} - [level: %level] - [msg: %message] [exc: %xException] [logger: %logger], [thread: %thread]%n</pattern>
-     </encoder>
-   </appender>
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${application.home}/logs/logFile.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <fileNamePattern>logFile.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+        <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+            <maxFileSize>100MB</maxFileSize>
+        </timeBasedFileNamingAndTriggeringPolicy>
+    </rollingPolicy>
+    <encoder>
+        <pattern>%d{HH:mm:ss.SSS} - [level: %level] - [msg: %message] [exc: %xException]%n</pattern>
+    </encoder>
+  </appender>
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
