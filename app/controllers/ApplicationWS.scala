@@ -18,12 +18,12 @@ package controllers
 
 import java.util.concurrent.TimeoutException
 import models.database.SessionUser
+import models.messages.actors.ConnectedClient
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import actors._
 import akka.actor.ActorRef
 import helpers.json.JsonErrorHelper
 import helpers.storage.DBHelper
-import models.ConnectedClient
 import play.api.Logger
 import play.api.Play.current
 import play.api.libs.concurrent.Akka

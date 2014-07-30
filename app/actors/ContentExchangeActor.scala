@@ -27,9 +27,10 @@ import helpers.json.{JsonInputHelper, JsonMessageHelper, JsonResponseHelper}
 import helpers.movements.SwipeMovementHelper
 import helpers.requests.RequestValidityHelper
 import helpers.storage.DBHelper
-import models.ClientInputMessages._
-import models._
 import models.database.SessionUser
+import models.matching.{Delivery, Matchee, RequestToMatch}
+import models.messages.actors._
+import models.messages.client._
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.concurrent.Promise
@@ -40,11 +41,15 @@ import scala.util.{Failure, Success, Try}
   *
   */
 class ContentExchangeActor(outActor: ActorRef, client: ConnectedClient, sessionUser: SessionUser) extends Actor {
+  lazy val getUserLog = s"[user: ${sessionUser.name}, app: ${sessionUser.appName}, dev ${client.deviceId}] "
+  def logInfo(message: String) = Logger.info(getUserLog + message)
+  def logError(message: String) = Logger.error(getUserLog + message)
+
   Logger.info(s"Client connected. ip: ${client.remoteAddress}, deviceId: ${client.deviceId}, user: ${sessionUser.name}, appName: ${sessionUser.appName}, managed by $self")
 
   // initiate a timeout which will close the connection after the timeout
   Promise.timeout({
-    Logger.info(s"dev ${client.deviceId}, timeout expired. Closing connection with client at ${client.remoteAddress}.")
+    logInfo("timeout expired. Closing connection with client at ${client.remoteAddress}.")
     closeClientConnection()
   }, Timeouts.maxConnectionLifetime)
 
@@ -80,13 +85,13 @@ class ContentExchangeActor(outActor: ActorRef, client: ConnectedClient, sessionU
       groupId = Some(groupUniqueId)
       hasBeenMatched = true
 
-      Logger.info(s"dev ${client.deviceId}, matched. Group id: $groupUniqueId, groupMatchees: $matchees")
+      logInfo(s"matched. Group id: $groupUniqueId, groupMatchees: $matchees")
       val jsonToSend = JsonResponseHelper.createMatchedResponse(me.head, groupMatchees, groupUniqueId, scheme)
       sendToClient(jsonToSend)
 
     case MatcheeLeftGroup(matchee, reason) =>
       if (groupId.isDefined) {
-        Logger.info(s"dev ${client.deviceId}, matchee left group: ${groupId.get}, matchee: $matchee, reason: $reason")
+        logInfo(s"matchee left group: ${groupId.get}, matchee: $matchee, reason: $reason")
 
         // notify client of broken group
         val message = JsonMessageHelper.createMatcheeLeftGroupMessage(groupId.get, matchee.idInGroup)
@@ -98,16 +103,16 @@ class ContentExchangeActor(outActor: ActorRef, client: ConnectedClient, sessionU
         if (newMatchees.isEmpty) matchees = None else matchees = Some(newMatchees)
 
       } else {
-        Logger.error(s"dev ${client.deviceId}, matchee left group, but my groupId is empty. Matchee: $matchee, reason: $reason")
+        logInfo(s"matchee left group, but my groupId is empty. Matchee: $matchee, reason: $reason")
       }
 
     case MatcheeDelivers(matchee, delivery) =>
       if (groupId.isDefined) {
-        Logger.info(s"dev ${client.deviceId}, matchee delivered payload. Matchee: $matchee, payload length: ${delivery.payload.length}")
+        logInfo(s"matchee delivered payload. Matchee: $matchee, payload length: ${delivery.payload.length}")
         val payloadMsg = JsonMessageHelper.createMatcheeSendsPayloadMessage(groupId.get, matchee.idInGroup, delivery)
         sendToClient(payloadMsg)
       } else {
-        Logger.error(s"dev ${client.deviceId}, matchee delivered payload. Matchee: $matchee, but I'm not part of any group!")
+        logInfo(s"matchee delivered payload. Matchee: $matchee, but I'm not part of any group!")
       }
   }
 
@@ -116,7 +121,7 @@ class ContentExchangeActor(outActor: ActorRef, client: ConnectedClient, sessionU
   // *************************************
   override def postStop() = {
     // the client disconnected
-    Logger.info(s"dev ${client.deviceId}, client disconnected: ${client.remoteAddress}, ${client.deviceId}")
+    logInfo(s"client disconnected: ${client.remoteAddress}, ${client.deviceId}")
     if (matchees.isDefined && myself.isDefined) {
       sendMessageToMatchees(MatcheeLeftGroup(myself.get, None))
     }
@@ -132,7 +137,7 @@ class ContentExchangeActor(outActor: ActorRef, client: ConnectedClient, sessionU
     * @param input the input coming from the client through the WebSocket channel.
     */
   def onInput(input: String) = {
-    Logger.info(s"dev ${client.deviceId}, client input. Length: ${input.length}")
+    logInfo(s"client input. Length: ${input.length}")
 
     // try to parse it to Json
     Try(JsonInputHelper.parseInput(input)) match {
@@ -150,7 +155,7 @@ class ContentExchangeActor(outActor: ActorRef, client: ConnectedClient, sessionU
       case Failure(e) =>
         // TODO: more descriptive error
         lazy val invalidJson = "Error parsing the JSON input."
-        Logger.info(s"dev ${client.deviceId}, couldn't parse input: $e}")
+        logInfo(s"couldn't parse input: $e")
         sendToClient(JsonResponseHelper.getInvalidInputResponse(Some(invalidJson)))
     }
   }
@@ -172,11 +177,11 @@ class ContentExchangeActor(outActor: ActorRef, client: ConnectedClient, sessionU
 
       case Failure(e) =>
         // request issue
-        Logger.info(s"dev ${client.deviceId}, match request invalid, exception: $e")
+        logInfo(s"match request invalid, exception: $e")
         sendToClient(JsonResponseHelper.getInvalidMatchRequestResponse(e.getMessage))
 
       case Success(isValid) =>
-        Logger.info(s"dev ${client.deviceId}, match request valid.")
+        logInfo(s"match request valid.")
 
         val apiKey = client.apiKey
         val appId = client.appId
@@ -227,31 +232,29 @@ class ContentExchangeActor(outActor: ActorRef, client: ConnectedClient, sessionU
     * @param leaveGroupMessage the request to leave the group
     */
   def onLeaveGroupInput(leaveGroupMessage: ClientInputMessageLeaveGroup) = {
-    def getLeaveGroupLog(msg: String) = {
-      s"dev ${client.deviceId}, leave group input, $msg, group id: ${leaveGroupMessage.groupId}, reason: ${leaveGroupMessage.reason}"
-    }
+    def getLeaveGroupLog(msg: String) = s"leave group input, $msg, group id: ${leaveGroupMessage.groupId}, reason: ${leaveGroupMessage.reason}"
 
     // if not valid, this input will be simply discarded
     if (groupsAreValid(leaveGroupMessage.groupId)) {
       // send messages to the other ones in the connection and simply forget about them
       matchees match {
         case Some(matcheesList) =>
-          Logger.info(getLeaveGroupLog("notifying other members"))
+          logInfo(getLeaveGroupLog("notifying other members"))
 
           if (myself.isDefined) {
             sendMessageToMatchees(MatcheeLeftGroup(myself.get, leaveGroupMessage.reason))
             sendToClient(JsonResponseHelper.getGroupLeftResponse(groupId.get))
           } else {
-            Logger.error(getLeaveGroupLog("myself is empty"))
+            logError(getLeaveGroupLog("myself is empty"))
           }
 
           leaveGroup()
         case None =>
-          Logger.error(getLeaveGroupLog("matchees is empty"))
+          logError(getLeaveGroupLog("matchees is empty"))
           sendToClient(JsonResponseHelper.getNotPartOfGroupResponse(leaveGroupMessage.groupId))
       }
     } else {
-      Logger.info(getLeaveGroupLog("client is not part of group"))
+      logInfo(getLeaveGroupLog("client is not part of group"))
       sendToClient(JsonResponseHelper.getNotPartOfGroupResponse(leaveGroupMessage.groupId))
     }
   }
@@ -261,7 +264,7 @@ class ContentExchangeActor(outActor: ActorRef, client: ConnectedClient, sessionU
     * @param clientDelivery the delivery request containing some payload
     */
   def onDeliveryInput(clientDelivery: ClientInputMessageDelivery) = {
-    def getDeliveryLog(msg: String = "") = s"dev ${client.deviceId}, client delivery," +
+    def getDeliveryLog(msg: String = "") = s"client delivery," +
       s" $msg, groupId: ${clientDelivery.groupId}, recipients: ${clientDelivery.recipients} " +
       s", payload length: ${clientDelivery.payload.length}"
 
@@ -296,7 +299,7 @@ class ContentExchangeActor(outActor: ActorRef, client: ConnectedClient, sessionU
         DBHelper.addPayloadDelivered(apiKey, appId, payloadLength * listRecipients.length)
       }
     } else {
-      Logger.info(getDeliveryLog(s"client is not part of this group"))
+      logInfo(getDeliveryLog(s"client is not part of this group"))
       sendToClient(JsonResponseHelper.getPayloadNotDeliveredResponse(clientDelivery.groupId,
         Some(JsonResponseLabels.REASON_NOT_PART_OF_THIS_GROUP)))
     }

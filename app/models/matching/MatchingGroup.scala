@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-package models
+package models.matching
 
-import consts.SwipeMovements._
-
-class PossibleMatching(val devicesInGroup: Int, val necessaryMovements: List[SwipeMovement])
+case class MatchingGroup(devicesInGroup: Int, requests: List[RequestToMatch])

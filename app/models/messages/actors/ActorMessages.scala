@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-package models
+package models.messages.actors
+
+import models.matching.{Delivery, Matchee, RequestToMatch}
+import models.scheme.Scheme
 
 // matching stuff
 case class NewRequest(request: RequestToMatch)

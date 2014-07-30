@@ -16,9 +16,9 @@
 
 package helpers.json
 
+import models.matching.Delivery
 import play.api.libs.json.{JsNumber, Json}
 import consts.json.{JsonInputLabels, JsonGeneralLabels, JsonMessageLabels}
-import models.Delivery
 
 object JsonMessageHelper {
 

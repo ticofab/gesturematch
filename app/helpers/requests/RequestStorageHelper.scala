@@ -18,7 +18,7 @@ package helpers.requests
 
 import consts.Criteria.Criteria
 import consts.{Criteria, MatchingDistance, Timeouts}
-import models.RequestToMatch
+import models.matching.RequestToMatch
 import play.api.Logger
 import storage._
 

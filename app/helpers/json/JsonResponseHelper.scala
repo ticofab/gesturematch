@@ -16,8 +16,9 @@
 
 package helpers.json
 
+import models.matching.Matchee
+import models.scheme.Scheme
 import play.api.libs.json._
-import models.{Scheme, Matchee}
 import consts.json.{JsonErrorLabels, JsonInputLabels, JsonGeneralLabels, JsonResponseLabels}
 import scala.Some
 

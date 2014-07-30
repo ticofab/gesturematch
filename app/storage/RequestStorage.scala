@@ -16,7 +16,7 @@
 
 package storage
 
-import models.RequestToMatch
+import models.matching.RequestToMatch
 
 abstract class RequestStorage {
 

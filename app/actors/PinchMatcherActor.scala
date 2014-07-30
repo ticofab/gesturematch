@@ -17,16 +17,17 @@
 package actors
 
 import akka.actor.{Actor, Props}
-import models._
-import helpers.requests.RequestStorageHelper
 import consts.Criteria
-import play.api.Logger
 import consts.SwipeMovements.SwipeMovement
-import traits.StringGenerator
-import models.NewRequest
-import helpers.storage.DBHelper
 import helpers.matchers.pinch.PinchMatchingHelper
 import helpers.matchers.swipe.PatternHelper
+import helpers.requests.RequestStorageHelper
+import helpers.storage.DBHelper
+import models.matching.{Matchee, RequestToMatch}
+import models.messages.actors.{Matched, NewRequest}
+import models.scheme.Scheme
+import play.api.Logger
+import traits.StringGenerator
 
 class PinchMatcherActor extends Actor with StringGenerator {
   lazy val myName = this.getClass.getSimpleName
@@ -84,7 +85,7 @@ class PinchMatcherActor extends Actor with StringGenerator {
 
           // Send a matching notification to the actors managing the corresponding devices
           val scheme: Scheme = new Scheme
-          val id1: Int = scheme.addFirstDevice
+          val id1: Int = scheme.addFirstDevice()
           val id2: Int = scheme.addDevice(PatternHelper.getDeviceSchemePosition(prevReq.areaEnd), id1)
           val matchee1 = new Matchee(request.handlingActor, id1)
           val matchee2 = new Matchee(prevReq.handlingActor, id2)

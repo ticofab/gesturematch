@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.ClientInputMessages
+package models.messages.client
 
 import play.api.libs.json._
 import play.api.libs.json.Reads._

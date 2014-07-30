@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package models
+package models.matching
 
 import akka.actor.ActorRef
-import consts.SwipeMovements.SwipeMovement
 import consts.Areas.Areas
+import consts.SwipeMovements.SwipeMovement
 
 class RequestToMatch(val apiKey: String,
                      val appId: String,

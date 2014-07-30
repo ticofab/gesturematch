@@ -17,15 +17,15 @@
 package actors
 
 import akka.actor.{Actor, Props}
-import play.api.Logger
-import models._
 import consts.Criteria
-import traits.StringGenerator
+import helpers.matchers.swipe.PatternHelper
 import helpers.requests.RequestStorageHelper
 import helpers.storage.DBHelper
-import models.NewRequest
-import models.Matched
-import helpers.matchers.swipe.PatternHelper
+import models.matching.{Matchee, RequestToMatch}
+import models.messages.actors.{Matched, NewRequest}
+import models.scheme.Scheme
+import play.api.Logger
+import traits.StringGenerator
 
 class SwipeMatcherActor extends Actor with StringGenerator {
 
@@ -70,7 +70,7 @@ class SwipeMatcherActor extends Actor with StringGenerator {
 
           val scheme: Option[Scheme] = if (isUnique) {
             def addZippedDevicesToScheme(devices: List[(RequestToMatch, Int)], scheme: Scheme): Unit = {
-              if (!devices.isEmpty) {
+              if (devices.nonEmpty) {
                 val (r, id) = devices.head
                 val pos = PatternHelper.getDeviceSchemePosition(r.areaStart)
                 scheme.addNextDevice(pos, id)

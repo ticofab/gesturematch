@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.ClientInputMessages
+package models.messages.client
 
 import play.api.libs.json.JsValue
 import consts.json.{JsonGeneralLabels, JsonInputLabels}
