@@ -49,7 +49,7 @@ class ContentExchangeActor(outActor: ActorRef, client: ConnectedClient, sessionU
 
   // initiate a timeout which will close the connection after the timeout
   Promise.timeout({
-    logInfo("timeout expired. Closing connection with client at ${client.remoteAddress}.")
+    logInfo(s"timeout expired. Closing connection with client at ${client.remoteAddress}.")
     closeClientConnection()
   }, Timeouts.maxConnectionLifetime)
 
@@ -121,7 +121,7 @@ class ContentExchangeActor(outActor: ActorRef, client: ConnectedClient, sessionU
   // *************************************
   override def postStop() = {
     // the client disconnected
-    logInfo(s"client disconnected: ${client.remoteAddress}, ${client.deviceId}")
+    logInfo(s"client disconnected: ${client.remoteAddress}")
     if (matchees.isDefined && myself.isDefined) {
       sendMessageToMatchees(MatcheeLeftGroup(myself.get, None))
     }
