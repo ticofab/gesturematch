@@ -29,6 +29,7 @@ import helpers.requests.RequestValidityHelper
 import helpers.storage.DBHelper
 import models.ClientInputMessages._
 import models._
+import models.database.SessionUser
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.concurrent.Promise
@@ -38,8 +39,8 @@ import scala.util.{Failure, Success, Try}
 /** Will manage a client connection and take the appropriate action upon receiving a client input.
   *
   */
-class ContentExchangeActor(client: ConnectedClient) extends Actor {
-  Logger.info(s"new client connected: ${client.remoteAddress}, ${client.deviceId}, managed by $self")
+class ContentExchangeActor(outActor: ActorRef, client: ConnectedClient, sessionUser: SessionUser) extends Actor {
+  Logger.info(s"Client connected. ip: ${client.remoteAddress}, deviceId: ${client.deviceId}, user: ${sessionUser.name}, appName: ${sessionUser.appName}, managed by $self")
 
   // initiate a timeout which will close the connection after the timeout
   Promise.timeout({
@@ -306,7 +307,7 @@ class ContentExchangeActor(client: ConnectedClient) extends Actor {
   // *************************************
   def groupsAreValid(inputGroupId: String) = groupId.isDefined && inputGroupId == groupId.get
 
-  def sendToClient(message: String) = client.outActor ! message
+  def sendToClient(message: String) = outActor ! message
 
   def closeClientConnection() = self ! PoisonPill
 
@@ -326,5 +327,5 @@ class ContentExchangeActor(client: ConnectedClient) extends Actor {
 }
 
 object ContentExchangeActor {
-  def props(client: ConnectedClient) = Props(new ContentExchangeActor(client))
+  def props(outActor: ActorRef, client: ConnectedClient, sessionUser: SessionUser) = Props(new ContentExchangeActor(outActor, client, sessionUser))
 }

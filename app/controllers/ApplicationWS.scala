@@ -17,6 +17,7 @@
 package controllers
 
 import java.util.concurrent.TimeoutException
+import models.database.SessionUser
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import actors._
 import akka.actor.ActorRef
@@ -42,23 +43,20 @@ object ApplicationWS extends Controller {
     request => {
       Logger.info(s"open websocket endpoint connection: $request")
 
-      val testValidity: Future[Boolean] = DBHelper.areKeyAndIdValid(apiKey, appId)
+      val futureUser: Future[Option[SessionUser]] = DBHelper.getSessionUser(apiKey, appId)
 
-      testValidity map {
-        isValid =>
-          if (isValid) {
-            Right((out: ActorRef) => {
-              val c = ConnectedClient(out, request.remoteAddress, deviceId, apiKey, appId, os)
-              ContentExchangeActor.props(c)
-            })
-          } else {
+      futureUser map {
+          case None =>
             Logger.debug(s"apiKey and appId: ($apiKey, $appId) are NOT valid.")
             val errorMsg = JsonErrorHelper.createInvalidCredentialsError(apiKey, appId)
             Left(Forbidden(errorMsg))
-          }
-      } recover {
+          case Some(sessionUser) =>
+            Right((out: ActorRef) => {
+              val connectedClient = ConnectedClient(request.remoteAddress, deviceId, apiKey, appId, os)
+              ContentExchangeActor.props(out, connectedClient, sessionUser)
+            })
+        } recover {
         // this is the recover of a Future so this will be a Future! No need for "Future { }"
-
         case t: TimeoutException =>
           // database timeout.
           Logger.error(s"Database TimeoutException: $t")
@@ -70,7 +68,6 @@ object ApplicationWS extends Controller {
           Logger.error(s"Future failure: $e")
           val exceptionMsg = s"Database failure."
           Left(InternalServerError(exceptionMsg))
-
       }
 
     }
