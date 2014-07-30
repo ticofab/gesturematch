@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package models
+package models.messages.actors
 
-import akka.actor.ActorRef
+import models.matching.{Delivery, Matchee, RequestToMatch}
+import models.scheme.Scheme
 
 // matching stuff
 case class NewRequest(request: RequestToMatch)
 
 // client handling actor messages
-case class ConnectedClient(outActor: ActorRef, remoteAddress: String, deviceId: String, apiKey: String, appId: String, os: String)
+case class ConnectedClient(remoteAddress: String, deviceId: String, apiKey: String, appId: String, os: String)
 case class Matched(matchees: List[Matchee], groupId: String, scheme: Option[Scheme] = None)
 case class Input(input: String)
 

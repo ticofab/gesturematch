@@ -16,11 +16,11 @@
 
 package helpers.matchers.swipe
 
-import models.RequestToMatch
 import consts.{Areas, ScreenPositions, SwipeMovements}
 import consts.SwipeMovements._
 import consts.ScreenPositions.ScreenPosition
 import consts.Areas._
+import models.matching.RequestToMatch
 import play.api.Logger
 
 object PatternHelper {

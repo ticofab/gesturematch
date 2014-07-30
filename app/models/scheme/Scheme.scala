@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package models
+package models.scheme
 
-import consts.ScreenPositions.ScreenPosition
 import consts.ScreenPositions
+import consts.ScreenPositions.ScreenPosition
 import play.api.libs.json.Json
 
 class Scheme() {

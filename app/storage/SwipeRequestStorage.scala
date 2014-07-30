@@ -16,7 +16,7 @@
 
 package storage
 
-import models.RequestToMatch
+import models.matching.RequestToMatch
 
 /*
  * This object is an abstraction to access the storage.

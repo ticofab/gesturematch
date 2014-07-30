@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package models.ClientInputMessages
+package models.messages.client
 
 import play.api.libs.json.JsValue
-import consts.json.JsonGeneralLabels
+import consts.json.{JsonGeneralLabels, JsonInputLabels}
 
-case class ClientInputMessageDisconnect(reason: Option[String]) extends ClientInputMessage
+case class ClientInputMessageLeaveGroup(groupId: String, reason: Option[String]) extends ClientInputMessage
 
-object ClientInputMessageDisconnect {
-  def fromJson(jsonValue: JsValue): ClientInputMessageDisconnect = {
+object ClientInputMessageLeaveGroup {
+  def fromJson(jsonValue: JsValue): ClientInputMessageLeaveGroup = {
+    val groupId = (jsonValue \ JsonGeneralLabels.GROUP_ID).as[String]
     val reason = (jsonValue \ JsonGeneralLabels.REASON).asOpt[String]
-    ClientInputMessageDisconnect(reason)
+    ClientInputMessageLeaveGroup(groupId, reason)
   }
 }

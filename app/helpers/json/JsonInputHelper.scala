@@ -17,7 +17,7 @@
 package helpers.json
 
 import play.api.libs.json.{JsValue, Json}
-import models.ClientInputMessages._
+import models.messages.client._
 import play.api.Logger
 import consts.json.{JsonGeneralLabels, JsonInputLabels}
 import scala.Some

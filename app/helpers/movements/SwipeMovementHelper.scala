@@ -16,10 +16,10 @@
 
 package helpers.movements
 
-import consts.SwipeMovements._
-import models.{RequestToMatch, PossibleMatching}
-import consts.SwipeMovements
 import consts.Areas.Areas
+import consts.SwipeMovements
+import consts.SwipeMovements._
+
 import scala.util.Try
 
 object SwipeMovementHelper {

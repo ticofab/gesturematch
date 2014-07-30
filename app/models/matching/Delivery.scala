@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-package models
+package models.matching
 
 case class Delivery(id: String, payload: String, chunk: Option[Int], totalChunks: Option[Int])
