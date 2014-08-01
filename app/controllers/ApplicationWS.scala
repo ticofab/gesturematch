@@ -47,7 +47,7 @@ object ApplicationWS extends Controller {
 
       futureUser map {
           case None =>
-            Logger.debug(s"apiKey and appId: ($apiKey, $appId) are NOT valid.")
+            Logger.info(s"apiKey and appId: ($apiKey, $appId) are NOT valid.")
             val errorMsg = JsonErrorHelper.createInvalidCredentialsError(apiKey, appId)
             Left(Forbidden(errorMsg))
           case Some(sessionUser) =>

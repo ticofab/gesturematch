@@ -32,7 +32,7 @@ class RequestToMatch(val apiKey: String,
                      val equalityParam: Option[String],
                      val handlingActor: ActorRef) {
   override def toString: String = s"Request: apiKey $apiKey, appId $appId, " +
-    s"deviceId $deviceId, latitude $latitude, longitude $longitude, " +
+    s"deviceId $deviceId, location $latitude $longitude, " +
     s"timestamp $timestamp, areaStart $areaStart, areaEnd $areaEnd, " +
     s"movement $movement, equalityParam $equalityParam, " +
     s"handlingActor $handlingActor"

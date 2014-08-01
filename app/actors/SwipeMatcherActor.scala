@@ -50,7 +50,7 @@ class SwipeMatcherActor extends Actor with StringGenerator {
       matches match {
         case Nil =>
           // no match. add the request to the storage
-          Logger.info(getNewRequestLogging(possiblyMatchingRequests.size, "no match found. Adding request to the storage."))
+          Logger.info(getNewRequestLogging(possiblyMatchingRequests.size, "no match found."))
           RequestStorageHelper.storeNewRequest(Criteria.SWIPE, request)
 
         case x :: Nil =>

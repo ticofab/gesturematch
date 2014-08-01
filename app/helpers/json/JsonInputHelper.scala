@@ -32,7 +32,7 @@ object JsonInputHelper {
 
     inputType match {
       case Some(header) =>
-        Logger.info(s"$myName, input parsed, type $header.")
+        Logger.debug(s"$myName, input parsed, type $header.")
 
         header match {
           case JsonInputLabels.INPUT_TYPE_MATCH => ClientInputMessageMatch.fromJson(jsonValue)

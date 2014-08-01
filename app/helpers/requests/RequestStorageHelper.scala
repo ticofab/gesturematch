@@ -64,7 +64,7 @@ object RequestStorageHelper {
 
     // check on location
     val distanceInMeters: Double = haversineDistanceInKm(r1.latitude, r1.longitude, r2.latitude, r2.longitude) * 1000
-    Logger.info(s"distance in meters: $distanceInMeters")
+    Logger.debug(s"distance in meters: $distanceInMeters")
 
     val closeEnough: Boolean = distanceInMeters < MatchingDistance.closeEnoughDistance
 
@@ -100,7 +100,7 @@ object RequestStorageHelper {
   }
 
   def storeNewRequest(criteria: Criteria, newRequest: RequestToMatch) = {
-    Logger.info(s"$myName, adding new request to the $criteria storage")
+    Logger.debug(s"$myName, adding new request to the $criteria storage")
     getCorrespondingStorage(criteria).addRequest(newRequest)
   }
 
