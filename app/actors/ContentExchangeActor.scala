@@ -41,15 +41,15 @@ import scala.util.{Failure, Success, Try}
   *
   */
 class ContentExchangeActor(outActor: ActorRef, client: ConnectedClient, sessionUser: SessionUser) extends Actor {
-  lazy val getUserLog = s"[user: ${sessionUser.name}, app: ${sessionUser.appName}, dev ${client.deviceId}] "
+  lazy val getUserLog = s"[app: ${sessionUser.name}/${sessionUser.appName}, dev ${client.deviceId}] "
   def logInfo(message: String) = Logger.info(getUserLog + message)
   def logError(message: String) = Logger.error(getUserLog + message)
 
-  Logger.info(s"Client connected. ip: ${client.remoteAddress}, deviceId: ${client.deviceId}, user: ${sessionUser.name}, appName: ${sessionUser.appName}, managed by $self")
+  logInfo(s"client connected, ip: ${client.remoteAddress}, managed by $self")
 
   // initiate a timeout which will close the connection after the timeout
   Promise.timeout({
-    logInfo("timeout expired. Closing connection with client at ${client.remoteAddress}.")
+    logInfo(s"timeout expired. Closing connection with client at ${client.remoteAddress}.")
     closeClientConnection()
   }, Timeouts.maxConnectionLifetime)
 
@@ -121,7 +121,7 @@ class ContentExchangeActor(outActor: ActorRef, client: ConnectedClient, sessionU
   // *************************************
   override def postStop() = {
     // the client disconnected
-    logInfo(s"client disconnected: ${client.remoteAddress}, ${client.deviceId}")
+    logInfo(s"client disconnected: ${client.remoteAddress}")
     if (matchees.isDefined && myself.isDefined) {
       sendMessageToMatchees(MatcheeLeftGroup(myself.get, None))
     }
