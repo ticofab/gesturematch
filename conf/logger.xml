@@ -11,7 +11,7 @@
         </timeBasedFileNamingAndTriggeringPolicy>
     </rollingPolicy>
     <encoder>
-        <pattern>%d{HH:mm:ss.SSS} - [level: %level] - [msg: %message] [exc: %xException]%n</pattern>
+        <pattern>%d{HH:mm:ss.SSS} - [msg: %message] [exc: %xException]%n</pattern>
     </encoder>
   </appender>
 

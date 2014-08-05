@@ -43,6 +43,7 @@ import scala.util.{Failure, Success, Try}
 class ContentExchangeActor(outActor: ActorRef, client: ConnectedClient, sessionUser: SessionUser) extends Actor {
   lazy val getUserLog = s"[app: ${sessionUser.name}/${sessionUser.appName}, dev ${client.deviceId}] "
   def logInfo(message: String) = Logger.info(getUserLog + message)
+  def logDebug(message: String) = Logger.debug(getUserLog + message)
   def logError(message: String) = Logger.error(getUserLog + message)
 
   logInfo(s"client connected, ip: ${client.remoteAddress}, managed by $self")
@@ -137,7 +138,7 @@ class ContentExchangeActor(outActor: ActorRef, client: ConnectedClient, sessionU
     * @param input the input coming from the client through the WebSocket channel.
     */
   def onInput(input: String) = {
-    logInfo(s"client input. Length: ${input.length}")
+    logDebug(s"client input. Length: ${input.length}")
 
     // try to parse it to Json
     Try(JsonInputHelper.parseInput(input)) match {
