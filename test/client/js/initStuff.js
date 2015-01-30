@@ -50,11 +50,6 @@ function initStuff(scope) {
     scope.dev3recip = "2"
     scope.dev4recip = "3"
 
-    scope.dev1os = "android"
-    scope.dev2os = "firefox OS"
-    scope.dev3os = "ios"
-    scope.dev4os = "android"
-
     scope.dev1groupId = "none"
     scope.dev2groupId = "none"
     scope.dev3groupId = "none"

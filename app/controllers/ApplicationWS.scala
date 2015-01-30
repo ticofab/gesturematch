@@ -16,12 +16,12 @@
 
 package controllers
 
-import actors._
+import actors.{UniversalMatcherActor, PinchMatcherActor, ContentExchangeActor, SwipeMatcherActor}
 import models.messages.actors.ConnectedClient
 import play.api.Logger
-import play.api.Play.current
 import play.api.libs.concurrent.Akka
-import play.api.mvc._
+import play.api.Play.current
+import play.api.mvc.{WebSocket, Controller}
 
 object ApplicationWS extends Controller {
   Logger.info("******* Server starting. Creating ActorSystem. ********")
@@ -31,8 +31,8 @@ object ApplicationWS extends Controller {
 
   // TODO: putting actor here in objects makes it hard to test. I can use the Global object.
 
-  def openv1(os: String, deviceId: String) = WebSocket.acceptWithActor[String, String] {
-    request => out => ContentExchangeActor.props(ConnectedClient(out, request.remoteAddress, deviceId, os))
+  def openv1(deviceId: String) = WebSocket.acceptWithActor[String, String] {
+    request => out => ContentExchangeActor.props(ConnectedClient(out, request.remoteAddress, deviceId))
   }
 
 }

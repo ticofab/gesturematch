@@ -28,7 +28,7 @@ case class NewCreateRequest(request: GroupCreateMatchRequest)
 case class NewComRequest(request: GroupComMatchRequest)
 
 // client handling actor messages
-case class ConnectedClient(outActor: ActorRef, remoteAddress: String, deviceId: String, os: String)
+case class ConnectedClient(outActor: ActorRef, remoteAddress: String, deviceId: String)
 
 case class Matched(criteria: MatchCriteria, movementType: SwipeMovementType, matchees: List[Matchee], groupId: String, scheme: Option[Scheme] = None)
 

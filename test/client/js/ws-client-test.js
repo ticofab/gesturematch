@@ -133,13 +133,13 @@ myApp.controller('paramTable', ['$scope', '$log', function($scope, $log) {
         $scope.$apply();
     }
 
-    $scope.getConnectUrl = function(devId, os) {
-        return $scope.openWSUrl + "?deviceId=" + devId + "&os=" + os
+    $scope.getConnectUrl = function(devId) {
+        return $scope.openWSUrl + "?deviceId=" + devId
     }
 
     $scope.connect1 = function() {
         $scope.isDisabled1 = true;
-        myConnectUrl = $scope.getConnectUrl($scope.dev1devid, $scope.dev1os)
+        myConnectUrl = $scope.getConnectUrl($scope.dev1devid)
         myWebSocket1 = new WebSocket(myConnectUrl);
         myWebSocket1.onmessage = onM1;
 
@@ -151,7 +151,7 @@ myApp.controller('paramTable', ['$scope', '$log', function($scope, $log) {
 
     $scope.connect2 = function() {
         $scope.isDisabled2 = true;
-        myConnectUrl = $scope.getConnectUrl($scope.dev2devid, $scope.dev2os)
+        myConnectUrl = $scope.getConnectUrl($scope.dev2devid)
         myWebSocket2 = new WebSocket(myConnectUrl);
         myWebSocket2.onmessage = onM2;
         myWebSocket2.onopen = onO.bind(null, "isDisabled2");
@@ -160,7 +160,7 @@ myApp.controller('paramTable', ['$scope', '$log', function($scope, $log) {
 
     $scope.connect3 = function() {
         $scope.isDisabled3 = true;
-        myConnectUrl = $scope.getConnectUrl($scope.dev3devid, $scope.dev3os)
+        myConnectUrl = $scope.getConnectUrl($scope.dev3devid)
         myWebSocket3 = new WebSocket(myConnectUrl);
         myWebSocket3.onmessage = onM3;
         myWebSocket3.onopen = onO.bind(null, "isDisabled3");
@@ -169,7 +169,7 @@ myApp.controller('paramTable', ['$scope', '$log', function($scope, $log) {
 
     $scope.connect4 = function() {
         $scope.isDisabled4 = true;
-        myConnectUrl = $scope.getConnectUrl($scope.dev4devid, $scope.dev4os)
+        myConnectUrl = $scope.getConnectUrl($scope.dev4devid)
         myWebSocket4 = new WebSocket(myConnectUrl);
         myWebSocket4.onmessage = onM4;
         myWebSocket4.onopen = onO.bind(null, "isDisabled4");
