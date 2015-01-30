@@ -28,20 +28,30 @@ case class NewCreateRequest(request: GroupCreateMatchRequest)
 case class NewComRequest(request: GroupComMatchRequest)
 
 // client handling actor messages
-case class ConnectedClient(outActor: ActorRef, remoteAddress: String, deviceId: String)
+case class ConnectedClient(outActor: ActorRef,
+                           remoteAddress: String,
+                           deviceId: String)
 
-case class Matched(criteria: MatchCriteria, movementType: SwipeMovementType, matchees: List[Matchee], groupId: String, scheme: Option[Scheme] = None)
+case class Matched(criteria: MatchCriteria,
+                   movementType: SwipeMovementType,
+                   matchees: List[Matchee],
+                   groupId: String,
+                   scheme: Option[Scheme] = None)
 
-case class MatchedInGroup(criteria: MatchCriteria, movementType: SwipeMovementType, groupMatchees: List[Int])
+case class MatchedInGroup(criteria: MatchCriteria,
+                          movementType: SwipeMovementType,
+                          groupMatchees: List[Int])
 
 case class Input(input: String)
 
 // inter actor messages
 sealed trait MatcheeMessage
 
-case class MatcheeLeftGroup(matchee: Matchee, reason: Option[String] = None) extends MatcheeMessage
+case class MatcheeLeftGroup(matchee: Matchee,
+                            reason: Option[String] = None) extends MatcheeMessage
 
-case class MatcheeDelivers(matchee: Matchee, delivery: Delivery) extends MatcheeMessage
+case class MatcheeDelivers(matchee: Matchee,
+                           delivery: Delivery) extends MatcheeMessage
 
 
 
