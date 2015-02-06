@@ -1,9 +1,9 @@
 # GestureMatch
 GestureMatch is a backend service that enables a new form of communication between mobile devices, that is extending hand gestures from one screen across into another. Imagine a swipe or pinch across two screens.
 
-![](https://github.com/ticofab/gesturematch/blob/master/docs/pinch.png)
+![](https://github.com/ticofab/gesturematch/blob/master-open/public/docs/swipe.png)
 
-![](https://github.com/ticofab/gesturematch/blob/master/docs/swipe)
+![](https://github.com/ticofab/gesturematch/blob/master-open/public/docs/pinch.png)
 
 We built a startup on top of this technology, called CloudMatch - 
 <http://cloudmatch.io>. The idea was to provide an SDK to integrate such functionality in mobile apps, and bill per usage. We met a lot of enthusiasm, but as it turned out, generate revenues was beyond our reach. 
