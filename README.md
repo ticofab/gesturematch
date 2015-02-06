@@ -10,8 +10,14 @@ We built a startup on top of this technology, called CloudMatch -
 
 The SDK and demos are available at the CloudMatch github account.
 
-This project makes intense use of WebSockets.
+Applications that use GestureMatch are:
 
+- [Perfect Earth Collector](https://play.google.com/store/apps/details?id=io.cloudmatch.perfectearth.cards): trade cards pinching across screens.
+- [CloudMatch DEMO](https://play.google.com/store/apps/details?id=io.cloudmatch.demo&hl=en): shows the possibilities enabled by this technology.
+
+This project makes use of WebSockets.
+
+Please check the [GestureMatch wiki](https://github.com/ticofab/gesturematch/wiki) to learn how to build and use this project.
 
 ## LICENSE
 
