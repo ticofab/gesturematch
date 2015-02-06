@@ -1,5 +1,17 @@
 # GestureMatch
-Public repository for the GestureMatch project.
+GestureMatch is a backend service that enables a new form of communication between mobile devices, that is extending hand gestures from one screen across into another. Imagine a swipe or pinch across two screens.
+
+![](https://github.com/ticofab/gesturematch/blob/master/docs/pinch.png)
+
+![](https://github.com/ticofab/gesturematch/blob/master/docs/swipe)
+
+We built a startup on top of this technology, called CloudMatch - 
+<http://cloudmatch.io>. The idea was to provide an SDK to integrate such functionality in mobile apps, and bill per usage. We met a lot of enthusiasm, but as it turned out, generate revenues was beyond our reach. 
+
+The SDK and demos are available at the CloudMatch github account.
+
+This project makes intense use of WebSockets.
+
 
 ## LICENSE
 
