@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 Fabio Tiriticco, Fabway
+ * Copyright 2014-2016 Fabio Tiriticco, Fabway
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import helpers.requests.RequestStorageHelper
 import models.matching.base.MatchRequest
 import models.messages.actors.{NewComRequest, NewCreateRequest}
 import play.api.Logger
-import traits.StringGenerator
 
 class UniversalMatcherActor extends Actor {
 

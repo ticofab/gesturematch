@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 Fabio Tiriticco, Fabway
+ * Copyright 2014-2016 Fabio Tiriticco, Fabway
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package consts
 
 /**
- * This object provides a set of relative positions in a composition of devices.
- */
+  * This object provides a set of relative positions in a composition of devices.
+  */
 object ScreenPositions extends Enumeration {
   type ScreenPosition = Value
 
@@ -26,7 +26,7 @@ object ScreenPositions extends Enumeration {
   val Unknown = Value("unknown")
   val Undetermined = Value("undetermined")
   val Start = Value("start")
-  val Left  = Value("left")
+  val Left = Value("left")
   val Right = Value("right")
   val Top = Value("top")
   val Bottom = Value("bottom")

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 Fabio Tiriticco, Fabway
+ * Copyright 2014-2016 Fabio Tiriticco, Fabway
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,15 +24,14 @@ import play.api.Logger
 
 object SwipeMatchingHelper {
   /**
-   * Given a list of requests, it identifies the longest pattern that matches them all.
-   *
-   * @param matchingRequests
-   * All the requests that we've been able to match based on other criteria.
-   *
-   * @return
-   * A pair (List[MatchRequest], Boolean) where the first is the longest closed sequence possible
-   * given all the requests, and the second indicates whether it is unique or not.
-   */
+    * Given a list of requests, it identifies the longest pattern that matches them all.
+    *
+    * @param matchingRequests
+    * All the requests that we've been able to match based on other criteria.
+    * @return
+    * A pair (List[MatchRequest], Boolean) where the first is the longest closed sequence possible
+    * given all the requests, and the second indicates whether it is unique or not.
+    */
   def getMatchedPattern(matchingRequests: List[MatchRequest]): (List[MatchRequest], Boolean) = {
 
     type Path = List[MatchRequest]

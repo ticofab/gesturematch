@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 Fabio Tiriticco, Fabway
+ * Copyright 2014-2016 Fabio Tiriticco, Fabway
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@ package consts
 import scala.concurrent.duration.DurationInt
 
 object Timeouts {
-  val maxConnectionLifetime = 750.seconds // 15 minutes
+  val maxConnectionLifetime = 750.seconds
+  // 15 minutes
   val maxOldestRequestInterval = 3.seconds
   val maxOldestRequestIntervalMillis = maxOldestRequestInterval.toMillis
 }

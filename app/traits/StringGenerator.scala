@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 Fabio Tiriticco, Fabway
+ * Copyright 2014-2016 Fabio Tiriticco, Fabway
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

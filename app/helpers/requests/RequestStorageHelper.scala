@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 Fabio Tiriticco, Fabway
+ * Copyright 2014-2016 Fabio Tiriticco, Fabway
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,20 +44,20 @@ object RequestStorageHelper {
     rNew.groupId.isDefined && rOld.groupId.isDefined && rNew.groupId.getOrElse("") == rOld.groupId.getOrElse("")
 
   /**
-   * This method provides the mandatory checks between two requests. Only put here the checks that are mandatory
-   * for each request to be matched.
-   *
-   * @param r1
-   * The first of the two requests to possibly match.
-   * @param r2
-   * The second of the two requests to possibly match.
-   * @return
-   * True or false whether the two requests might match.
-   */
+    * This method provides the mandatory checks between two requests. Only put here the checks that are mandatory
+    * for each request to be matched.
+    *
+    * @param r1
+    * The first of the two requests to possibly match.
+    * @param r2
+    * The second of the two requests to possibly match.
+    * @return
+    * True or false whether the two requests might match.
+    */
   private def compatibilityFilter(r1: MatchRequest, r2: MatchRequest) = {
     // check if equality parameters are the same
-      if (r1.equalityParam.isDefined && r2.equalityParam.isDefined) r1.equalityParam.get == r2.equalityParam.get
-      else true
+    if (r1.equalityParam.isDefined && r2.equalityParam.isDefined) r1.equalityParam.get == r2.equalityParam.get
+    else true
   }
 
   private def locationCompatibilityFilter(r1: GroupCreateMatchRequest, r2: GroupCreateMatchRequest) = {

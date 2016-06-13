@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 Fabio Tiriticco, Fabway
+ * Copyright 2014-2016 Fabio Tiriticco, Fabway
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,12 @@ package consts
 import scala.util.Try
 
 object MatchPurpose extends Enumeration {
-    type MatchPurpose = Value
-    val INVALID = Value("invalid")
-    val GROUP_CREATION = Value("groupCreation")
-    val GROUP_COMMUNICATION = Value("groupCommunication")
+  type MatchPurpose = Value
+  val INVALID = Value("invalid")
+  val GROUP_CREATION = Value("groupCreation")
+  val GROUP_COMMUNICATION = Value("groupCommunication")
 
-    def getMatchPurposeFromString(purpose: String) = Try(MatchCriteria.withName(purpose)) getOrElse INVALID
+  def getMatchPurposeFromString(purpose: String) = Try(MatchCriteria.withName(purpose)) getOrElse INVALID
 
-    def getValidOnes = this.values.filter(_ != INVALID)
+  def getValidOnes = this.values.filter(_ != INVALID)
 }

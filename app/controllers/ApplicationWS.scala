@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 Fabio Tiriticco, Fabway
+ * Copyright 2014-2016 Fabio Tiriticco, Fabway
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 package controllers
 
-import actors.{UniversalMatcherActor, PinchMatcherActor, ContentExchangeActor, SwipeMatcherActor}
+import actors.{ContentExchangeActor, PinchMatcherActor, SwipeMatcherActor, UniversalMatcherActor}
 import models.messages.actors.ConnectedClient
 import play.api.Logger
-import play.api.libs.concurrent.Akka
 import play.api.Play.current
-import play.api.mvc.{WebSocket, Controller}
+import play.api.libs.concurrent.Akka
+import play.api.mvc.{Controller, WebSocket}
 
 object ApplicationWS extends Controller {
   Logger.info("******* Server starting. Creating ActorSystem. ********")

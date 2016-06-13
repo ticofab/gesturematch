@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 Fabio Tiriticco, Fabway
+ * Copyright 2014-2016 Fabio Tiriticco, Fabway
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -213,10 +213,10 @@ class ContentExchangeActor(client: ConnectedClient) extends Actor {
           val matchedFuture = matchRequest match {
             case comR: GroupComMatchRequest =>
               needsToBeMatched = Some(JsonInputLabels.INPUT_TYPE_MATCH_IN_GROUP)
-              (matcher ? NewComRequest(comR))(Timeouts.maxOldestRequestInterval)
+              (matcher ? NewComRequest(comR)) (Timeouts.maxOldestRequestInterval)
             case creR: GroupCreateMatchRequest =>
               needsToBeMatched = Some(JsonInputLabels.INPUT_TYPE_MATCH_CREATE)
-              (matcher ? NewCreateRequest(creR))(Timeouts.maxOldestRequestInterval)
+              (matcher ? NewCreateRequest(creR)) (Timeouts.maxOldestRequestInterval)
           }
           matchedFuture recover {
             // basically this timeout will always trigger, but maybe we've been matched in the meantime.

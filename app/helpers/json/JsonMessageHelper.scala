@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 Fabio Tiriticco, Fabway
+ * Copyright 2014-2016 Fabio Tiriticco, Fabway
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package helpers.json
 
+import consts.json.{JsonGeneralLabels, JsonInputLabels, JsonMessageLabels}
 import models.matching.Delivery
-import play.api.libs.json.{JsString, JsNumber, Json}
-import consts.json.{JsonInputLabels, JsonGeneralLabels, JsonMessageLabels}
+import play.api.libs.json.{JsNumber, JsString, Json}
 
 object JsonMessageHelper {
 
@@ -32,9 +32,9 @@ object JsonMessageHelper {
       JsonGeneralLabels.PAYLOAD -> delivery.payload
     )
 
-    if (delivery.tag.isDefined) json = json + (JsonInputLabels.INPUT_DELIVERY_TAG, JsString(delivery.tag.get))
-    if (delivery.chunk.isDefined) json = json + (JsonInputLabels.INPUT_CHUNK_NUMBER, JsNumber(delivery.chunk.get))
-    if (delivery.totalChunks.isDefined) json = json + (JsonInputLabels.INPUT_TOTAL_CHUNKS, JsNumber(delivery.totalChunks.get))
+    if (delivery.tag.isDefined) json = json +(JsonInputLabels.INPUT_DELIVERY_TAG, JsString(delivery.tag.get))
+    if (delivery.chunk.isDefined) json = json +(JsonInputLabels.INPUT_CHUNK_NUMBER, JsNumber(delivery.chunk.get))
+    if (delivery.totalChunks.isDefined) json = json +(JsonInputLabels.INPUT_TOTAL_CHUNKS, JsNumber(delivery.totalChunks.get))
 
     Json.stringify(json)
   }

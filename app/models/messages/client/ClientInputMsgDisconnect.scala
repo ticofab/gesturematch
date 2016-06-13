@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 Fabio Tiriticco, Fabway
+ * Copyright 2014-2016 Fabio Tiriticco, Fabway
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package models.messages.client
 
+import consts.json.JsonGeneralLabels
 import models.messages.client.base.ClientInputMsg
 import play.api.libs.json.JsValue
-import consts.json.JsonGeneralLabels
 
 case class ClientInputMsgDisconnect(reason: Option[String]) extends ClientInputMsg
 
