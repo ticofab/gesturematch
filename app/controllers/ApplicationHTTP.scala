@@ -19,7 +19,7 @@ package controllers
 import play.api.Logger
 import play.api.mvc.{Action, Controller}
 
-object ApplicationHTTP extends Controller {
+class ApplicationHTTP extends Controller {
 
   // simple alive response
   def alive() = Action {

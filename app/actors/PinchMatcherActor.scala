@@ -16,6 +16,8 @@
 
 package actors
 
+import javax.inject.Singleton
+
 import akka.actor.{Actor, Props}
 import consts.MatchCriteria.MatchCriteria
 import consts.{MatchCriteria, SwipeMovementType}
@@ -30,6 +32,7 @@ import models.scheme.Scheme
 import play.api.Logger
 import traits.StringGenerator
 
+@Singleton
 class PinchMatcherActor extends Actor {
 
   def receive: Actor.Receive = {

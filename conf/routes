@@ -15,7 +15,7 @@
 ##
 
 # Http
-GET     /             controllers.ApplicationHTTP.alive
+GET        /               @controllers.ApplicationHTTP.alive
 
 # Websocket
-GET     /v1/open    controllers.ApplicationWS.openv1(deviceId: String)
+GET        /v1/open        @controllers.ApplicationWS.openv1(deviceId: String)

@@ -16,6 +16,8 @@
 
 package actors
 
+import javax.inject.Singleton
+
 import akka.actor.{Actor, Props}
 import consts.MatchCriteria
 import consts.MatchCriteria.MatchCriteria
@@ -27,6 +29,7 @@ import models.matching.base.MatchRequest
 import models.messages.actors.{NewComRequest, NewCreateRequest}
 import play.api.Logger
 
+@Singleton
 class UniversalMatcherActor extends Actor {
 
   def receive: Actor.Receive = {

@@ -17,12 +17,12 @@
 package actors
 
 import java.util.concurrent.TimeoutException
+import javax.inject.Inject
 
 import akka.actor.{Actor, ActorRef, PoisonPill, Props}
 import akka.pattern.ask
 import consts.json.{JsonInputLabels, JsonResponseLabels}
 import consts.{Areas, MatchCriteria, Timeouts}
-import controllers.ApplicationWS
 import helpers.json.{JsonInputHelper, JsonMessageHelper, JsonResponseHelper}
 import helpers.movements.SwipeMovementHelper
 import helpers.requests.RequestValidityHelper
@@ -40,7 +40,11 @@ import scala.util.{Failure, Success, Try}
 /** Will manage a client connection and take the appropriate action upon receiving a client input.
   *
   */
-class ContentExchangeActor(client: ConnectedClient) extends Actor {
+class ContentExchangeActor @Inject()(client: ConnectedClient,
+                                     swipeMatcherActor: ActorRef,
+                                     pinchMatcherActor: ActorRef,
+                                     universalMatcherActor: ActorRef) extends Actor {
+
   lazy val getUserLog = s"[dev ${client.deviceId}] "
 
   def logInfo(message: String) = Logger.info(getUserLog + message)
@@ -232,9 +236,9 @@ class ContentExchangeActor(client: ConnectedClient) extends Actor {
         val criteria = MatchCriteria.getMatchCriteriaFromString(matchInput.criteria)
         criteria match {
           // we only get here if the criteria is valid
-          case MatchCriteria.SWIPE => futureMatched(ApplicationWS.swipeMatchingActor)
-          case MatchCriteria.PINCH => futureMatched(ApplicationWS.pinchMatchingActor)
-          case MatchCriteria.UNIVERSAL => futureMatched(ApplicationWS.universalMatchingActor)
+          case MatchCriteria.SWIPE => futureMatched(swipeMatcherActor)
+          case MatchCriteria.PINCH => futureMatched(pinchMatcherActor)
+          case MatchCriteria.UNIVERSAL => futureMatched(universalMatcherActor)
         }
 
     }
@@ -351,5 +355,8 @@ class ContentExchangeActor(client: ConnectedClient) extends Actor {
 }
 
 object ContentExchangeActor {
-  def props(client: ConnectedClient) = Props(new ContentExchangeActor(client))
+  def props(client: ConnectedClient,
+            swipeMatcherActor: ActorRef,
+            pinchMatcherActor: ActorRef,
+            universalMatcherActor: ActorRef) = Props(new ContentExchangeActor(client, swipeMatcherActor, pinchMatcherActor, universalMatcherActor))
 }

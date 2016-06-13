@@ -16,23 +16,29 @@
 
 package controllers
 
-import actors.{ContentExchangeActor, PinchMatcherActor, SwipeMatcherActor, UniversalMatcherActor}
+import javax.inject.Inject
+
+import actors.ContentExchangeActor
+import akka.actor.ActorRef
+import com.google.inject.name.Named
+import injection.InjectionModule
 import models.messages.actors.ConnectedClient
 import play.api.Logger
 import play.api.Play.current
-import play.api.libs.concurrent.Akka
 import play.api.mvc.{Controller, WebSocket}
 
-object ApplicationWS extends Controller {
-  Logger.info("******* Server starting. Creating ActorSystem. ********")
-  val swipeMatchingActor = Akka.system.actorOf(SwipeMatcherActor.props)
-  val pinchMatchingActor = Akka.system.actorOf(PinchMatcherActor.props)
-  val universalMatchingActor = Akka.system.actorOf(UniversalMatcherActor.props)
+class ApplicationWS @Inject()(@Named(InjectionModule.PINCH_MATCHING_ACTOR_NAME) pinchMatcherActor: ActorRef,
+                              @Named(InjectionModule.SWIPE_MATCHING_ACTOR_NAME) swipeMatcherActor: ActorRef,
+                              @Named(InjectionModule.UNIVERSAL_MATCHING_ACTOR_NAME) universalMatcherActor: ActorRef) extends Controller {
 
-  // TODO: putting actor here in objects makes it hard to test. I can use the Global object.
+  Logger.info("******* Server starting. Creating ActorSystem. ********")
 
   def openv1(deviceId: String) = WebSocket.acceptWithActor[String, String] {
-    request => out => ContentExchangeActor.props(ConnectedClient(out, request.remoteAddress, deviceId))
+    request => out => ContentExchangeActor.props(
+      ConnectedClient(out, request.remoteAddress, deviceId),
+      swipeMatcherActor,
+      pinchMatcherActor,
+      universalMatcherActor)
   }
 
 }
