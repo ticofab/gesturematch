@@ -1,3 +1,7 @@
+> **NOTE**: this project is long discontinued. It was my first big thing using Scala and Akka and (of course) when I look at it now I feel deeply embarassed of what I wrote all those years ago!
+
+***
+
 # GestureMatch
 GestureMatch is a backend service that enables a new form of communication between mobile devices, that is extending hand gestures from one screen across into another. Imagine a swipe or pinch across two screens.
 
