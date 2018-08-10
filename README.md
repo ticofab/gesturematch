@@ -1,4 +1,4 @@
-> **NOTE**: this project is long discontinued. It was my first big thing using Scala and Akka and (of course) when I look at it now I feel deeply embarassed of what I wrote all those years ago!
+> **NOTE**: this project is long discontinued. It was my first big thing using Scala and Akka and (of course) when I look at it now I find it quite embarassing! As it should be, I guess :)
 
 ***
 
